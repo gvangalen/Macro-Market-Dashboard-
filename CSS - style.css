@@ -45,4 +45,48 @@ th, td {
     border: 1px solid black;
     padding: 10px;
     text-align: center;
+
+    /* Macro Indicatoren Tabel */
+#macroTable {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 20px;
+    background: white;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+#macroTable th, #macroTable td {
+    border: 1px solid #ddd;
+    padding: 12px;
+    text-align: center;
+}
+
+#macroTable th {
+    background-color: #f4f4f4;
+    font-weight: bold;
+}
+
+#macroTable td {
+    font-size: 16px;
+}
+
+/* Positieve en negatieve trends */
+.green {
+    color: #4CAF50; /* Groen */
+    font-weight: bold;
+}
+
+.red {
+    color: #E53935; /* Rood */
+    font-weight: bold;
+}
+
+/* Responsief design voor kleinere schermen */
+@media (max-width: 768px) {
+    #macroTable th, #macroTable td {
+        padding: 8px;
+        font-size: 14px;
+    }
+}
 }
