@@ -62,4 +62,20 @@ async function fetchMacroData() {
 setInterval(fetchMacroData, 60000);
 window.onload = fetchMacroData;
 
-});
+}
+                          // Functie om trends visueel te maken
+function updateTrendColor(elementId, value) {
+    let element = document.getElementById(elementId);
+    if (value > 0) {
+        element.classList.add("green");
+        element.classList.remove("red");
+    } else {
+        element.classList.add("red");
+        element.classList.remove("green");
+    }
+}
+
+// Voorbeeld bij US10Y rente
+document.getElementById("us10y").innerText = us10yData.value || 'N/A';
+updateTrendColor("us10y", us10yData.value);
+                         );
