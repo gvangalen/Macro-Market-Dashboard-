@@ -56,6 +56,91 @@ async function fetchMacroData() {
     } catch (error) {
         console.error("Error fetching macro data:", error);
     }
+    document.addEventListener("DOMContentLoaded", function () {
+    // Controleer of JustGage correct is geladen
+    if (typeof JustGage === "undefined") {
+        console.error("JustGage is niet correct geladen!");
+        return;
+    }
+
+    // Initialiseer de meters
+    let macroGauge = new JustGage({
+        id: "macroGauge",
+        value: 0,
+        min: 0,
+        max: 100,
+        title: "Macro Trend",
+        gaugeWidthScale: 0.6,
+        levelColors: ["#777"],
+    });
+
+    let technicalGauge = new JustGage({
+        id: "technicalGauge",
+        value: 0,
+        min: 0,
+        max: 100,
+        title: "Technische Analyse",
+        gaugeWidthScale: 0.6,
+        levelColors: ["#4CAF50"],
+    });
+
+    let setupGauge = new JustGage({
+        id: "setupGauge",
+        value: 0,
+        min: 0,
+        max: 100,
+        title: "Huidige Setup",
+        gaugeWidthScale: 0.6,
+        levelColors: ["#FFA500"],
+    });
+
+    // 🔹 Functie om BTC Dominantie te laden
+    async function fetchBTCDominance() {
+        try {
+            let response = await fetch("https://api.coingecko.com/api/v3/global");
+            let data = await response.json();
+            let btcDominance = data.data.market_cap_percentage.btc;
+            macroGauge.refresh(btcDominance);
+        } catch (error) {
+            console.error("Fout bij ophalen BTC Dominantie:", error);
+        }
+    }
+
+    // 🔹 Functie om Fear & Greed Index te laden
+    async function fetchFearGreedIndex() {
+        try {
+            let response = await fetch("https://api.alternative.me/fng/?limit=1&format=json");
+            let data = await response.json();
+            let fearGreed = parseInt(data.data[0].value);
+            setupGauge.refresh(fearGreed);
+        } catch (error) {
+            console.error("Fout bij ophalen Fear & Greed Index:", error);
+        }
+    }
+
+    // 🔹 Functie om RSI van Bitcoin te laden
+    async function fetchRSIBitcoin() {
+        try {
+            let response = await fetch("https://api.binance.com/api/v3/ticker/24hr?symbol=BTCUSDT");
+            let data = await response.json();
+            let priceChangePercent = Math.abs(parseFloat(data.priceChangePercent));  // Simpele proxy voor RSI
+            technicalGauge.refresh(priceChangePercent);
+        } catch (error) {
+            console.error("Fout bij ophalen RSI Bitcoin:", error);
+        }
+    }
+
+    // 🔄 Update elke minuut
+    function updateAllGauges() {
+        fetchBTCDominance();
+        fetchFearGreedIndex();
+        fetchRSIBitcoin();
+    }
+
+    // Eerste keer laden
+    updateAllGauges();
+    setInterval(updateAllGauges, 60000);
+});
 }
 
 // Refresh data every 60 seconds
