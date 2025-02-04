@@ -1,3 +1,4 @@
+/* Algemene instellingen */
 body {
     font-family: Arial, sans-serif;
     margin: 20px;
@@ -5,13 +6,16 @@ body {
     text-align: center;
 }
 
+/* Container voor de drie meters */
 .dashboard-container {
     display: flex;
     justify-content: center;
     gap: 30px;
     margin-bottom: 30px;
+    flex-wrap: wrap; /* Zorgt ervoor dat meters op kleine schermen op een nieuwe rij komen */
 }
 
+/* Stijl voor de meters */
 .gauge-container {
     width: 250px;
     height: 250px;
@@ -24,6 +28,7 @@ body {
     justify-content: center;
 }
 
+/* Tabel container */
 .table-container {
     background: white;
     padding: 20px;
@@ -36,6 +41,7 @@ body {
     overflow-x: auto;
 }
 
+/* Tabellen styling */
 table {
     width: 100%;
     border-collapse: collapse;
@@ -45,8 +51,9 @@ th, td {
     border: 1px solid black;
     padding: 10px;
     text-align: center;
+}
 
-    /* Macro Indicatoren Tabel */
+/* Macro Indicatoren Tabel */
 #macroTable {
     width: 100%;
     border-collapse: collapse;
@@ -84,9 +91,18 @@ th, td {
 
 /* Responsief design voor kleinere schermen */
 @media (max-width: 768px) {
+    .dashboard-container {
+        flex-direction: column;
+        align-items: center;
+    }
+
+    .gauge-container {
+        width: 90%;
+        height: auto;
+    }
+
     #macroTable th, #macroTable td {
         padding: 8px;
         font-size: 14px;
     }
-}
 }
