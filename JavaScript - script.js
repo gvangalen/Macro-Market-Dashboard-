@@ -22,4 +22,44 @@ document.addEventListener("DOMContentLoaded", function() {
 
     fetchBitcoinData();
     setInterval(fetchBitcoinData, 60000); // Elke minuut verversen
+
+    // macroData.js
+
+async function fetchMacroData() {
+    try {
+        // API Calls
+        let dxyResponse = await fetch('https://www.alphavantage.co/query?function=DX.FX&apikey=YOUR_API_KEY');
+        let us10yResponse = await fetch('https://www.alphavantage.co/query?function=US10Y&apikey=YOUR_API_KEY');
+        let us2yResponse = await fetch('https://www.alphavantage.co/query?function=US2Y&apikey=YOUR_API_KEY');
+        let etfResponse = await fetch('https://fintel.io/api/btc-etf-inflows');
+        let fearGreedResponse = await fetch('https://api.alternative.me/fng/');
+        let usdtResponse = await fetch('https://api.coingecko.com/api/v3/global');
+        let googleTrendsResponse = await fetch('https://serpapi.com/search.json?q=Bitcoin+trends&api_key=YOUR_API_KEY');
+        
+        // JSON Parsing
+        let dxyData = await dxyResponse.json();
+        let us10yData = await us10yResponse.json();
+        let us2yData = await us2yResponse.json();
+        let etfData = await etfResponse.json();
+        let fearGreedData = await fearGreedResponse.json();
+        let usdtData = await usdtResponse.json();
+        let googleTrendsData = await googleTrendsResponse.json();
+
+        // Update HTML Elements
+        document.getElementById("dxyIndex").innerText = dxyData.value || 'N/A';
+        document.getElementById("us10y").innerText = us10yData.value || 'N/A';
+        document.getElementById("us2y").innerText = us2yData.value || 'N/A';
+        document.getElementById("etfFlows").innerText = etfData.inflows || 'N/A';
+        document.getElementById("fearGreed").innerText = fearGreedData.data[0].value || 'N/A';
+        document.getElementById("usdtDominance").innerText = usdtData.data.market_cap_percentage.usdt.toFixed(2) + "%" || 'N/A';
+        document.getElementById("googleTrends").innerText = googleTrendsData.searches || 'N/A';
+    } catch (error) {
+        console.error("Error fetching macro data:", error);
+    }
+}
+
+// Refresh data every 60 seconds
+setInterval(fetchMacroData, 60000);
+window.onload = fetchMacroData;
+
 });
