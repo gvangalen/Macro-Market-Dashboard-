@@ -26,6 +26,12 @@ body {
     display: flex;
     align-items: center;
     justify-content: center;
+    transition: transform 0.2s ease-in-out;
+}
+
+/* Hover-effect voor meters */
+.gauge-container:hover {
+    transform: scale(1.05);
 }
 
 /* Tabel container */
@@ -38,7 +44,7 @@ body {
     width: 90%;
     margin-left: auto;
     margin-right: auto;
-    overflow-x: auto;
+    overflow-x: auto; /* Voorkomt dat tabellen breken op kleine schermen */
 }
 
 /* Tabellen styling */
@@ -53,7 +59,7 @@ th, td {
     text-align: center;
 }
 
-/* Macro Indicatoren Tabel */
+/* Stijl voor Macro Indicatoren Tabel */
 #macroTable {
     width: 100%;
     border-collapse: collapse;
@@ -63,6 +69,7 @@ th, td {
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
 }
 
+/* Specifieke stijlen voor macro-informatie */
 #macroTable th, #macroTable td {
     border: 1px solid #ddd;
     padding: 12px;
@@ -76,6 +83,16 @@ th, td {
 
 #macroTable td {
     font-size: 16px;
+}
+
+/* Rijen laten afwisselen van kleur voor betere leesbaarheid */
+#macroTable tr:nth-child(even) {
+    background-color: #f9f9f9;
+}
+
+/* Hover-effect op tabellen voor betere leesbaarheid */
+table tr:hover {
+    background-color: #f1f1f1;
 }
 
 /* Positieve en negatieve trends */
@@ -104,5 +121,9 @@ th, td {
     #macroTable th, #macroTable td {
         padding: 8px;
         font-size: 14px;
+    }
+
+    table {
+        font-size: 12px;
     }
 }
