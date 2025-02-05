@@ -4,10 +4,9 @@ document.addEventListener("DOMContentLoaded", function () {
         return;
     }
 
-    // 📊 Initialiseer de gauges (meters)
     let macroGauge = new JustGage({
         id: "macroGauge",
-        value: 0,
+        value: 50,
         min: 0,
         max: 100,
         title: "Macro Trend",
@@ -17,7 +16,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
     let technicalGauge = new JustGage({
         id: "technicalGauge",
-        value: 0,
+        value: 70,
         min: 0,
         max: 100,
         title: "Technische Analyse",
@@ -27,13 +26,21 @@ document.addEventListener("DOMContentLoaded", function () {
 
     let setupGauge = new JustGage({
         id: "setupGauge",
-        value: 0,
+        value: 30,
         min: 0,
         max: 100,
         title: "Huidige Setup",
         gaugeWidthScale: 0.6,
         levelColors: ["#FF5733", "#FFC300", "#4CAF50"],
     });
+
+    // Simuleer updates
+    setTimeout(() => {
+        macroGauge.refresh(65);
+        technicalGauge.refresh(85);
+        setupGauge.refresh(40);
+    }, 2000);
+});
 
     // 🔄 Functie om BTC Dominantie te laden
     async function fetchBTCDominance() {
