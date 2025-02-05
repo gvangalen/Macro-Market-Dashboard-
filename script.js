@@ -1,15 +1,16 @@
 document.addEventListener("DOMContentLoaded", function () {
-    console.log("✅ DOM geladen, initialiseren...");
+    console.log("📌 DOM geladen!");
 
-    if (typeof JustGage === "undefined") {
-        console.error("❌ JustGage is niet correct geladen! Controleer de scripts in index.html.");
+    if (typeof JustGage === "undefined" || typeof Raphael === "undefined") {
+        console.error("❌ JustGage of Raphael is niet correct geladen!");
         return;
     }
 
-    // 🎯 Initialiseer de meters
+    console.log("✅ JustGage en Raphael geladen!");
+
     let macroGauge = new JustGage({
         id: "macroGauge",
-        value: 0,
+        value: 50,
         min: 0,
         max: 100,
         title: "Macro Trend",
@@ -19,7 +20,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
     let technicalGauge = new JustGage({
         id: "technicalGauge",
-        value: 0,
+        value: 70,
         min: 0,
         max: 100,
         title: "Technische Analyse",
@@ -29,7 +30,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
     let setupGauge = new JustGage({
         id: "setupGauge",
-        value: 0,
+        value: 30,
         min: 0,
         max: 100,
         title: "Huidige Setup",
@@ -37,8 +38,15 @@ document.addEventListener("DOMContentLoaded", function () {
         levelColors: ["#FF5733", "#FFC300", "#4CAF50"],
     });
 
-    console.log("✅ JustGage meters zijn geladen.");
+    console.log("📊 Meters succesvol geïnitialiseerd!");
 
+    setTimeout(() => {
+        macroGauge.refresh(65);
+        technicalGauge.refresh(85);
+        setupGauge.refresh(40);
+        console.log("🔄 Meters geüpdatet met nieuwe waarden!");
+    }, 2000);
+});
     // 🔄 **Laad live data**
     async function fetchBTCDominance() {
         try {
