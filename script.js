@@ -10,6 +10,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
     console.log("✅ JustGage en Raphael geladen!");
 
+    // ✅ Maak de meters aan
     macroGauge = new JustGage({
         id: "macroGauge",
         value: 50,
@@ -41,6 +42,10 @@ document.addEventListener("DOMContentLoaded", function () {
     });
 
     console.log("📊 Meters succesvol geïnitialiseerd!");
+
+    // ✅ Start het updaten
+    updateAllGauges();
+    setInterval(updateAllGauges, 60000);  // Elke minuut updaten
 });
 
 // 🔄 **Live data ophalen en meters updaten**
@@ -49,8 +54,10 @@ async function fetchBTCDominance() {
         let response = await fetch("https://api.coingecko.com/api/v3/global");
         let data = await response.json();
         let btcDominance = parseFloat(data.data.market_cap_percentage.btc.toFixed(2));
-        macroGauge.refresh(btcDominance);
         console.log("📊 BTC Dominantie:", btcDominance);
+        
+        // ✅ Check of macroGauge bestaat voordat we refresh doen
+        if (macroGauge) macroGauge.refresh(btcDominance);
     } catch (error) {
         console.error("❌ Fout bij ophalen BTC Dominantie:", error);
     }
@@ -61,8 +68,9 @@ async function fetchFearGreedIndex() {
         let response = await fetch("https://api.alternative.me/fng/");
         let data = await response.json();
         let fearGreed = parseInt(data.data[0].value);
-        setupGauge.refresh(fearGreed);
         console.log("📊 Fear & Greed Index:", fearGreed);
+
+        if (setupGauge) setupGauge.refresh(fearGreed);
     } catch (error) {
         console.error("❌ Fout bij ophalen Fear & Greed Index:", error);
     }
@@ -73,8 +81,9 @@ async function fetchRSIBitcoin() {
         let response = await fetch("https://api.binance.com/api/v3/ticker/24hr?symbol=BTCUSDT");
         let data = await response.json();
         let priceChangePercent = Math.abs(parseFloat(data.priceChangePercent));  // Simpele proxy voor RSI
-        technicalGauge.refresh(priceChangePercent);
         console.log("📊 RSI Bitcoin (proxy via prijsverandering):", priceChangePercent);
+
+        if (technicalGauge) technicalGauge.refresh(priceChangePercent);
     } catch (error) {
         console.error("❌ Fout bij ophalen RSI Bitcoin:", error);
     }
@@ -92,5 +101,4 @@ function updateAllGauges() {
 window.onload = function() {
     console.log("✅ Window onload functie geactiveerd!");
     updateAllGauges();  // Start met ophalen van live data
-    setInterval(updateAllGauges, 60000);  // Elke minuut updaten
 };
