@@ -115,6 +115,7 @@ function updateAllGauges() {
     fetchBTCDominance();
     fetchFearGreedIndex();
     fetchRSIBitcoin();
+    fetchBitcoinData();
 }
 
 window.onload = function() {
