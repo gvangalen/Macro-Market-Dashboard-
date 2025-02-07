@@ -117,8 +117,10 @@ function updateAllGauges() {
     fetchRSIBitcoin();
 }
 
-// 🚀 **Window.onload om alles te starten als de pagina is geladen**
 window.onload = function() {
     console.log("✅ Window onload functie geactiveerd!");
-    updateAllGauges();  // Start met ophalen van live data
+    fetchBitcoinData();  // Voeg deze regel toe
+    updateAllGauges();
+    setInterval(updateAllGauges, 60000);
+    setInterval(fetchBitcoinData, 60000); // Elke minuut Bitcoin data verversen
 };
