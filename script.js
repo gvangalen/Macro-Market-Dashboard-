@@ -89,6 +89,21 @@ async function fetchRSIBitcoin() {
     }
 }
 
+async function fetchBitcoinData() {
+    try {
+        let response = await fetch("https://api.coingecko.com/api/v3/simple/price?ids=bitcoin&vs_currencies=usd&include_market_cap=true&include_24hr_vol=true&include_24hr_change=true");
+        let data = await response.json();
+        let btc = data.bitcoin;
+
+        document.getElementById("btcClose").innerText = `$${btc.usd.toLocaleString()}`;
+        document.getElementById("btcChange").innerText = `${btc.usd_24h_change.toFixed(2)}%`;
+        document.getElementById("btcMarketCap").innerText = `$${(btc.usd_market_cap / 1e9).toFixed(2)}B`;
+        document.getElementById("btcVolume").innerText = `$${(btc.usd_24h_vol / 1e9).toFixed(2)}B`;
+    } catch (error) {
+        console.error("❌ Fout bij ophalen Bitcoin data:", error);
+    }
+}
+
 // 🔄 **Alles tegelijk updaten**
 function updateAllGauges() {
     console.log("🔄 Data ophalen en meters updaten...");
