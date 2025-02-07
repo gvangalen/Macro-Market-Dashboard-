@@ -95,10 +95,15 @@ async function fetchBitcoinData() {
         let data = await response.json();
         let btc = data.bitcoin;
 
+        document.getElementById("btcOpen").innerText = "N/A";  // API geeft geen open prijs, maar voorkomt error
+        document.getElementById("btcHigh").innerText = "N/A";  // API geeft geen high prijs, maar voorkomt error
+        document.getElementById("btcLow").innerText = "N/A";   // API geeft geen low prijs, maar voorkomt error
         document.getElementById("btcClose").innerText = `$${btc.usd.toLocaleString()}`;
         document.getElementById("btcChange").innerText = `${btc.usd_24h_change.toFixed(2)}%`;
         document.getElementById("btcMarketCap").innerText = `$${(btc.usd_market_cap / 1e9).toFixed(2)}B`;
         document.getElementById("btcVolume").innerText = `$${(btc.usd_24h_vol / 1e9).toFixed(2)}B`;
+
+        console.log("📊 Bitcoin data geüpdatet:", data);
     } catch (error) {
         console.error("❌ Fout bij ophalen Bitcoin data:", error);
     }
