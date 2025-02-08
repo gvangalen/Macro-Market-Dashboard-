@@ -83,6 +83,19 @@ function removeRow(button) {
     let row = button.parentNode.parentNode;
     row.parentNode.removeChild(row);
 }
+function addMacroRow() {
+    let table = document.getElementById("macroTable").getElementsByTagName('tbody')[0];
+    let newRow = table.insertRow();
+
+    newRow.innerHTML = `
+        <td><input type="text" placeholder="Naam Indicator"></td>
+        <td>Laden...</td>
+        <td>N/A</td>
+        <td>N/A</td>
+        <td>N/A</td>
+        <td><button class="btn-remove" onclick="removeRow(this)">❌</button></td>
+    `;
+}
 
 // ✅ **Google Trends ophalen**
 async function fetchGoogleTrends() {
