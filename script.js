@@ -3,17 +3,17 @@ document.addEventListener("DOMContentLoaded", function () {
     updateAllGauges();
     setInterval(updateAllGauges, 60000);
 
-    // ✅ Voeg verwijderoptie toe aan bestaande indicatoren bij het laden
+    // ✅ Zorg ervoor dat bestaande indicatoren een verwijderoptie krijgen bij laden
     ensureIndicatorRemoveButtons();
 });
 
-// ✅ Zorg ervoor dat bestaande indicatoren een verwijderoptie krijgen
+// ✅ Voeg verwijderknoppen toe aan bestaande indicatoren
 function ensureIndicatorRemoveButtons() {
     let headerRow = document.getElementById("techTable").getElementsByTagName("thead")[0].rows[0];
 
     for (let i = 9; i < headerRow.cells.length - 1; i++) { // Vanaf index 9 tot voorlaatste kolom
         let cell = headerRow.cells[i];
-        if (!cell.querySelector("button")) { // Voeg alleen toe als het nog niet bestaat
+        if (!cell.querySelector("button")) { // Voorkom dubbele knoppen
             let removeButton = document.createElement("button");
             removeButton.innerHTML = "❌";
             removeButton.classList.add("btn-remove");
@@ -28,7 +28,7 @@ function addTechRow() {
     let table = document.getElementById("techTable").getElementsByTagName('tbody')[0];
     let newRow = table.insertRow();
 
-    // Voeg standaard kolommen toe (zonder indicatoren)
+    // Voeg standaard kolommen toe
     newRow.innerHTML = `
         <td><input type="text" placeholder="Naam Asset"></td>
         <td><input type="text" placeholder="Timeframe"></td>
@@ -42,7 +42,7 @@ function addTechRow() {
 
     // Voeg bestaande indicatoren toe aan de nieuwe asset
     let headerRow = document.getElementById("techTable").getElementsByTagName("thead")[0].rows[0];
-    let indicatorCount = headerRow.cells.length - 9; // Indicatoren tellen
+    let indicatorCount = headerRow.cells.length - 9; // Aantal extra indicatoren
 
     for (let i = 0; i < indicatorCount; i++) {
         let newCell = newRow.insertCell(newRow.cells.length);
@@ -71,10 +71,9 @@ function addTechIndicator() {
         }
     }
 
-    // ✅ Nieuwe kolom in de header vóór de "Verwijderen"-kolom
+    // ✅ Nieuwe kolom vóór de "Verwijderen"-kolom
     let newHeader = document.createElement("th");
     newHeader.innerHTML = `${indicatorName} <button class="btn-remove" onclick="removeTechIndicator(this)">❌</button>`;
-
     headerRow.insertBefore(newHeader, headerRow.cells[headerRow.cells.length - 1]);
 
     // ✅ Voeg een lege cel toe voor deze indicator in elke asset-rij
