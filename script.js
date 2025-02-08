@@ -44,41 +44,81 @@ document.addEventListener("DOMContentLoaded", function () {
     setInterval(updateAllGauges, 60000);  // Elke minuut updaten
 });
 
-// ✅ **Asset toevoegen in technische analyse**
+/// ✅ Asset toevoegen in technische analyse
 function addTechRow() {
     let table = document.getElementById("techTable").getElementsByTagName('tbody')[0];
     let newRow = table.insertRow();
 
+    // Voeg standaard kolommen toe
     newRow.innerHTML = `
         <td><input type="text" placeholder="Naam Asset"></td>
         <td><input type="text" placeholder="Timeframe"></td>
-        <td id="rsi">Laden...</td>
-        <td id="atr">Laden...</td>
-        <td id="volume">Laden...</td>
-        <td id="trend">Laden...</td>
-        <td id="200ma">Laden...</td>
-        <td id="positie">Laden...</td>
+        <td>Laden...</td>
+        <td>Laden...</td>
+        <td>Laden...</td>
+        <td>Laden...</td>
+        <td>Laden...</td>
+        <td>Laden...</td>
         <td><button class="btn-remove" onclick="removeRow(this)">❌</button></td>
     `;
+
+    // ✅ Voeg dynamische indicator kolommen toe aan de nieuwe rij
+    let indicators = document.getElementById("techTable").getElementsByTagName("thead")[0].rows[0].cells;
+    for (let i = 9; i < indicators.length; i++) {  // 9 is startindex van indicatoren
+        let newCell = newRow.insertCell(-1);
+        newCell.innerHTML = "Laden...";
+    }
 }
 
-// ✅ **Indicator toevoegen aan technische analyse**
-function addIndicatorToTech() {
-    let table = document.getElementById("techTable").getElementsByTagName('thead')[0];
-    let headerRow = table.rows[0];
+// ✅ Indicator toevoegen aan technische analyse
+function addTechIndicator() {
+    let table = document.getElementById("techTable");
+    let headerRow = table.getElementsByTagName("thead")[0].rows[0];
+    let bodyRows = table.getElementsByTagName("tbody")[0].rows;
 
+    // Vraag gebruiker om indicatornaam
     let indicatorName = prompt("Voer de naam van de indicator in:");
     if (!indicatorName) return;
 
+    // Voeg nieuwe kolom toe in de header
     let newHeader = document.createElement("th");
     newHeader.textContent = indicatorName;
+    
+    // Voeg knop toe om indicator te verwijderen
+    let removeButton = document.createElement("button");
+    removeButton.textContent = "❌";
+    removeButton.classList.add("btn-remove");
+    removeButton.onclick = function () { removeTechIndicator(newHeader.cellIndex); };
+    newHeader.appendChild(removeButton);
+    
     headerRow.appendChild(newHeader);
 
-    let rows = document.getElementById("techTable").getElementsByTagName("tbody")[0].rows;
-    for (let row of rows) {
+    // Voeg een lege cel toe in elke bestaande asset-rij
+    for (let row of bodyRows) {
         let newCell = row.insertCell(-1);
         newCell.innerHTML = "Laden...";
     }
+}
+
+// ✅ Indicator verwijderen uit technische analyse
+function removeTechIndicator(index) {
+    let table = document.getElementById("techTable");
+    let headerRow = table.getElementsByTagName("thead")[0].rows[0];
+    let bodyRows = table.getElementsByTagName("tbody")[0].rows;
+
+    // Verwijder kolom uit header
+    headerRow.deleteCell(index);
+
+    // Verwijder kolom uit alle rijen
+    for (let row of bodyRows) {
+        row.deleteCell(index);
+    }
+}
+
+// ✅ Rij verwijderen (asset of indicator)
+function removeRow(button) {
+    let row = button.parentNode.parentNode;
+    row.parentNode.removeChild(row);
 }
 
 // ✅ **Macro-indicator toevoegen**
