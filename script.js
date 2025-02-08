@@ -48,7 +48,7 @@ document.addEventListener("DOMContentLoaded", function () {
     setInterval(updateAllGauges, 60000);  // Elke minuut updaten
 });
 
-// ✅ Google Trends ophalen
+// ✅ **Google Trends ophalen**
 async function fetchGoogleTrends() {
     const url = 'https://google-trends8.p.rapidapi.com/trendings?region_code=NL&hl=nl-NL';
 
@@ -86,7 +86,7 @@ async function fetchGoogleTrends() {
     }
 }
 
-// ✅ Fear & Greed Index ophalen
+// ✅ **Fear & Greed Index ophalen**
 async function fetchFearGreedIndex() {
     try {
         let response = await fetch("https://api.alternative.me/fng/");
@@ -100,7 +100,7 @@ async function fetchFearGreedIndex() {
     }
 }
 
-// ✅ BTC Dominantie ophalen
+// ✅ **BTC Dominantie ophalen**
 async function fetchBTCDominance() {
     try {
         let response = await fetch("https://api.coingecko.com/api/v3/global");
@@ -114,7 +114,7 @@ async function fetchBTCDominance() {
     }
 }
 
-// ✅ Bitcoin RSI (proxy via prijsverandering)
+// ✅ **Bitcoin RSI (proxy via prijsverandering)**
 async function fetchRSIBitcoin() {
     try {
         let response = await fetch("https://api.binance.com/api/v3/ticker/24hr?symbol=BTCUSDT");
@@ -128,7 +128,7 @@ async function fetchRSIBitcoin() {
     }
 }
 
-// ✅ Bitcoin Data ophalen
+// ✅ **Bitcoin Data ophalen**
 async function fetchBitcoinData() {
     try {
         let response = await fetch("https://api.coingecko.com/api/v3/simple/price?ids=bitcoin&vs_currencies=usd&include_market_cap=true&include_24hr_vol=true&include_24hr_change=true");
@@ -156,7 +156,22 @@ function updateAllGauges() {
     fetchBitcoinData();
 }
 
-// ✅ Functie om een technische indicator toe te voegen
+// ✅ **Functie om een macro-indicator toe te voegen**
+function addMacroRow() {
+    let table = document.getElementById("macroTable").getElementsByTagName('tbody')[0];
+    let newRow = table.insertRow();
+
+    newRow.innerHTML = `
+        <td><input type="text" placeholder="Naam Indicator"></td>
+        <td>Laden...</td>
+        <td>N/A</td>
+        <td>N/A</td>
+        <td>N/A</td>
+        <td><button class="btn-remove" onclick="removeRow(this)">❌</button></td>
+    `;
+}
+
+// ✅ **Functie om een technische indicator toe te voegen**
 function addTechIndicator() {
     let table = document.getElementById("techIndicatorsTable").getElementsByTagName('tbody')[0];
     let newRow = table.insertRow();
@@ -168,31 +183,13 @@ function addTechIndicator() {
     `;
 }
 
-// ✅ Functie om een asset toe te voegen
-function addTechRow() {
-    let table = document.getElementById("techTable").getElementsByTagName('tbody')[0];
-    let row = table.insertRow();
-
-    row.innerHTML = `
-        <td><input type="text" placeholder="Asset"></td>
-        <td><input type="text" placeholder="Timeframe"></td>
-        <td>Laden...</td>
-        <td>Laden...</td>
-        <td>Laden...</td>
-        <td>Laden...</td>
-        <td>Laden...</td>
-        <td>Laden...</td>
-        <td><button onclick="removeRow(this)">❌</button></td>
-    `;
-}
-
-// ✅ Functie om een rij te verwijderen
+// ✅ **Functie om een rij te verwijderen**
 function removeRow(button) {
     let row = button.parentNode.parentNode;
     row.parentNode.removeChild(row);
 }
 
-// ✅ Start automatische updates
+// ✅ **Start automatische updates**
 window.onload = function() {
     console.log("✅ Window onload functie geactiveerd!");
     updateAllGauges();
