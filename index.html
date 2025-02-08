@@ -43,100 +43,71 @@
         </table>
     </div>
 
-   
-    
+    <div class="table-container">
+        <h3>2. Macro Indicatoren</h3>
+        <button class="btn-add" onclick="addMacroRow()">➕ Indicator Toevoegen</button>
+        <table id="macroTable">
+            <thead>
+                <tr>
+                    <th>Indicator</th>
+                    <th>Huidig Niveau</th>
+                    <th>Trend</th>
+                    <th>Interpretatie</th>
+                    <th>Actiepunten</th>
+                    <th>Verwijderen</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr> <td>Dollar Index (DXY)</td> <td id="dxyIndex">Laden...</td> <td>N/A</td> <td>N/A</td> <td>N/A</td> <td></td> </tr>
+                <tr> <td>US10Y (10-jaars rente)</td> <td id="us10y">Laden...</td> <td>N/A</td> <td>N/A</td> <td>N/A</td> <td></td> </tr>
+                <tr> <td>US2Y (2-jaars rente)</td> <td id="us2y">Laden...</td> <td>N/A</td> <td>N/A</td> <td>N/A</td> <td></td> </tr>
+                <tr> <td>ETF Flows</td> <td id="etfFlows">Laden...</td> <td>N/A</td> <td>N/A</td> <td>N/A</td> <td></td> </tr>
+                <tr> <td>Fear & Greed Index</td> <td id="fearGreed">Laden...</td> <td>N/A</td> <td>N/A</td> <td>N/A</td> <td></td> </tr>
+                <tr> <td>USDT Dominantie</td> <td id="usdtDominance">Laden...</td> <td>N/A</td> <td>N/A</td> <td>N/A</td> <td></td> </tr>
+                <tr> <td>Google Trends (Bitcoin)</td> <td id="googleTrends">Laden...</td> <td>N/A</td> <td>N/A</td> <td>N/A</td> <td></td> </tr>
+            </tbody>
+        </table>
+    </div>
 
- <div class="table-container">
-    <h3>2. Macro Indicatoren</h3>
-    <button class="btn-add" onclick="addMacroRow()">➕ Indicator Toevoegen</button>
-    <table id="macroTable">
-        <thead>
-            <tr>
-                <th>Indicator</th>
-                <th>Huidig Niveau</th>
-                <th>Trend</th>
-                <th>Interpretatie</th>
-                <th>Actiepunten</th>
-                <th>Verwijderen</th>
-            </tr>
-        </thead>
-        <tbody>
-            <!-- ✅ Statische macro-indicatoren -->
-            <tr> <td>Dollar Index (DXY)</td> <td id="dxyIndex">Laden...</td> <td>N/A</td> <td>N/A</td> <td>N/A</td> <td></td> </tr>
-            <tr> <td>US10Y (10-jaars rente)</td> <td id="us10y">Laden...</td> <td>N/A</td> <td>N/A</td> <td>N/A</td> <td></td> </tr>
-            <tr> <td>US2Y (2-jaars rente)</td> <td id="us2y">Laden...</td> <td>N/A</td> <td>N/A</td> <td>N/A</td> <td></td> </tr>
-            <tr> <td>ETF Flows</td> <td id="etfFlows">Laden...</td> <td>N/A</td> <td>N/A</td> <td>N/A</td> <td></td> </tr>
-            <tr> <td>Fear & Greed Index</td> <td id="fearGreed">Laden...</td> <td>N/A</td> <td>N/A</td> <td>N/A</td> <td></td> </tr>
-            <tr> <td>USDT Dominantie</td> <td id="usdtDominance">Laden...</td> <td>N/A</td> <td>N/A</td> <td>N/A</td> <td></td> </tr>
-            <tr> <td>Google Trends (Bitcoin)</td> <td id="googleTrends">Laden...</td> <td>N/A</td> <td>N/A</td> <td>N/A</td> <td></td> </tr>
-        </tbody>
-<div class="table-container">
-    <h3>3. Technische Analyse</h3>
-    <button class="btn-add" onclick="addTechRow()">➕ Asset Toevoegen</button>
-    <button class="btn-add" onclick="addTechIndicator()">➕ Indicator Toevoegen</button>
-    <table id="techTable">
-        <thead>
-            <tr>
-                <th>Asset</th>
-                <th>Timeframe</th>
-                <th>RSI</th>
-                <th>ATR-Model</th>
-                <th>Volume (24u)</th>
-                <th>Volume Trend</th>
-                <th>200MA</th>
-                <th>Positie t.o.v. 200MA</th>
-                <th>Verwijderen</th>
-            </tr>
-        </thead>
-        <tbody>
-            <!-- Dynamische rijen worden hier toegevoegd -->
-        </tbody>
-    </table>
+    <div class="table-container">
+        <h3>3. Technische Analyse</h3>
+        <button class="btn-add" onclick="addTechRow()">➕ Asset Toevoegen</button>
+        <button class="btn-add" onclick="addTechIndicator()">➕ Indicator Toevoegen</button>
+        <table id="techTable">
+            <thead>
+                <tr>
+                    <th>Asset</th>
+                    <th>Timeframe</th>
+                    <th>RSI</th>
+                    <th>ATR-Model</th>
+                    <th>Volume (24u)</th>
+                    <th>Volume Trend</th>
+                    <th>200MA</th>
+                    <th>Positie t.o.v. 200MA</th>
+                    <th>Verwijderen</th>
+                </tr>
+            </thead>
+            <tbody>
+                <!-- Dynamische rijen worden hier toegevoegd -->
+            </tbody>
+        </table>
 
-    <h4>📈 Toegevoegde Indicatoren</h4>
-    <table id="techIndicatorsTable">
-        <thead>
-            <tr>
-                <th>Indicator</th>
-                <th>Waarde</th>
-                <th>Verwijderen</th>
-            </tr>
-        </thead>
-        <tbody>
-            <!-- Dynamische indicatoren worden hier toegevoegd -->
-        </tbody>
-    </table>
-</div>
-        
-    </table>
-</div>
-<!-- ✅ Technische Analyse -->
-<div class="table-container">
-    <h3>3. Technische Analyse</h3>
-    <button class="btn-add" onclick="addTechRow()">➕ Asset Toevoegen</button>
-    <table id="techTable">
-        <thead>
-            <tr>
-                <th>Asset</th>
-                <th>Timeframe</th>
-                <th>RSI</th>
-                <th>ATR-Model</th>
-                <th>Volume (24u)</th>
-                <th>Volume Trend</th>
-                <th>200MA</th>
-                <th>Positie t.o.v. 200MA</th>
-                <th>Verwijderen</th>
-            </tr>
-        </thead>
-        <tbody>
-            <!-- Dynamische rijen worden hier toegevoegd -->
-        </tbody>
-    </table>
-</div>
-    <!-- ✅ JavaScript aan einde van <body> voor betere laadtijd -->
-<script defer src="https://cdn.jsdelivr.net/npm/raphael@2.3.0/raphael.min.js"></script>
-<script defer src="https://cdn.jsdelivr.net/npm/justgage@1.4.0/justgage.min.js"></script>
-<script defer src="script.js"></script>
+        <h4>📈 Toegevoegde Indicatoren</h4>
+        <table id="techIndicatorsTable">
+            <thead>
+                <tr>
+                    <th>Indicator</th>
+                    <th>Waarde</th>
+                    <th>Verwijderen</th>
+                </tr>
+            </thead>
+            <tbody>
+                <!-- Dynamische indicatoren worden hier toegevoegd -->
+            </tbody>
+        </table>
+    </div>
+
+    <script defer src="script.js"></script>
 
 </body>
 </html>
