@@ -112,6 +112,52 @@ async function fetchBitcoinData() {
         console.error("❌ Fout bij ophalen Bitcoin data:", error);
     }
 }
+async function fetchGoogleTrends() {
+    const url = 'https://google-trends8.p.rapidapi.com/trendings?region_code=NL&hl=nl-NL';
+    
+    const options = {
+        method: 'GET',
+        headers: {
+            'X-RapidAPI-Key': 'b78636a22cmsh7f068b3613a3c54p1ba923jsn1f119b970bef', // Vervang door je eigen API-key
+            'X-RapidAPI-Host': 'google-trends8.p.rapidapi.com'
+        }
+    };
+
+    try {
+        let response = await fetch(url, options);
+        let data = await response.json();
+        
+        console.log("📊 Google Trends Data:", data);
+
+        // ✅ Zoek of 'Bitcoin' voorkomt in trending topics
+        let bitcoinTrend = data.trendingSearches.find(item => item.title.toLowerCase().includes("bitcoin"));
+
+        if (bitcoinTrend) {
+            let trendScore = bitcoinTrend.traffic;
+            
+            console.log("🔥 Bitcoin Trend Score:", trendScore);
+
+            let trendStatus;
+            if (trendScore > 50) {
+                trendStatus = "📈 Bitcoin zoekvolume stijgt!";
+            } else if (trendScore < 50) {
+                trendStatus = "📉 Bitcoin zoekvolume daalt!";
+            } else {
+                trendStatus = "⚖️ Bitcoin zoekvolume stabiel.";
+            }
+
+            document.getElementById("googleTrends").innerText = `${trendStatus} (Score: ${trendScore})`;
+        } else {
+            document.getElementById("googleTrends").innerText = "❌ Geen Bitcoin trend gevonden.";
+        }
+
+    } catch (error) {
+        console.error("❌ Fout bij ophalen Google Trends:", error);
+    }
+}
+
+// ✅ Roep de functie aan bij het laden van de pagina
+document.addEventListener("DOMContentLoaded", fetchGoogleTrends);
 
 // 🔄 **Alles tegelijk updaten**
 function updateAllGauges() {
