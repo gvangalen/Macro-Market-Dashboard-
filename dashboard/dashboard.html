@@ -1,1 +1,32 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard</title>
+    <link rel="stylesheet" href="dashboard.css">
+</head>
+<body>
 
+    <h2>Macro Market Dashboard</h2>
+
+    <!-- ✅ Meters -->
+    <div class="dashboard-container">
+        <div class="gauge-container">
+            <h3>Macro Indicatoren</h3>
+            <div id="macroGauge" class="gauge"></div>
+        </div>
+        <div class="gauge-container">
+            <h3>Technische Indicatoren</h3>
+            <div id="technicalGauge" class="gauge"></div>
+        </div>
+        <div class="gauge-container">
+            <h3>Setup Score</h3>
+            <div id="setupGauge" class="gauge"></div>
+        </div>
+    </div>
+
+    <script src="../gauges/gauges.js"></script>
+    <script src="dashboard.js"></script>
+</body>
+</html>
