@@ -233,59 +233,34 @@ function addMacroRow() {
 // ✅ **Asset toevoegen via pop-up**
 function addTechRow() {
     let assetName = prompt("Voer de naam van de asset in:");
-    if (!assetName) return;
+    if (!assetName) return; // Stop als geen naam is ingevoerd
 
     let table = document.getElementById("techTable").getElementsByTagName('tbody')[0];
     let newRow = table.insertRow();
     
     // ✅ Timeframe dropdown
     let timeframeOptions = ["1hr", "4hr", "1day", "1week"];
-    let timeframeSelect = `<select>`;
+    let timeframeSelect = document.createElement("select");
     timeframeOptions.forEach(option => {
-        timeframeSelect += `<option value="${option}">${option}</option>`;
+        let opt = document.createElement("option");
+        opt.value = option;
+        opt.text = option;
+        timeframeSelect.appendChild(opt);
     });
-    timeframeSelect += `</select>`;
-    
-    // ✅ Voeg standaard kolommen toe
-    newRow.innerHTML = `
-        <td>${assetName}</td>
-        <td>${timeframeSelect}</td>
-        <td>Laden...</td>
-        <td>Laden...</td>
-        <td>Laden...</td>
-        <td>Laden...</td>
-        <td>Laden...</td>
-        <td>Laden...</td>
-    `;
 
-    // ✅ Voeg bestaande indicatoren toe aan de nieuwe asset
-    let headerRow = document.getElementById("techTable").getElementsByTagName("thead")[0].rows[0];
-    let indicatorCount = headerRow.cells.length - 9;
-    for (let i = 0; i < indicatorCount; i++) {
-        let newCell = newRow.insertCell(newRow.cells.length);
-        newCell.innerHTML = "Laden...";
+    // ✅ Voeg cellen toe aan de rij
+    newRow.insertCell(0).innerText = assetName;
+    let timeframeCell = newRow.insertCell(1);
+    timeframeCell.appendChild(timeframeSelect);
+    
+    for (let i = 2; i < 8; i++) { // Voeg lege cellen toe voor indicatoren
+        newRow.insertCell(i).innerHTML = "Laden...";
     }
 
     // ✅ Voeg de "Verwijderen"-knop toe
     let deleteCell = newRow.insertCell(-1);
     deleteCell.innerHTML = `<button class="btn-remove" onclick="removeRow(this)">❌</button>`;
 }
-
-// ✅ **Indicator toevoegen voor ALLE assets**
-function addTechIndicator() {
-    let table = document.getElementById("techTable");
-    let headerRow = table.getElementsByTagName("thead")[0].rows[0];
-    let bodyRows = table.getElementsByTagName("tbody")[0].rows;
-
-    let indicatorName = prompt("Voer de naam van de indicator in:");
-    if (!indicatorName) return;
-
-    for (let cell of headerRow.cells) {
-        if (cell.textContent.includes(indicatorName)) {
-            alert("Deze indicator bestaat al!");
-            return;
-        }
-    }
 
 // ✅ **Google Trends ophalen**
 async function fetchGoogleTrends() {
