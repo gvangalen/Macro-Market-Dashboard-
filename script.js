@@ -1,4 +1,4 @@
-let macroGauge, technicalGauge, setupGauge;  // 🔹 Globale variabelen voor meters
+let macroGauge, technicalGauge, setupGauge;  // 🔹 Maak globale variabelen
 
 document.addEventListener("DOMContentLoaded", function () {
     console.log("📌 DOM geladen!");
@@ -48,21 +48,46 @@ document.addEventListener("DOMContentLoaded", function () {
     setInterval(updateAllGauges, 60000);  // Elke minuut updaten
 });
 
-async function fetchBTCDominance() {
-    const url = "https://api.coingecko.com/api/v3/global";
-    
-    try {
-        let response = await fetch(url);
-        let data = await response.json();
-        let btcDominance = parseFloat(data.data.market_cap_percentage.btc.toFixed(2));
+// ✅ Google Trends ophalen
+async function fetchGoogleTrends() {
+    const url = 'https://google-trends8.p.rapidapi.com/trendings?region_code=NL&hl=nl-NL';
 
-        if (macroGauge) macroGauge.refresh(btcDominance);
-        console.log("📊 BTC Dominantie:", btcDominance);
+    const options = {
+        method: 'GET',
+        headers: {
+            'X-RapidAPI-Key': 'b78636a22cmsh7f068b3613a3c54p1ba923jsn1f119b970bef',
+            'X-RapidAPI-Host': 'google-trends8.p.rapidapi.com'
+        }
+    };
+
+    try {
+        let response = await fetch(url, options);
+        if (!response.ok) {
+            throw new Error(`HTTP Error! Status: ${response.status}`);
+        }
+        let data = await response.json();
+
+        console.log("📊 Google Trends Data:", data);
+
+        if (!data || !data.trendingSearches) {
+            throw new Error("📛 API response is niet correct!");
+        }
+
+        let bitcoinTrend = data.trendingSearches.find(item => item.title.toLowerCase().includes("bitcoin"));
+
+        if (bitcoinTrend) {
+            let trendScore = bitcoinTrend.traffic;
+            document.getElementById("googleTrends").innerText = `📈 Bitcoin trending! Score: ${trendScore}`;
+        } else {
+            document.getElementById("googleTrends").innerText = "❌ Geen Bitcoin trend gevonden.";
+        }
     } catch (error) {
-        console.error("❌ Fout bij ophalen BTC Dominantie:", error);
+        console.error("❌ Fout bij ophalen Google Trends:", error);
+        document.getElementById("googleTrends").innerText = "❌ Fout bij ophalen.";
     }
 }
 
+// ✅ Fear & Greed Index ophalen
 async function fetchFearGreedIndex() {
     try {
         let response = await fetch("https://api.alternative.me/fng/");
@@ -70,25 +95,42 @@ async function fetchFearGreedIndex() {
         let fearGreed = parseInt(data.data[0].value);
         console.log("📊 Fear & Greed Index:", fearGreed);
 
+        document.getElementById("fearGreed").innerText = fearGreed;
         if (setupGauge) setupGauge.refresh(fearGreed);
     } catch (error) {
         console.error("❌ Fout bij ophalen Fear & Greed Index:", error);
     }
 }
 
+// ✅ Bitcoin Dominantie ophalen via CoinGecko
+async function fetchBTCDominance() {
+    try {
+        let response = await fetch("https://api.coingecko.com/api/v3/global");
+        let data = await response.json();
+        let btcDominance = parseFloat(data.data.market_cap_percentage.btc.toFixed(2));
+
+        document.getElementById("usdtDominance").innerText = btcDominance + "%";
+        if (macroGauge) macroGauge.refresh(btcDominance);
+    } catch (error) {
+        console.error("❌ Fout bij ophalen BTC Dominantie:", error);
+    }
+}
+
+// ✅ RSI Bitcoin ophalen
 async function fetchRSIBitcoin() {
     try {
         let response = await fetch("https://api.binance.com/api/v3/ticker/24hr?symbol=BTCUSDT");
         let data = await response.json();
-        let priceChangePercent = Math.abs(parseFloat(data.priceChangePercent));  // Simpele proxy voor RSI
-        console.log("📊 RSI Bitcoin (proxy via prijsverandering):", priceChangePercent);
+        let priceChangePercent = Math.abs(parseFloat(data.priceChangePercent));
 
+        document.getElementById("rsiBitcoin").innerText = priceChangePercent;
         if (technicalGauge) technicalGauge.refresh(priceChangePercent);
     } catch (error) {
         console.error("❌ Fout bij ophalen RSI Bitcoin:", error);
     }
 }
 
+// ✅ Bitcoin Data ophalen
 async function fetchBitcoinData() {
     try {
         let response = await fetch("https://api.coingecko.com/api/v3/simple/price?ids=bitcoin&vs_currencies=usd&include_market_cap=true&include_24hr_vol=true&include_24hr_change=true");
@@ -109,53 +151,34 @@ async function fetchBitcoinData() {
 // 🔄 **Alles tegelijk updaten**
 function updateAllGauges() {
     console.log("🔄 Data ophalen en meters updaten...");
-    fetchBTCDominance();
+    fetchGoogleTrends();
     fetchFearGreedIndex();
+    fetchBTCDominance();
     fetchRSIBitcoin();
     fetchBitcoinData();
 }
 
-// ✅ Functie om een technische analyse **asset** toe te voegen
-function addTechRow() {
-    let table = document.getElementById("techTable").getElementsByTagName('tbody')[0];
-    let row = table.insertRow();
-
-    row.innerHTML = `
-        <td><input type="text" placeholder="Naam Asset"></td>
-        <td><input type="text" placeholder="Timeframe"></td>
-        <td>Laden...</td>
-        <td>Laden...</td>
-        <td>Laden...</td>
-        <td>Laden...</td>
-        <td>Laden...</td>
-        <td>Laden...</td>
-        <td><button class="btn-remove" onclick="removeRow(this)">❌</button></td>
-    `;
-}
-
-// ✅ Functie om een technische analyse **indicator** toe te voegen
+// ✅ Functie om een technische indicator toe te voegen
 function addTechIndicator() {
     let table = document.getElementById("techIndicatorsTable").getElementsByTagName('tbody')[0];
-    let row = table.insertRow();
-
-    row.innerHTML = `
+    let newRow = table.insertRow();
+    
+    newRow.innerHTML = `
         <td><input type="text" placeholder="Naam Indicator"></td>
         <td><input type="text" placeholder="Waarde"></td>
         <td><button class="btn-remove" onclick="removeRow(this)">❌</button></td>
     `;
 }
 
-// ✅ Functie om een rij te verwijderen (zowel assets als indicatoren)
+// ✅ Functie om een rij te verwijderen
 function removeRow(button) {
     let row = button.parentNode.parentNode;
     row.parentNode.removeChild(row);
 }
 
-// ✅ Window onload - Start alle updates
+// ✅ Start automatische updates
 window.onload = function() {
     console.log("✅ Window onload functie geactiveerd!");
-    fetchBitcoinData();
     updateAllGauges();
     setInterval(updateAllGauges, 60000);
-    setInterval(fetchBitcoinData, 60000);
 };
