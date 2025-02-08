@@ -3,98 +3,22 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Macro Market Dashboard V2</title>
-    <link rel="stylesheet" href="style.css">
+    <title>Macro Market Dashboard</title>
+    <link rel="stylesheet" href="style/style.css">
 </head>
 <body>
 
-    <h2>Marktoverzicht</h2>
-
-    <!-- ✅ Enkele Dashboard Container -->
-    <div class="dashboard-container">
-        <div class="gauge-container"><div id="macroGauge" class="gauge"></div></div>
-        <div class="gauge-container"><div id="technicalGauge" class="gauge"></div></div>
-        <div class="gauge-container"><div id="setupGauge" class="gauge"></div></div>
-    </div>
-
+    <h1>Macro Market Dashboard</h1>
+    
     <div class="table-container">
-        <h3>1. Marktgegevens</h3>
-        <table id="marketTable">
-            <tr>
-                <th>Asset</th>
-                <th>Open</th>
-                <th>High</th>
-                <th>Low</th>
-                <th>Close</th>
-                <th>24u Wijziging (%)</th>
-                <th>Marktkapitalisatie</th>
-                <th>Volume (24u)</th>
-            </tr>
-            <tr>
-                <td>Bitcoin (BTC)</td>
-                <td id="btcOpen">Laden...</td>
-                <td id="btcHigh">Laden...</td>
-                <td id="btcLow">Laden...</td>
-                <td id="btcClose">Laden...</td>
-                <td id="btcChange">Laden...</td>
-                <td id="btcMarketCap">Laden...</td>
-                <td id="btcVolume">Laden...</td>
-            </tr>
-        </table>
+        <h2>📊 Navigatie</h2>
+        <p>Klik op een onderdeel om verder te gaan:</p>
+        <ul>
+            <li><a href="dashboard/dashboard.html">📈 Dashboard (Meters)</a></li>
+            <li><a href="macro/macro.html">📊 Macro Indicatoren</a></li>
+            <li><a href="technical/technical.html">📉 Technische Analyse</a></li>
+        </ul>
     </div>
-
-    <div class="table-container">
-        <h3>2. Macro Indicatoren</h3>
-        <button class="btn-add" onclick="addMacroRow()">➕ Indicator Toevoegen</button>
-        <table id="macroTable">
-            <thead>
-                <tr>
-                    <th>Indicator</th>
-                    <th>Huidig Niveau</th>
-                    <th>Trend</th>
-                    <th>Interpretatie</th>
-                    <th>Actiepunten</th>
-                    <th>Verwijderen</th>
-                </tr>
-            </thead>
-            <tbody>
-                <tr> <td>Dollar Index (DXY)</td> <td id="dxyIndex">Laden...</td> <td>N/A</td> <td>N/A</td> <td>N/A</td> <td></td> </tr>
-                <tr> <td>US10Y (10-jaars rente)</td> <td id="us10y">Laden...</td> <td>N/A</td> <td>N/A</td> <td>N/A</td> <td></td> </tr>
-                <tr> <td>US2Y (2-jaars rente)</td> <td id="us2y">Laden...</td> <td>N/A</td> <td>N/A</td> <td>N/A</td> <td></td> </tr>
-                <tr> <td>ETF Flows</td> <td id="etfFlows">Laden...</td> <td>N/A</td> <td>N/A</td> <td>N/A</td> <td></td> </tr>
-                <tr> <td>Fear & Greed Index</td> <td id="fearGreed">Laden...</td> <td>N/A</td> <td>N/A</td> <td>N/A</td> <td></td> </tr>
-                <tr> <td>USDT Dominantie</td> <td id="usdtDominance">Laden...</td> <td>N/A</td> <td>N/A</td> <td>N/A</td> <td></td> </tr>
-                <tr> <td>Google Trends (Bitcoin)</td> <td id="googleTrends">Laden...</td> <td>N/A</td> <td>N/A</td> <td>N/A</td> <td></td> </tr>
-            </tbody>
-        </table>
-    </div>
-
-    <div class="table-container">
-        <h3>3. Technische Analyse</h3>
-        <button class="btn-add" onclick="addTechRow()">➕ Asset Toevoegen</button>
-        <button class="btn-add" onclick="addTechIndicator()">➕ Indicator Toevoegen</button>
-        <table id="techTable">
-            <thead>
-                <tr>
-                    <th>Asset</th>
-                    <th>Timeframe</th>
-                    <th>RSI</th>
-                    <th>ATR-Model</th>
-                    <th>Volume (24u)</th>
-                    <th>Volume Trend</th>
-                    <th>200MA</th>
-                    <th>Positie t.o.v. 200MA</th>
-                    <th>Verwijderen</th>
-                </tr>
-            </thead>
-            <tbody>
-                <!-- Dynamische rijen worden hier toegevoegd -->
-            </tbody>
-        </table>
-
-        
-
-    <script defer src="script.js"></script>
 
 </body>
 </html>
