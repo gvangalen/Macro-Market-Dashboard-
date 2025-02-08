@@ -51,17 +51,23 @@ document.addEventListener("DOMContentLoaded", function () {
 const apiKey = "CG-5i5Ak7f99kCCPHaRwa7xSrW4";  // Zet hier jouw echte API key!
 
 async function fetchBTCDominance() {
+    const url = "https://api.coingecko.com/api/v3/global";
+    
+    const options = {
+        method: "GET",
+        headers: {
+            "x-cg-demo-api-key": "CG-5i5Ak7f99kCCPHaRwa7rW4", // Voeg hier jouw API-key toe
+            "Accept": "application/json"
+        }
+    };
+
     try {
-        let response = await fetch("https://api.coingecko.com/api/v3/global", {
-            headers: {
-                "x-cg-api-key": apiKey  // CoinGecko API vereist deze header
-            }
-        });
+        let response = await fetch(url, options);
         let data = await response.json();
         let btcDominance = parseFloat(data.data.market_cap_percentage.btc.toFixed(2));
-        console.log("📊 BTC Dominantie:", btcDominance);
 
         if (macroGauge) macroGauge.refresh(btcDominance);
+        console.log("📊 BTC Dominantie:", btcDominance);
     } catch (error) {
         console.error("❌ Fout bij ophalen BTC Dominantie:", error);
     }
@@ -114,11 +120,11 @@ async function fetchBitcoinData() {
 }
 async function fetchGoogleTrends() {
     const url = 'https://google-trends8.p.rapidapi.com/trendings?region_code=NL&hl=nl-NL';
-    
+
     const options = {
         method: 'GET',
         headers: {
-            'X-RapidAPI-Key': 'b78636a22cmsh7f068b3613a3c54p1ba923jsn1f119b970bef', // Vervang door je eigen API-key
+            'X-RapidAPI-Key': 'b78636a22cmsh7f068b3613a3c54p1ba923jsn1f119b970bef', // Jouw API-key
             'X-RapidAPI-Host': 'google-trends8.p.rapidapi.com'
         }
     };
@@ -126,39 +132,28 @@ async function fetchGoogleTrends() {
     try {
         let response = await fetch(url, options);
         let data = await response.json();
-        
+
         console.log("📊 Google Trends Data:", data);
+
+        // ✅ Controleer of data een geldig object is
+        if (!data || !data.trendingSearches) {
+            throw new Error("📛 API response is niet correct!");
+        }
 
         // ✅ Zoek of 'Bitcoin' voorkomt in trending topics
         let bitcoinTrend = data.trendingSearches.find(item => item.title.toLowerCase().includes("bitcoin"));
 
         if (bitcoinTrend) {
             let trendScore = bitcoinTrend.traffic;
-            
-            console.log("🔥 Bitcoin Trend Score:", trendScore);
-
-            let trendStatus;
-            if (trendScore > 50) {
-                trendStatus = "📈 Bitcoin zoekvolume stijgt!";
-            } else if (trendScore < 50) {
-                trendStatus = "📉 Bitcoin zoekvolume daalt!";
-            } else {
-                trendStatus = "⚖️ Bitcoin zoekvolume stabiel.";
-            }
-
-            document.getElementById("googleTrends").innerText = `${trendStatus} (Score: ${trendScore})`;
+            document.getElementById("googleTrends").innerText = `📈 Bitcoin trending! Score: ${trendScore}`;
         } else {
             document.getElementById("googleTrends").innerText = "❌ Geen Bitcoin trend gevonden.";
         }
-
     } catch (error) {
         console.error("❌ Fout bij ophalen Google Trends:", error);
+        document.getElementById("googleTrends").innerText = "❌ Fout bij ophalen.";
     }
 }
-
-// ✅ Roep de functie aan bij het laden van de pagina
-document.addEventListener("DOMContentLoaded", fetchGoogleTrends);
-
 // 🔄 **Alles tegelijk updaten**
 function updateAllGauges() {
     console.log("🔄 Data ophalen en meters updaten...");
