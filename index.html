@@ -9,16 +9,16 @@
 </head>
 <body>
     <h1>Macro Market Dashboard</h1>
-    <p>Live Bitcoin marktgegevens en macro-indicatoren.</p>
-    
-    <!-- Dashboard Meters -->
+    <p>Welkom bij de live Bitcoin marktgegevens en macro-indicatoren.</p>
+
+    <!-- ✅ Dashboard sectie -->
     <div class="dashboard-container">
-        <div class="gauge-container" id="macroGauge"></div>
-        <div class="gauge-container" id="technicalGauge"></div>
-        <div class="gauge-container" id="setupGauge"></div>
+        <div class="gauge-container" id="macroGauge">Macro</div>
+        <div class="gauge-container" id="technicalGauge">Technisch</div>
+        <div class="gauge-container" id="setupGauge">Setup</div>
     </div>
 
-    <!-- Macro Indicatoren Tabel -->
+    <!-- ✅ Macro Indicatoren -->
     <div class="table-container">
         <h2>📊 Macro Indicatoren</h2>
         <table id="macroTable">
@@ -28,39 +28,37 @@
                     <th>Huidig Niveau</th>
                     <th>Trend</th>
                     <th>Interpretatie</th>
-                    <th>Actie</th>
+                    <th>Actiepunten</th>
                     <th>Verwijderen</th>
                 </tr>
             </thead>
             <tbody>
-                <!-- Data wordt hier dynamisch toegevoegd -->
+                <!-- Dynamische rijen worden hier toegevoegd -->
             </tbody>
         </table>
-        <button class="btn-add" onclick="addMacroRow()">+ Macro Indicator</button>
+        <button class="btn-add" onclick="addMacroRow()">➕ Indicator toevoegen</button>
     </div>
 
-    <!-- Technische Indicatoren Tabel -->
+    <!-- ✅ Technische Analyse -->
     <div class="table-container">
-        <h2>📈 Technische Analyse</h2>
+        <h2>📉 Technische Analyse</h2>
         <table id="techTable">
             <thead>
                 <tr>
                     <th>Asset</th>
                     <th>Timeframe</th>
                     <th>RSI</th>
-                    <th>ATR</th>
+                    <th>ATR-Model</th>
                     <th>Volume</th>
                     <th>200MA</th>
-                    <th>Positie</th>
                     <th>Verwijderen</th>
                 </tr>
             </thead>
             <tbody>
-                <!-- Data wordt hier dynamisch toegevoegd -->
+                <!-- Dynamische rijen worden hier toegevoegd -->
             </tbody>
         </table>
-        <button class="btn-add" onclick="addTechRow()">+ Asset</button>
-        <button class="btn-add" onclick="addTechIndicator()">+ Indicator</button>
+        <button class="btn-add" onclick="addTechRow()">➕ Asset toevoegen</button>
     </div>
 </body>
 </html>
