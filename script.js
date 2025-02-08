@@ -1,16 +1,16 @@
 document.addEventListener("DOMContentLoaded", function () {
     console.log("📌 DOM geladen!");
-    
+
     updateAllGauges();
     setInterval(updateAllGauges, 60000);
 });
 
-// ✅ **Asset toevoegen**
+// ✅ Asset toevoegen
 function addTechRow() {
     let table = document.getElementById("techTable").getElementsByTagName('tbody')[0];
     let newRow = table.insertRow();
-    
-    // Voeg standaard kolommen toe (exclusief indicatoren)
+
+    // Standaard kolommen + inputvelden voor asset en timeframe
     newRow.innerHTML = `
         <td><input type="text" placeholder="Naam Asset"></td>
         <td><input type="text" placeholder="Timeframe"></td>
@@ -23,17 +23,17 @@ function addTechRow() {
         <td><button class="btn-remove" onclick="removeRow(this)">❌</button></td>
     `;
 
-    // Voeg bestaande indicatoren toe aan de nieuwe asset
+    // ✅ Voeg bestaande indicatoren toe aan de nieuwe asset
     let headerRow = document.getElementById("techTable").getElementsByTagName("thead")[0].rows[0];
-    let indicatorCount = headerRow.cells.length - 9; // 9 is het aantal vaste kolommen (excl. indicatoren)
-    
+    let indicatorCount = headerRow.cells.length - 9; // Aantal dynamische indicatoren
+
     for (let i = 0; i < indicatorCount; i++) {
-        let newCell = newRow.insertCell(-1);
+        let newCell = newRow.insertCell(newRow.cells.length - 1);
         newCell.innerHTML = "Laden...";
     }
 }
 
-// ✅ **Indicator toevoegen voor ALLE assets**
+// ✅ Indicator toevoegen aan ALLE assets
 function addTechIndicator() {
     let table = document.getElementById("techTable");
     let headerRow = table.getElementsByTagName("thead")[0].rows[0];
@@ -42,56 +42,42 @@ function addTechIndicator() {
     let indicatorName = prompt("Voer de naam van de indicator in:");
     if (!indicatorName) return;
 
-    // **Nieuwe kolom in de header toevoegen**
+    // ✅ Nieuwe kolom in de header vóór de "Verwijderen"-kolom
     let newHeader = document.createElement("th");
     newHeader.textContent = indicatorName;
 
-    // Voeg knop toe om indicator te verwijderen
     let removeButton = document.createElement("button");
     removeButton.textContent = "❌";
     removeButton.classList.add("btn-remove");
     removeButton.onclick = function () { removeTechIndicator(newHeader.cellIndex); };
     newHeader.appendChild(removeButton);
 
-    // Voeg nieuwe header toe vóór de "Verwijderen"-kolom
     headerRow.insertBefore(newHeader, headerRow.cells[headerRow.cells.length - 1]);
 
-    // Voeg een lege cel toe in elke bestaande asset-rij
+    // ✅ Voeg een lege cel toe voor deze indicator in elke asset-rij
     for (let row of bodyRows) {
         let newCell = row.insertCell(row.cells.length - 1);
         newCell.innerHTML = "Laden...";
     }
 }
 
-// ✅ **Indicator verwijderen uit ALLE assets**
+// ✅ Indicator verwijderen uit ALLE assets
 function removeTechIndicator(index) {
     let table = document.getElementById("techTable");
     let headerRow = table.getElementsByTagName("thead")[0].rows[0];
     let bodyRows = table.getElementsByTagName("tbody")[0].rows;
 
-    // Verwijder kolom uit header
     headerRow.deleteCell(index);
 
-    // Verwijder kolom uit alle asset-rijen
     for (let row of bodyRows) {
         row.deleteCell(index);
     }
 }
 
-// ✅ **Rij verwijderen (asset)**
+// ✅ Rij verwijderen (asset)
 function removeRow(button) {
     let row = button.parentNode.parentNode;
     row.parentNode.removeChild(row);
-}
-
-// 🔄 **Alles updaten**
-function updateAllGauges() {
-    console.log("🔄 Data ophalen en meters updaten...");
-    fetchGoogleTrends();
-    fetchFearGreedIndex();
-    fetchBTCDominance();
-    fetchRSIBitcoin();
-    fetchBitcoinData();
 }
 
 // ✅ **Google Trends ophalen**
@@ -144,6 +130,15 @@ async function fetchBitcoinData() {
     } catch (error) {
         console.error("❌ Fout bij ophalen Bitcoin data:", error);
     }
+}
+
+// 🔄 **Alles updaten**
+function updateAllGauges() {
+    console.log("🔄 Data ophalen en meters updaten...");
+    fetchGoogleTrends();
+    fetchBTCDominance();
+    fetchRSIBitcoin();
+    fetchBitcoinData();
 }
 
 // ✅ **Start updates bij laden**
