@@ -5,60 +5,34 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Macro Market Dashboard</title>
     <link rel="stylesheet" href="style/style.css">
-    <script defer src="script/script.js"></script>
 </head>
 <body>
+
     <h1>Macro Market Dashboard</h1>
     <p>Welkom bij de live Bitcoin marktgegevens en macro-indicatoren.</p>
 
-    <!-- ✅ Dashboard sectie -->
-    <div class="dashboard-container">
-        <div class="gauge-container" id="macroGauge">Macro</div>
-        <div class="gauge-container" id="technicalGauge">Technisch</div>
-        <div class="gauge-container" id="setupGauge">Setup</div>
-    </div>
+    <!-- Containers waarin we de externe HTML-bestanden gaan inladen -->
+    <div id="dashboard-container"></div>
+    <div id="macro-container"></div>
+    <div id="technical-container"></div>
 
-    <!-- ✅ Macro Indicatoren -->
-    <div class="table-container">
-        <h2>📊 Macro Indicatoren</h2>
-        <table id="macroTable">
-            <thead>
-                <tr>
-                    <th>Indicator</th>
-                    <th>Huidig Niveau</th>
-                    <th>Trend</th>
-                    <th>Interpretatie</th>
-                    <th>Actiepunten</th>
-                    <th>Verwijderen</th>
-                </tr>
-            </thead>
-            <tbody>
-                <!-- Dynamische rijen worden hier toegevoegd -->
-            </tbody>
-        </table>
-        <button class="btn-add" onclick="addMacroRow()">➕ Indicator toevoegen</button>
-    </div>
+    <script>
+        // ✅ Laad externe HTML-bestanden in index.html
+        function loadHTML(id, url) {
+            fetch(url)
+                .then(response => response.text())
+                .then(data => {
+                    document.getElementById(id).innerHTML = data;
+                })
+                .catch(error => console.error(`Fout bij laden van ${url}:`, error));
+        }
 
-    <!-- ✅ Technische Analyse -->
-    <div class="table-container">
-        <h2>📉 Technische Analyse</h2>
-        <table id="techTable">
-            <thead>
-                <tr>
-                    <th>Asset</th>
-                    <th>Timeframe</th>
-                    <th>RSI</th>
-                    <th>ATR-Model</th>
-                    <th>Volume</th>
-                    <th>200MA</th>
-                    <th>Verwijderen</th>
-                </tr>
-            </thead>
-            <tbody>
-                <!-- Dynamische rijen worden hier toegevoegd -->
-            </tbody>
-        </table>
-        <button class="btn-add" onclick="addTechRow()">➕ Asset toevoegen</button>
-    </div>
+        // ✅ Laad alle secties
+        loadHTML("dashboard-container", "dashboard/dashboard.html");
+        loadHTML("macro-container", "macro/macro.html");
+        loadHTML("technical-container", "technical/technical.html");
+    </script>
+
+    <script src="script/script.js"></script>
 </body>
 </html>
