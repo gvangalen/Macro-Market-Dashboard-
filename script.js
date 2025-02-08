@@ -156,7 +156,7 @@ async function fetchGoogleTrends() {
         console.error("❌ Fout bij ophalen Google Trends:", error);
         document.getElementById("googleTrends").innerText = "❌ Fout bij ophalen.";
     }
-}
+
 }
 // 🔄 **Alles tegelijk updaten**
 function updateAllGauges() {
@@ -165,6 +165,7 @@ function updateAllGauges() {
     fetchFearGreedIndex();
     fetchRSIBitcoin();
     fetchBitcoinData();
+    fetchGoogleTrends();
 }
 
 window.onload = function() {
