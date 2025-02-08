@@ -19,17 +19,20 @@ function addTechRow() {
         <td>Laden...</td>
         <td>Laden...</td>
         <td>Laden...</td>
-        <td><button class="btn-remove" onclick="removeRow(this)">❌</button></td>
     `;
 
-    // ✅ Voeg bestaande indicatoren toe aan de nieuwe asset
+    // Voeg bestaande indicatoren toe aan de nieuwe asset
     let headerRow = document.getElementById("techTable").getElementsByTagName("thead")[0].rows[0];
     let indicatorCount = headerRow.cells.length - 9; // Indicatoren tellen
 
     for (let i = 0; i < indicatorCount; i++) {
-        let newCell = newRow.insertCell(newRow.cells.length - 1);
+        let newCell = newRow.insertCell(newRow.cells.length);
         newCell.innerHTML = "Laden...";
     }
+
+    // Voeg de "Verwijderen"-knop toe als laatste cel
+    let deleteCell = newRow.insertCell(-1);
+    deleteCell.innerHTML = `<button class="btn-remove" onclick="removeRow(this)">❌</button>`;
 }
 
 // ✅ Indicator toevoegen aan ALLE assets
@@ -68,6 +71,7 @@ function removeTechIndicator(button) {
     let tableBody = document.getElementById("techTable").getElementsByTagName("tbody")[0];
 
     let columnIndex = button.parentNode.cellIndex;
+
     headerRow.deleteCell(columnIndex);
 
     for (let row of tableBody.rows) {
