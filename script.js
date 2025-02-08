@@ -1,17 +1,16 @@
 document.addEventListener("DOMContentLoaded", function () {
     console.log("📌 DOM geladen!");
-
-    // ✅ Start updates
+    
     updateAllGauges();
     setInterval(updateAllGauges, 60000);
 });
 
-// ✅ Asset toevoegen
+// ✅ **Asset toevoegen**
 function addTechRow() {
     let table = document.getElementById("techTable").getElementsByTagName('tbody')[0];
     let newRow = table.insertRow();
     
-    // Voeg standaard kolommen toe, waarbij de laatste kolom "Verwijderen" is
+    // Voeg standaard kolommen toe (exclusief indicatoren)
     newRow.innerHTML = `
         <td><input type="text" placeholder="Naam Asset"></td>
         <td><input type="text" placeholder="Timeframe"></td>
@@ -23,47 +22,63 @@ function addTechRow() {
         <td>Laden...</td>
         <td><button class="btn-remove" onclick="removeRow(this)">❌</button></td>
     `;
+
+    // Voeg bestaande indicatoren toe aan de nieuwe asset
+    let headerRow = document.getElementById("techTable").getElementsByTagName("thead")[0].rows[0];
+    let indicatorCount = headerRow.cells.length - 9; // 9 is het aantal vaste kolommen (excl. indicatoren)
+    
+    for (let i = 0; i < indicatorCount; i++) {
+        let newCell = newRow.insertCell(-1);
+        newCell.innerHTML = "Laden...";
+    }
 }
 
-// ✅ Indicator toevoegen voor een specifieke asset
+// ✅ **Indicator toevoegen voor ALLE assets**
 function addTechIndicator() {
-    let assetRows = document.getElementById("techTable").getElementsByTagName('tbody')[0].rows;
-    if (assetRows.length === 0) {
-        alert("Voeg eerst een asset toe voordat je een indicator toevoegt.");
-        return;
-    }
-    
+    let table = document.getElementById("techTable");
+    let headerRow = table.getElementsByTagName("thead")[0].rows[0];
+    let bodyRows = table.getElementsByTagName("tbody")[0].rows;
+
     let indicatorName = prompt("Voer de naam van de indicator in:");
     if (!indicatorName) return;
-    
-    let assetNames = [];
-    for (let row of assetRows) {
-        let assetName = row.cells[0].querySelector('input').value || "Onbekend";
-        assetNames.push(assetName);
-    }
-    
-    let selectedAsset = prompt(`Voor welke asset wil je "${indicatorName}" toevoegen?\n${assetNames.join("\n")}`);
-    if (!selectedAsset || !assetNames.includes(selectedAsset)) {
-        alert("Ongeldige asset gekozen.");
-        return;
-    }
-    
-    for (let row of assetRows) {
-        let assetInput = row.cells[0].querySelector('input');
-        if (assetInput.value === selectedAsset) {
-            let newCell = row.insertCell(row.cells.length - 1); // Voorlaatste kolom
-            newCell.innerHTML = `${indicatorName} <button class="btn-remove" onclick="removeCell(this)">❌</button>`;
-        }
+
+    // **Nieuwe kolom in de header toevoegen**
+    let newHeader = document.createElement("th");
+    newHeader.textContent = indicatorName;
+
+    // Voeg knop toe om indicator te verwijderen
+    let removeButton = document.createElement("button");
+    removeButton.textContent = "❌";
+    removeButton.classList.add("btn-remove");
+    removeButton.onclick = function () { removeTechIndicator(newHeader.cellIndex); };
+    newHeader.appendChild(removeButton);
+
+    // Voeg nieuwe header toe vóór de "Verwijderen"-kolom
+    headerRow.insertBefore(newHeader, headerRow.cells[headerRow.cells.length - 1]);
+
+    // Voeg een lege cel toe in elke bestaande asset-rij
+    for (let row of bodyRows) {
+        let newCell = row.insertCell(row.cells.length - 1);
+        newCell.innerHTML = "Laden...";
     }
 }
 
-// ✅ Verwijder een cel (indicator) uit een asset
-function removeCell(button) {
-    let cell = button.parentNode;
-    cell.parentNode.removeChild(cell);
+// ✅ **Indicator verwijderen uit ALLE assets**
+function removeTechIndicator(index) {
+    let table = document.getElementById("techTable");
+    let headerRow = table.getElementsByTagName("thead")[0].rows[0];
+    let bodyRows = table.getElementsByTagName("tbody")[0].rows;
+
+    // Verwijder kolom uit header
+    headerRow.deleteCell(index);
+
+    // Verwijder kolom uit alle asset-rijen
+    for (let row of bodyRows) {
+        row.deleteCell(index);
+    }
 }
 
-// ✅ Rij verwijderen (asset of indicator)
+// ✅ **Rij verwijderen (asset)**
 function removeRow(button) {
     let row = button.parentNode.parentNode;
     row.parentNode.removeChild(row);
@@ -85,7 +100,6 @@ async function fetchGoogleTrends() {
         let response = await fetch("https://api.alternative.me/fng/");
         let data = await response.json();
         let fearGreed = parseInt(data.data[0].value);
-
         document.getElementById("googleTrends").innerText = fearGreed;
     } catch (error) {
         console.error("❌ Fout bij ophalen Google Trends:", error);
@@ -98,20 +112,18 @@ async function fetchBTCDominance() {
         let response = await fetch("https://api.coingecko.com/api/v3/global");
         let data = await response.json();
         let btcDominance = parseFloat(data.data.market_cap_percentage.btc.toFixed(2));
-
         document.getElementById("usdtDominance").innerText = btcDominance + "%";
     } catch (error) {
         console.error("❌ Fout bij ophalen BTC Dominantie:", error);
     }
 }
 
-// ✅ **Bitcoin RSI (proxy via prijsverandering)**
+// ✅ **Bitcoin RSI ophalen**
 async function fetchRSIBitcoin() {
     try {
         let response = await fetch("https://api.binance.com/api/v3/ticker/24hr?symbol=BTCUSDT");
         let data = await response.json();
         let priceChangePercent = Math.abs(parseFloat(data.priceChangePercent));
-
         document.getElementById("rsiBitcoin").innerText = priceChangePercent;
     } catch (error) {
         console.error("❌ Fout bij ophalen RSI Bitcoin:", error);
@@ -133,8 +145,6 @@ async function fetchBitcoinData() {
         console.error("❌ Fout bij ophalen Bitcoin data:", error);
     }
 }
-window.addTechRow = addTechRow;
-window.addTechIndicator = addTechIndicator;
 
 // ✅ **Start updates bij laden**
 window.onload = function() {
