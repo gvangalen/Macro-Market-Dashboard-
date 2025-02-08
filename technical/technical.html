@@ -1,17 +1,5 @@
-<!DOCTYPE html>
-<html lang="nl">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Technische Analyse</title>
-    <link rel="stylesheet" href="technical.css">
-</head>
-<body>
-
-    <h2>Technische Analyse</h2>
-    <button class="btn-add" onclick="addTechRow()">➕ Asset Toevoegen</button>
-    <button class="btn-add" onclick="addTechIndicator()">➕ Indicator Toevoegen</button>
-
+<div class="table-container">
+    <h2>📈 Technische Analyse</h2>
     <table id="techTable">
         <thead>
             <tr>
@@ -19,18 +7,30 @@
                 <th>Timeframe</th>
                 <th>RSI</th>
                 <th>ATR-Model</th>
-                <th>Volume (24u)</th>
-                <th>Volume Trend</th>
+                <th>Volume</th>
                 <th>200MA</th>
-                <th>Positie t.o.v. 200MA</th>
-                <th>Verwijderen</th>
+                <th>Actie</th>
             </tr>
         </thead>
         <tbody>
-            <!-- Dynamische rijen worden hier toegevoegd -->
+            <tr>
+                <td>Bitcoin</td>
+                <td>4h</td>
+                <td id="btcRSI">Laden...</td>
+                <td>N/A</td>
+                <td id="btcVolume">Laden...</td>
+                <td id="btc200MA">Laden...</td>
+                <td>N/A</td>
+            </tr>
+            <tr>
+                <td>Solana</td>
+                <td>4h</td>
+                <td id="solRSI">Laden...</td>
+                <td>N/A</td>
+                <td id="solVolume">Laden...</td>
+                <td id="sol200MA">Laden...</td>
+                <td>N/A</td>
+            </tr>
         </tbody>
     </table>
-
-    <script src="technical.js"></script>
-</body>
-</html>
+</div>
