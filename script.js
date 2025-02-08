@@ -124,18 +124,21 @@ async function fetchGoogleTrends() {
     const options = {
         method: 'GET',
         headers: {
-            'X-RapidAPI-Key': 'b78636a22cmsh7f068b3613a3c54p1ba923jsn1f119b970bef', // Jouw API-key
+            'X-RapidAPI-Key': 'b78636a22cmsh7f068b3613a3c54p1ba923jsn1f119b970bef', // JOUW API KEY
             'X-RapidAPI-Host': 'google-trends8.p.rapidapi.com'
         }
     };
 
     try {
         let response = await fetch(url, options);
+        if (!response.ok) {
+            throw new Error(`HTTP Error! Status: ${response.status}`);
+        }
         let data = await response.json();
 
         console.log("📊 Google Trends Data:", data);
 
-        // ✅ Controleer of data een geldig object is
+        // ✅ Check of 'trendingSearches' bestaat in de response
         if (!data || !data.trendingSearches) {
             throw new Error("📛 API response is niet correct!");
         }
@@ -153,6 +156,7 @@ async function fetchGoogleTrends() {
         console.error("❌ Fout bij ophalen Google Trends:", error);
         document.getElementById("googleTrends").innerText = "❌ Fout bij ophalen.";
     }
+}
 }
 // 🔄 **Alles tegelijk updaten**
 function updateAllGauges() {
