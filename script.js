@@ -48,15 +48,19 @@ document.addEventListener("DOMContentLoaded", function () {
     setInterval(updateAllGauges, 60000);  // Elke minuut updaten
 });
 
-// 🔄 **Live data ophalen en meters updaten**
+const apiKey = "CG-5i5Ak7f99kCCPHaRwa7xSrW4";  // Zet hier jouw echte API key!
+
 async function fetchBTCDominance() {
     try {
-        let response = await fetch("https://api.coingecko.com/api/v3/global");
+        let response = await fetch("https://api.coingecko.com/api/v3/global", {
+            headers: {
+                "x-cg-api-key": apiKey  // CoinGecko API vereist deze header
+            }
+        });
         let data = await response.json();
         let btcDominance = parseFloat(data.data.market_cap_percentage.btc.toFixed(2));
         console.log("📊 BTC Dominantie:", btcDominance);
-        
-        // ✅ Check of macroGauge bestaat voordat we refresh doen
+
         if (macroGauge) macroGauge.refresh(btcDominance);
     } catch (error) {
         console.error("❌ Fout bij ophalen BTC Dominantie:", error);
