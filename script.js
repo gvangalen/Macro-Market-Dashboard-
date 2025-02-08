@@ -6,13 +6,15 @@ document.addEventListener("DOMContentLoaded", function () {
     setInterval(updateAllGauges, 60000);
 });
 
-// ✅ **Asset toevoegen aan technische analyse**
+// ✅ Functie om een nieuwe asset toe te voegen
 function addTechRow() {
     let table = document.getElementById("techTable").getElementsByTagName('tbody')[0];
     let newRow = table.insertRow();
 
+    let assetId = `asset-${new Date().getTime()}`;  // Unieke ID voor asset
+
     newRow.innerHTML = `
-        <td><input type="text" placeholder="Naam Asset"></td>
+        <td><input type="text" placeholder="Naam Asset" id="${assetId}"></td>
         <td><input type="text" placeholder="Timeframe"></td>
         <td>Laden...</td>
         <td>Laden...</td>
@@ -20,66 +22,56 @@ function addTechRow() {
         <td>Laden...</td>
         <td>Laden...</td>
         <td>Laden...</td>
-        <td><button class="btn-remove" onclick="removeRow(this)">❌</button></td>
+        <td class="remove-cell"><button class="btn-remove" onclick="removeRow(this)">❌</button></td>
     `;
 
-    // ✅ Dynamische indicatoren toevoegen aan de nieuwe asset-rij
-    let headers = document.getElementById("techTable").getElementsByTagName("thead")[0].rows[0].cells;
-    for (let i = 9; i < headers.length; i++) {  // 9 is startindex van extra indicatoren
-        let newCell = newRow.insertCell(-1);
-        newCell.innerHTML = "Laden...";
-    }
+    newRow.setAttribute("data-asset-id", assetId);  // Bewaar ID van de asset
 }
 
-// ✅ **Indicator toevoegen aan technische analyse**
+// ✅ Functie om een indicator toe te voegen aan een specifieke asset
 function addTechIndicator() {
-    let table = document.getElementById("techTable");
-    let headerRow = table.getElementsByTagName("thead")[0].rows[0];
-    let bodyRows = table.getElementsByTagName("tbody")[0].rows;
+    let table = document.getElementById("techTable").getElementsByTagName('tbody')[0];
+    let rows = table.getElementsByTagName("tr");
+
+    if (rows.length === 0) {
+        alert("Voeg eerst een asset toe voordat je een indicator toevoegt.");
+        return;
+    }
 
     let indicatorName = prompt("Voer de naam van de indicator in:");
     if (!indicatorName) return;
 
-    // Voorkom dubbele indicatoren
-    let existingHeaders = [...headerRow.cells].map(cell => cell.textContent.trim());
-    if (existingHeaders.includes(indicatorName)) {
-        alert("Deze indicator bestaat al!");
+    // ✅ Selecteer een asset om de indicator aan toe te voegen
+    let assetOptions = Array.from(rows).map(row => {
+        let assetInput = row.cells[0].querySelector("input");
+        return assetInput ? assetInput.value : "Onbekende asset";
+    });
+
+    let assetSelection = prompt(`Voor welke asset wil je "${indicatorName}" toevoegen?\n${assetOptions.join("\n")}`);
+    if (!assetSelection || !assetOptions.includes(assetSelection)) {
+        alert("Ongeldige asset geselecteerd.");
         return;
     }
 
-    // ✅ Nieuwe kolom toevoegen aan de header
-    let newHeader = document.createElement("th");
-    newHeader.textContent = indicatorName;
-
-    // ✅ Knop toevoegen om de indicator te verwijderen
-    let removeButton = document.createElement("button");
-    removeButton.textContent = "❌";
-    removeButton.classList.add("btn-remove");
-    removeButton.onclick = function () { removeTechIndicator(newHeader.cellIndex); };
-    newHeader.appendChild(removeButton);
-    
-    headerRow.appendChild(newHeader);
-
-    // ✅ Nieuwe kolom toevoegen aan elke bestaande asset-rij
-    for (let row of bodyRows) {
-        let newCell = row.insertCell(-1);
-        newCell.innerHTML = "Laden...";
+    // ✅ Zoek de juiste asset-rij en voeg de indicator toe vóór de "Verwijderen"-kolom
+    for (let row of rows) {
+        let assetInput = row.cells[0].querySelector("input");
+        if (assetInput && assetInput.value === assetSelection) {
+            let removeCellIndex = row.cells.length - 1;  // Laatste kolom is "Verwijderen"
+            let newCell = row.insertCell(removeCellIndex);
+            newCell.innerHTML = `${indicatorName} <button class="btn-remove" onclick="removeIndicator(this)">❌</button>`;
+            return;
+        }
     }
 }
 
-// ✅ **Indicator verwijderen uit technische analyse**
-function removeTechIndicator(index) {
-    let table = document.getElementById("techTable");
-    let headerRow = table.getElementsByTagName("thead")[0].rows[0];
-    let bodyRows = table.getElementsByTagName("tbody")[0].rows;
-
-    headerRow.deleteCell(index);
-    for (let row of bodyRows) {
-        row.deleteCell(index);
-    }
+// ✅ Functie om een specifieke indicator te verwijderen
+function removeIndicator(button) {
+    let cell = button.parentNode;
+    cell.parentNode.removeChild(cell);
 }
 
-// ✅ **Rij verwijderen (asset of indicator)**
+// ✅ Functie om een asset-rij te verwijderen
 function removeRow(button) {
     let row = button.parentNode.parentNode;
     row.parentNode.removeChild(row);
