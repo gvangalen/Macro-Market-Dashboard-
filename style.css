@@ -34,7 +34,7 @@ body {
     transform: scale(1.05);
 }
 
-/* Tabel container */
+/* Algemene tabel container */
 .table-container {
     background: white;
     padding: 20px;
@@ -51,6 +51,7 @@ body {
 table {
     width: 100%;
     border-collapse: collapse;
+    margin-top: 10px;
 }
 
 th, td {
@@ -60,30 +61,33 @@ th, td {
 }
 
 /* Stijl voor Macro Indicatoren Tabel */
-#macroTable {
+#macroTable, #techTable, #techIndicatorsTable {
     width: 100%;
     border-collapse: collapse;
-    margin-top: 20px;
     background: white;
     border-radius: 8px;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
 }
 
-/* Specifieke stijlen voor macro-informatie */
-#macroTable th, #macroTable td {
+/* Tabellen opmaak */
+#macroTable th, #macroTable td, 
+#techTable th, #techTable td,
+#techIndicatorsTable th, #techIndicatorsTable td {
     border: 1px solid #ddd;
     padding: 12px;
     text-align: center;
 }
 
-#macroTable th {
+#macroTable th, #techTable th, #techIndicatorsTable th {
     background-color: #f4f4f4;
     font-weight: bold;
 }
 
-#macroTable td {
+#macroTable td, #techTable td, #techIndicatorsTable td {
     font-size: 16px;
 }
+
+/* Knoppen styling */
 .btn-add {
     background-color: #4CAF50;
     color: white;
@@ -92,6 +96,11 @@ th, td {
     margin: 5px;
     cursor: pointer;
     border-radius: 5px;
+    transition: 0.3s;
+}
+
+.btn-add:hover {
+    background-color: #45a049;
 }
 
 .btn-remove {
@@ -101,16 +110,30 @@ th, td {
     padding: 5px 10px;
     cursor: pointer;
     border-radius: 5px;
+    transition: 0.3s;
+}
+
+.btn-remove:hover {
+    background-color: #e53935;
 }
 
 /* Rijen laten afwisselen van kleur voor betere leesbaarheid */
-#macroTable tr:nth-child(even) {
+#macroTable tr:nth-child(even),
+#techTable tr:nth-child(even),
+#techIndicatorsTable tr:nth-child(even) {
     background-color: #f9f9f9;
 }
 
 /* Hover-effect op tabellen voor betere leesbaarheid */
 table tr:hover {
     background-color: #f1f1f1;
+}
+
+/* Toegevoegde indicatoren sectie */
+h4 {
+    margin-top: 20px;
+    font-size: 18px;
+    color: #333;
 }
 
 /* Positieve en negatieve trends */
@@ -136,7 +159,9 @@ table tr:hover {
         height: auto;
     }
 
-    #macroTable th, #macroTable td {
+    #macroTable th, #macroTable td,
+    #techTable th, #techTable td,
+    #techIndicatorsTable th, #techIndicatorsTable td {
         padding: 8px;
         font-size: 14px;
     }
