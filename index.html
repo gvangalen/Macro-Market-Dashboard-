@@ -67,10 +67,33 @@
         <tr><td>Google Trends (Bitcoin)</td><td id="googleTrends">Laden...</td><td>N/A</td><td>N/A</td><td>N/A</td></tr>
     </table>
 
-    <div class="table-container">
-        <h3>3. Technische Analyse</h3>
-        <button class="btn-add" onclick="addTechRow()">Asset Toevoegen</button>
-        <table id="techTable">
+    <!-- ✅ Macro Indicatoren -->
+<div class="table-container">
+    <h3>2. Macro Indicatoren</h3>
+    <button class="btn-add" onclick="addMacroRow()">➕ Indicator Toevoegen</button>
+    <table id="macroTable">
+        <thead>
+            <tr>
+                <th>Indicator</th>
+                <th>Huidig Niveau</th>
+                <th>Trend</th>
+                <th>Interpretatie</th>
+                <th>Actiepunten</th>
+                <th>Verwijderen</th>
+            </tr>
+        </thead>
+        <tbody>
+            <!-- Dynamische rijen worden hier toegevoegd -->
+        </tbody>
+    </table>
+</div>
+
+<!-- ✅ Technische Analyse -->
+<div class="table-container">
+    <h3>3. Technische Analyse</h3>
+    <button class="btn-add" onclick="addTechRow()">➕ Asset Toevoegen</button>
+    <table id="techTable">
+        <thead>
             <tr>
                 <th>Asset</th>
                 <th>Timeframe</th>
@@ -80,43 +103,14 @@
                 <th>Volume Trend</th>
                 <th>200MA</th>
                 <th>Positie t.o.v. 200MA</th>
-                <th>Actie</th>
+                <th>Verwijderen</th>
             </tr>
-        </table>
-    </div>
-    <div class="table-container">
-    <h3>2. Macro Indicatoren</h3>
-    <button onclick="addMacroRow()">➕ Indicator Toevoegen</button>
-    <table id="macroTable">
-        <tr>
-            <th>Indicator</th>
-            <th>Huidig Niveau</th>
-            <th>Trend</th>
-            <th>Interpretatie</th>
-            <th>Actiepunten</th>
-            <th>Verwijderen</th>
-        </tr>
+        </thead>
+        <tbody>
+            <!-- Dynamische rijen worden hier toegevoegd -->
+        </tbody>
     </table>
 </div>
-
-<div class="table-container">
-    <h3>3. Technische Analyse</h3>
-    <button onclick="addTechRow()">➕ Asset Toevoegen</button>
-    <table id="techTable">
-        <tr>
-            <th>Asset</th>
-            <th>Timeframe</th>
-            <th>RSI</th>
-            <th>ATR-Model</th>
-            <th>Volume (24u)</th>
-            <th>Volume Trend</th>
-            <th>200MA</th>
-            <th>Positie t.o.v. 200MA</th>
-            <th>Verwijderen</th>
-        </tr>
-    </table>
-</div>
-
     <!-- ✅ JavaScript aan einde van <body> voor betere laadtijd -->
 <script defer src="https://cdn.jsdelivr.net/npm/raphael@2.3.0/raphael.min.js"></script>
 <script defer src="https://cdn.jsdelivr.net/npm/justgage@1.4.0/justgage.min.js"></script>
