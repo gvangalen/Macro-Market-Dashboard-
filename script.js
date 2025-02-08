@@ -167,6 +167,57 @@ function updateAllGauges() {
     fetchBitcoinData();
     fetchGoogleTrends();
 }
+// ✅ Functie om een macro-indicator toe te voegen
+function addMacroRow() {
+    let table = document.getElementById("macroTable");
+    let row = table.insertRow(-1);
+    
+    let cell1 = row.insertCell(0);
+    let cell2 = row.insertCell(1);
+    let cell3 = row.insertCell(2);
+    let cell4 = row.insertCell(3);
+    let cell5 = row.insertCell(4);
+    let cell6 = row.insertCell(5);
+
+    cell1.innerHTML = `<input type="text" placeholder="Naam Indicator">`;
+    cell2.innerHTML = "Laden...";
+    cell3.innerHTML = "N/A";
+    cell4.innerHTML = "N/A";
+    cell5.innerHTML = "N/A";
+    cell6.innerHTML = `<button onclick="removeRow(this)">❌</button>`;
+}
+
+// ✅ Functie om een technische analyse asset toe te voegen
+function addTechRow() {
+    let table = document.getElementById("techTable");
+    let row = table.insertRow(-1);
+
+    let cell1 = row.insertCell(0);
+    let cell2 = row.insertCell(1);
+    let cell3 = row.insertCell(2);
+    let cell4 = row.insertCell(3);
+    let cell5 = row.insertCell(4);
+    let cell6 = row.insertCell(5);
+    let cell7 = row.insertCell(6);
+    let cell8 = row.insertCell(7);
+    let cell9 = row.insertCell(8);
+
+    cell1.innerHTML = `<input type="text" placeholder="Asset">`;
+    cell2.innerHTML = `<input type="text" placeholder="Timeframe">`;
+    cell3.innerHTML = "Laden...";
+    cell4.innerHTML = "Laden...";
+    cell5.innerHTML = "Laden...";
+    cell6.innerHTML = "Laden...";
+    cell7.innerHTML = "Laden...";
+    cell8.innerHTML = "Laden...";
+    cell9.innerHTML = `<button onclick="removeRow(this)">❌</button>`;
+}
+
+// ✅ Functie om een rij te verwijderen
+function removeRow(button) {
+    let row = button.parentNode.parentNode;
+    row.parentNode.removeChild(row);
+}
 
 window.onload = function() {
     console.log("✅ Window onload functie geactiveerd!");
