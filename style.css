@@ -84,6 +84,24 @@ th, td {
 #macroTable td {
     font-size: 16px;
 }
+.btn-add {
+    background-color: #4CAF50;
+    color: white;
+    border: none;
+    padding: 8px 12px;
+    margin: 5px;
+    cursor: pointer;
+    border-radius: 5px;
+}
+
+.btn-remove {
+    background-color: #ff4d4d;
+    color: white;
+    border: none;
+    padding: 5px 10px;
+    cursor: pointer;
+    border-radius: 5px;
+}
 
 /* Rijen laten afwisselen van kleur voor betere leesbaarheid */
 #macroTable tr:nth-child(even) {
