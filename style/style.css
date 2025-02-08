@@ -1,4 +1,4 @@
-/* Algemene instellingen */
+/* ✅ Algemene instellingen */
 body {
     font-family: Arial, sans-serif;
     margin: 20px;
@@ -6,7 +6,41 @@ body {
     text-align: center;
 }
 
-/* Container voor de drie meters */
+/* ✅ Hoofdtitel */
+h1 {
+    font-size: 28px;
+    font-weight: bold;
+    margin-bottom: 10px;
+}
+
+h2 {
+    font-size: 22px;
+    margin-bottom: 15px;
+}
+
+/* ✅ Navigatieblok */
+.nav-container {
+    background: white;
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    margin-bottom: 20px;
+}
+
+.nav-container a {
+    display: block;
+    font-size: 18px;
+    font-weight: bold;
+    color: #007bff;
+    text-decoration: none;
+    margin: 8px 0;
+}
+
+.nav-container a:hover {
+    text-decoration: underline;
+}
+
+/* ✅ Dashboard container */
 .dashboard-container {
     display: flex;
     justify-content: center;
@@ -15,7 +49,7 @@ body {
     flex-wrap: wrap; /* Zorgt ervoor dat meters op kleine schermen op een nieuwe rij komen */
 }
 
-/* Stijl voor de meters */
+/* ✅ Stijl voor de meters */
 .gauge-container {
     width: 250px;
     height: 250px;
@@ -29,12 +63,11 @@ body {
     transition: transform 0.2s ease-in-out;
 }
 
-/* Hover-effect voor meters */
 .gauge-container:hover {
     transform: scale(1.05);
 }
 
-/* Algemene tabel container */
+/* ✅ Tabel container */
 .table-container {
     background: white;
     padding: 20px;
@@ -44,10 +77,10 @@ body {
     width: 90%;
     margin-left: auto;
     margin-right: auto;
-    overflow-x: auto; /* Voorkomt dat tabellen breken op kleine schermen */
+    overflow-x: auto;
 }
 
-/* Tabellen styling */
+/* ✅ Tabellen styling */
 table {
     width: 100%;
     border-collapse: collapse;
@@ -60,8 +93,8 @@ th, td {
     text-align: center;
 }
 
-/* Stijl voor Macro Indicatoren Tabel */
-#macroTable, #techTable, #techIndicatorsTable {
+/* ✅ Stijl voor tabellen */
+#macroTable, #techTable {
     width: 100%;
     border-collapse: collapse;
     background: white;
@@ -69,25 +102,18 @@ th, td {
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
 }
 
-/* Tabellen opmaak */
-#macroTable th, #macroTable td, 
-#techTable th, #techTable td,
-#techIndicatorsTable th, #techIndicatorsTable td {
-    border: 1px solid #ddd;
-    padding: 12px;
-    text-align: center;
-}
-
-#macroTable th, #techTable th, #techIndicatorsTable th {
+/* ✅ Tabellen koppen */
+#macroTable th, #techTable th {
     background-color: #f4f4f4;
     font-weight: bold;
 }
 
-#macroTable td, #techTable td, #techIndicatorsTable td {
+/* ✅ Tabellen rijen */
+#macroTable td, #techTable td {
     font-size: 16px;
 }
 
-/* Knoppen styling */
+/* ✅ Knoppen styling */
 .btn-add {
     background-color: #4CAF50;
     color: white;
@@ -117,37 +143,29 @@ th, td {
     background-color: #e53935;
 }
 
-/* Rijen laten afwisselen van kleur voor betere leesbaarheid */
+/* ✅ Rijen laten afwisselen van kleur */
 #macroTable tr:nth-child(even),
-#techTable tr:nth-child(even),
-#techIndicatorsTable tr:nth-child(even) {
+#techTable tr:nth-child(even) {
     background-color: #f9f9f9;
 }
 
-/* Hover-effect op tabellen voor betere leesbaarheid */
+/* ✅ Hover-effect op tabellen */
 table tr:hover {
     background-color: #f1f1f1;
 }
 
-/* Toegevoegde indicatoren sectie */
-h4 {
-    margin-top: 20px;
-    font-size: 18px;
-    color: #333;
-}
-
-/* Positieve en negatieve trends */
+/* ✅ Positieve en negatieve trends */
 .green {
-    color: #4CAF50; /* Groen */
+    color: #4CAF50;
     font-weight: bold;
 }
 
 .red {
-    color: #E53935; /* Rood */
+    color: #E53935;
     font-weight: bold;
 }
 
-/* Responsief design voor kleinere schermen */
+/* ✅ Responsief design voor kleinere schermen */
 @media (max-width: 768px) {
     .dashboard-container {
         flex-direction: column;
@@ -160,8 +178,7 @@ h4 {
     }
 
     #macroTable th, #macroTable td,
-    #techTable th, #techTable td,
-    #techIndicatorsTable th, #techIndicatorsTable td {
+    #techTable th, #techTable td {
         padding: 8px;
         font-size: 14px;
     }
