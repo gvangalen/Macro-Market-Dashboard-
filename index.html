@@ -70,6 +70,44 @@
             <tr> <td>USDT Dominantie</td> <td id="usdtDominance">Laden...</td> <td>N/A</td> <td>N/A</td> <td>N/A</td> <td></td> </tr>
             <tr> <td>Google Trends (Bitcoin)</td> <td id="googleTrends">Laden...</td> <td>N/A</td> <td>N/A</td> <td>N/A</td> <td></td> </tr>
         </tbody>
+<div class="table-container">
+    <h3>3. Technische Analyse</h3>
+    <button class="btn-add" onclick="addTechRow()">➕ Asset Toevoegen</button>
+    <button class="btn-add" onclick="addTechIndicator()">➕ Indicator Toevoegen</button>
+    <table id="techTable">
+        <thead>
+            <tr>
+                <th>Asset</th>
+                <th>Timeframe</th>
+                <th>RSI</th>
+                <th>ATR-Model</th>
+                <th>Volume (24u)</th>
+                <th>Volume Trend</th>
+                <th>200MA</th>
+                <th>Positie t.o.v. 200MA</th>
+                <th>Verwijderen</th>
+            </tr>
+        </thead>
+        <tbody>
+            <!-- Dynamische rijen worden hier toegevoegd -->
+        </tbody>
+    </table>
+
+    <h4>📈 Toegevoegde Indicatoren</h4>
+    <table id="techIndicatorsTable">
+        <thead>
+            <tr>
+                <th>Indicator</th>
+                <th>Waarde</th>
+                <th>Verwijderen</th>
+            </tr>
+        </thead>
+        <tbody>
+            <!-- Dynamische indicatoren worden hier toegevoegd -->
+        </tbody>
+    </table>
+</div>
+        
     </table>
 </div>
 <!-- ✅ Technische Analyse -->
