@@ -1,1 +1,38 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Macro Indicatoren</title>
+    <link rel="stylesheet" href="macro.css">
+</head>
+<body>
 
+    <h2>Macro Indicatoren</h2>
+    <button class="btn-add" onclick="addMacroRow()">➕ Indicator Toevoegen</button>
+
+    <table id="macroTable">
+        <thead>
+            <tr>
+                <th>Indicator</th>
+                <th>Huidig Niveau</th>
+                <th>Trend</th>
+                <th>Interpretatie</th>
+                <th>Actiepunten</th>
+                <th>Verwijderen</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr> <td>Dollar Index (DXY)</td> <td id="dxyIndex">Laden...</td> <td>N/A</td> <td>N/A</td> <td>N/A</td> <td></td> </tr>
+            <tr> <td>US10Y (10-jaars rente)</td> <td id="us10y">Laden...</td> <td>N/A</td> <td>N/A</td> <td>N/A</td> <td></td> </tr>
+            <tr> <td>US2Y (2-jaars rente)</td> <td id="us2y">Laden...</td> <td>N/A</td> <td>N/A</td> <td>N/A</td> <td></td> </tr>
+            <tr> <td>ETF Flows</td> <td id="etfFlows">Laden...</td> <td>N/A</td> <td>N/A</td> <td>N/A</td> <td></td> </tr>
+            <tr> <td>Fear & Greed Index</td> <td id="fearGreed">Laden...</td> <td>N/A</td> <td>N/A</td> <td>N/A</td> <td></td> </tr>
+            <tr> <td>USDT Dominantie</td> <td id="usdtDominance">Laden...</td> <td>N/A</td> <td>N/A</td> <td>N/A</td> <td></td> </tr>
+            <tr> <td>Google Trends (Bitcoin)</td> <td id="googleTrends">Laden...</td> <td>N/A</td> <td>N/A</td> <td>N/A</td> <td></td> </tr>
+        </tbody>
+    </table>
+
+    <script src="macro.js"></script>
+</body>
+</html>
