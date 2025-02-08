@@ -3,6 +3,107 @@ document.addEventListener("DOMContentLoaded", function () {
     updateAllGauges();
     setInterval(updateAllGauges, 60000);
 });
+document.addEventListener("DOMContentLoaded", function () {
+    console.log("📌 DOM geladen!");
+    updateAllGauges();
+    setInterval(updateAllGauges, 60000);
+
+    // ✅ Voeg verwijderknoppen toe aan ALLE bestaande macro-indicatoren
+    ensureMacroRemoveButtons();
+    ensureTechIndicatorRemoveButtons();
+});
+
+// ✅ Voeg verwijderknoppen toe aan ALLE bestaande macro-indicatoren
+function ensureMacroRemoveButtons() {
+    let tableBody = document.getElementById("macroTable").getElementsByTagName("tbody")[0];
+
+    for (let row of tableBody.rows) {
+        if (!row.cells[5].querySelector("button")) { // Check of er al een verwijderknop is
+            let deleteCell = row.cells[5];
+            deleteCell.innerHTML = `<button class="btn-remove" onclick="removeRow(this)">❌</button>`;
+        }
+    }
+}
+
+// ✅ Voeg verwijderknoppen toe aan ALLE bestaande technische indicatoren
+function ensureTechIndicatorRemoveButtons() {
+    let headerRow = document.getElementById("techTable").getElementsByTagName("thead")[0].rows[0];
+
+    for (let i = 9; i < headerRow.cells.length - 1; i++) { // Indicator-kolommen
+        let cell = headerRow.cells[i];
+        if (!cell.querySelector("button")) { // Check of er al een verwijderknop is
+            let removeButton = document.createElement("button");
+            removeButton.innerHTML = "❌";
+            removeButton.classList.add("btn-remove");
+            removeButton.onclick = function () { removeTechIndicator(this); };
+            cell.appendChild(removeButton);
+        }
+    }
+}
+
+// ✅ **Macro-indicator toevoegen**
+function addMacroRow() {
+    let table = document.getElementById("macroTable").getElementsByTagName('tbody')[0];
+    let newRow = table.insertRow();
+
+    newRow.innerHTML = `
+        <td><input type="text" placeholder="Naam Indicator"></td>
+        <td>Laden...</td>
+        <td>N/A</td>
+        <td>N/A</td>
+        <td>N/A</td>
+        <td><button class="btn-remove" onclick="removeRow(this)">❌</button></td>
+    `;
+}
+
+// ✅ **Indicator toevoegen voor ALLE assets**
+function addTechIndicator() {
+    let table = document.getElementById("techTable");
+    let headerRow = table.getElementsByTagName("thead")[0].rows[0];
+    let bodyRows = table.getElementsByTagName("tbody")[0].rows;
+
+    let indicatorName = prompt("Voer de naam van de indicator in:");
+    if (!indicatorName) return;
+
+    // ✅ Controleer of indicator al bestaat
+    for (let cell of headerRow.cells) {
+        if (cell.textContent.includes(indicatorName)) {
+            alert("Deze indicator bestaat al!");
+            return;
+        }
+    }
+
+    // ✅ Nieuwe kolom vóór de "Verwijderen"-kolom
+    let newHeader = document.createElement("th");
+    newHeader.innerHTML = `${indicatorName} <button class="btn-remove" onclick="removeTechIndicator(this)">❌</button>`;
+    headerRow.insertBefore(newHeader, headerRow.cells[headerRow.cells.length - 1]);
+
+    // ✅ Voeg een lege cel toe voor deze indicator in elke asset-rij
+    for (let row of bodyRows) {
+        let newCell = row.insertCell(row.cells.length - 1);
+        newCell.innerHTML = "Laden...";
+    }
+}
+
+// ✅ **Indicator verwijderen uit ALLE assets**
+function removeTechIndicator(button) {
+    let headerRow = document.getElementById("techTable").getElementsByTagName("thead")[0].rows[0];
+    let tableBody = document.getElementById("techTable").getElementsByTagName("tbody")[0];
+
+    let columnIndex = button.parentNode.cellIndex;
+
+    headerRow.deleteCell(columnIndex);
+
+    for (let row of tableBody.rows) {
+        row.deleteCell(columnIndex);
+    }
+}
+
+// ✅ **Rij verwijderen (asset of macro-indicator)**
+function removeRow(button) {
+    let row = button.parentNode.parentNode;
+    row.parentNode.removeChild(row);
+}
 
 // ✅ **Asset toevoegen**
 function addTechRow() {
