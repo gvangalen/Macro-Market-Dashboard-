@@ -170,6 +170,24 @@ function addMacroRow() {
         <td><button class="btn-remove" onclick="removeRow(this)">❌</button></td>
     `;
 }
+// ✅ **Technische indicator toevoegen AAN een asset**
+function addIndicatorToAsset() {
+    let table = document.getElementById("techTable").getElementsByTagName('tbody')[0];
+    let rows = table.getElementsByTagName("tr");
+
+    if (rows.length === 0) {
+        alert("Voeg eerst een asset toe voordat je een indicator toevoegt.");
+        return;
+    }
+
+    let indicatorName = prompt("Voer de naam van de indicator in (bijv. Bollinger Bands, MACD, etc.):");
+    if (!indicatorName) return;
+
+    for (let row of rows) {
+        let cell = row.insertCell(-1);
+        cell.innerHTML = `${indicatorName} <button class="btn-remove" onclick="removeIndicator(this)">❌</button>`;
+    }
+}
 
 // ✅ **Technische indicatoren toevoegen**
 function addTechIndicator() {
