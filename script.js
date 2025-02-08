@@ -6,15 +6,14 @@ document.addEventListener("DOMContentLoaded", function () {
     setInterval(updateAllGauges, 60000);
 });
 
-// ✅ Functie om een nieuwe asset toe te voegen
+// ✅ Asset toevoegen
 function addTechRow() {
     let table = document.getElementById("techTable").getElementsByTagName('tbody')[0];
     let newRow = table.insertRow();
-
-    let assetId = `asset-${new Date().getTime()}`;  // Unieke ID voor asset
-
+    
+    // Voeg standaard kolommen toe, waarbij de laatste kolom "Verwijderen" is
     newRow.innerHTML = `
-        <td><input type="text" placeholder="Naam Asset" id="${assetId}"></td>
+        <td><input type="text" placeholder="Naam Asset"></td>
         <td><input type="text" placeholder="Timeframe"></td>
         <td>Laden...</td>
         <td>Laden...</td>
@@ -22,56 +21,49 @@ function addTechRow() {
         <td>Laden...</td>
         <td>Laden...</td>
         <td>Laden...</td>
-        <td class="remove-cell"><button class="btn-remove" onclick="removeRow(this)">❌</button></td>
+        <td><button class="btn-remove" onclick="removeRow(this)">❌</button></td>
     `;
-
-    newRow.setAttribute("data-asset-id", assetId);  // Bewaar ID van de asset
 }
 
-// ✅ Functie om een indicator toe te voegen aan een specifieke asset
+// ✅ Indicator toevoegen voor een specifieke asset
 function addTechIndicator() {
-    let table = document.getElementById("techTable").getElementsByTagName('tbody')[0];
-    let rows = table.getElementsByTagName("tr");
-
-    if (rows.length === 0) {
+    let assetRows = document.getElementById("techTable").getElementsByTagName('tbody')[0].rows;
+    if (assetRows.length === 0) {
         alert("Voeg eerst een asset toe voordat je een indicator toevoegt.");
         return;
     }
-
+    
     let indicatorName = prompt("Voer de naam van de indicator in:");
     if (!indicatorName) return;
-
-    // ✅ Selecteer een asset om de indicator aan toe te voegen
-    let assetOptions = Array.from(rows).map(row => {
-        let assetInput = row.cells[0].querySelector("input");
-        return assetInput ? assetInput.value : "Onbekende asset";
-    });
-
-    let assetSelection = prompt(`Voor welke asset wil je "${indicatorName}" toevoegen?\n${assetOptions.join("\n")}`);
-    if (!assetSelection || !assetOptions.includes(assetSelection)) {
-        alert("Ongeldige asset geselecteerd.");
+    
+    let assetNames = [];
+    for (let row of assetRows) {
+        let assetName = row.cells[0].querySelector('input').value || "Onbekend";
+        assetNames.push(assetName);
+    }
+    
+    let selectedAsset = prompt(`Voor welke asset wil je "${indicatorName}" toevoegen?\n${assetNames.join("\n")}`);
+    if (!selectedAsset || !assetNames.includes(selectedAsset)) {
+        alert("Ongeldige asset gekozen.");
         return;
     }
-
-    // ✅ Zoek de juiste asset-rij en voeg de indicator toe vóór de "Verwijderen"-kolom
-    for (let row of rows) {
-        let assetInput = row.cells[0].querySelector("input");
-        if (assetInput && assetInput.value === assetSelection) {
-            let removeCellIndex = row.cells.length - 1;  // Laatste kolom is "Verwijderen"
-            let newCell = row.insertCell(removeCellIndex);
-            newCell.innerHTML = `${indicatorName} <button class="btn-remove" onclick="removeIndicator(this)">❌</button>`;
-            return;
+    
+    for (let row of assetRows) {
+        let assetInput = row.cells[0].querySelector('input');
+        if (assetInput.value === selectedAsset) {
+            let newCell = row.insertCell(row.cells.length - 1); // Voorlaatste kolom
+            newCell.innerHTML = `${indicatorName} <button class="btn-remove" onclick="removeCell(this)">❌</button>`;
         }
     }
 }
 
-// ✅ Functie om een specifieke indicator te verwijderen
-function removeIndicator(button) {
+// ✅ Verwijder een cel (indicator) uit een asset
+function removeCell(button) {
     let cell = button.parentNode;
     cell.parentNode.removeChild(cell);
 }
 
-// ✅ Functie om een asset-rij te verwijderen
+// ✅ Rij verwijderen (asset of indicator)
 function removeRow(button) {
     let row = button.parentNode.parentNode;
     row.parentNode.removeChild(row);
