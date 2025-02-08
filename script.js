@@ -2,11 +2,49 @@ document.addEventListener("DOMContentLoaded", function () {
     console.log("📌 DOM geladen!");
     updateAllGauges();
     setInterval(updateAllGauges, 60000);
-});
-document.addEventListener("DOMContentLoaded", function () {
+
+    document.addEventListener("DOMContentLoaded", function () {
     console.log("📌 DOM geladen!");
     updateAllGauges();
     setInterval(updateAllGauges, 60000);
+
+    ensureMacroRemoveButtons();
+    ensureTechIndicatorRemoveButtons(); // Fix: Bestaande technische indicatoren verwijderen
+});
+
+// ✅ Voeg verwijderknoppen toe aan ALLE bestaande technische indicatoren
+function ensureTechIndicatorRemoveButtons() {
+    let headerRow = document.getElementById("techTable").getElementsByTagName("thead")[0].rows[0];
+
+    // Begin na de standaardkolommen (Asset, Timeframe, RSI, ATR-Model, Volume, 200MA, etc.)
+    for (let i = 2; i < headerRow.cells.length - 1; i++) {
+        let cell = headerRow.cells[i];
+
+        // Controleer of er al een knop in de header staat
+        if (!cell.querySelector("button")) {
+            let removeButton = document.createElement("button");
+            removeButton.innerHTML = "❌";
+            removeButton.classList.add("btn-remove");
+            removeButton.onclick = function () { removeTechIndicatorByIndex(i); };
+            cell.appendChild(removeButton);
+        }
+    }
+}
+
+// ✅ Indicator verwijderen uit ALLE assets op basis van kolomindex
+function removeTechIndicatorByIndex(index) {
+    let headerRow = document.getElementById("techTable").getElementsByTagName("thead")[0].rows[0];
+    let tableBody = document.getElementById("techTable").getElementsByTagName("tbody")[0];
+
+    headerRow.deleteCell(index);
+
+    for (let row of tableBody.rows) {
+        row.deleteCell(index);
+    }
+
+    // **Herlaad de verwijderknoppen zodat alles correct blijft**
+    ensureTechIndicatorRemoveButtons();
+}
 
     // ✅ Voeg verwijderknoppen toe aan ALLE bestaande macro-indicatoren
     ensureMacroRemoveButtons();
