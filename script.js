@@ -2,26 +2,7 @@ document.addEventListener("DOMContentLoaded", function () {
     console.log("📌 DOM geladen!");
     updateAllGauges();
     setInterval(updateAllGauges, 60000);
-
-    // ✅ Zorg ervoor dat bestaande indicatoren een verwijderknop krijgen bij laden
-    ensureIndicatorRemoveButtons();
 });
-
-// ✅ Voeg verwijderknoppen toe aan bestaande indicatoren
-function ensureIndicatorRemoveButtons() {
-    let headerRow = document.getElementById("techTable").getElementsByTagName("thead")[0].rows[0];
-
-    for (let i = 9; i < headerRow.cells.length - 1; i++) { // Indicator-kolommen
-        let cell = headerRow.cells[i];
-        if (!cell.querySelector("button")) { // Voorkom dubbele knoppen
-            let removeButton = document.createElement("button");
-            removeButton.innerHTML = "❌";
-            removeButton.classList.add("btn-remove");
-            removeButton.onclick = function () { removeTechIndicator(this); };
-            cell.appendChild(removeButton);
-        }
-    }
-}
 
 // ✅ **Asset toevoegen**
 function addTechRow() {
