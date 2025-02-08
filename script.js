@@ -2,7 +2,26 @@ document.addEventListener("DOMContentLoaded", function () {
     console.log("📌 DOM geladen!");
     updateAllGauges();
     setInterval(updateAllGauges, 60000);
+
+    // ✅ Voeg verwijderoptie toe aan bestaande indicatoren bij het laden
+    ensureIndicatorRemoveButtons();
 });
+
+// ✅ Zorg ervoor dat bestaande indicatoren een verwijderoptie krijgen
+function ensureIndicatorRemoveButtons() {
+    let headerRow = document.getElementById("techTable").getElementsByTagName("thead")[0].rows[0];
+
+    for (let i = 9; i < headerRow.cells.length - 1; i++) { // Vanaf index 9 tot voorlaatste kolom
+        let cell = headerRow.cells[i];
+        if (!cell.querySelector("button")) { // Voeg alleen toe als het nog niet bestaat
+            let removeButton = document.createElement("button");
+            removeButton.innerHTML = "❌";
+            removeButton.classList.add("btn-remove");
+            removeButton.onclick = function () { removeTechIndicator(this); };
+            cell.appendChild(removeButton);
+        }
+    }
+}
 
 // ✅ Asset toevoegen
 function addTechRow() {
