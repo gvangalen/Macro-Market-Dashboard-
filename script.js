@@ -212,6 +212,42 @@ function removeRow(button) {
     row.parentNode.removeChild(row);
 }
 
+// ✅ Functie om een nieuwe asset toe te voegen
+function addTechRow() {
+    let table = document.getElementById("techTable").getElementsByTagName('tbody')[0];
+    let newRow = table.insertRow();
+    
+    newRow.innerHTML = `
+        <td><input type="text" placeholder="Naam Asset"></td>
+        <td><input type="text" placeholder="Timeframe"></td>
+        <td><input type="text" placeholder="RSI"></td>
+        <td><input type="text" placeholder="ATR-Model"></td>
+        <td><input type="text" placeholder="Volume (24u)"></td>
+        <td><input type="text" placeholder="Volume Trend"></td>
+        <td><input type="text" placeholder="200MA"></td>
+        <td><input type="text" placeholder="Positie t.o.v. 200MA"></td>
+        <td><button class="btn-remove" onclick="removeRow(this)">❌</button></td>
+    `;
+}
+
+// ✅ Functie om een nieuwe indicator toe te voegen
+function addTechIndicator() {
+    let table = document.getElementById("techIndicatorsTable").getElementsByTagName('tbody')[0];
+    let newRow = table.insertRow();
+    
+    newRow.innerHTML = `
+        <td><input type="text" placeholder="Naam Indicator"></td>
+        <td><input type="text" placeholder="Waarde"></td>
+        <td><button class="btn-remove" onclick="removeRow(this)">❌</button></td>
+    `;
+}
+
+// ✅ Functie om rijen (assets of indicatoren) te verwijderen
+function removeRow(button) {
+    let row = button.parentNode.parentNode;
+    row.parentNode.removeChild(row);
+}
+
 window.onload = function() {
     console.log("✅ Window onload functie geactiveerd!");
     fetchBitcoinData();  // Voeg deze regel toe
