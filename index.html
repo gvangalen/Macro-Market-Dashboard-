@@ -4,26 +4,63 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Macro Market Dashboard</title>
-    
-    <!-- ✅ Update de verwijzing naar style.css -->
     <link rel="stylesheet" href="style/style.css">
+    <script defer src="script/script.js"></script>
 </head>
 <body>
-
     <h1>Macro Market Dashboard</h1>
-    <p>Welkom bij de live Bitcoin marktgegevens en macro-indicatoren.</p>
-
-    <div class="table-container">
-        <h2>🌍 Navigatie</h2>
-        <ul>
-            <li><a href="dashboard/dashboard.html">📊 Dashboard</a></li>
-            <li><a href="macro/macro.html">📈 Macro Indicatoren</a></li>
-            <li><a href="technical/technical.html">📉 Technische Analyse</a></li>
-        </ul>
+    <p>Live Bitcoin marktgegevens en macro-indicatoren.</p>
+    
+    <!-- Dashboard Meters -->
+    <div class="dashboard-container">
+        <div class="gauge-container" id="macroGauge"></div>
+        <div class="gauge-container" id="technicalGauge"></div>
+        <div class="gauge-container" id="setupGauge"></div>
     </div>
 
-    <!-- ✅ Update de verwijzing naar script.js -->
-    <script src="script/script.js"></script>
+    <!-- Macro Indicatoren Tabel -->
+    <div class="table-container">
+        <h2>📊 Macro Indicatoren</h2>
+        <table id="macroTable">
+            <thead>
+                <tr>
+                    <th>Indicator</th>
+                    <th>Huidig Niveau</th>
+                    <th>Trend</th>
+                    <th>Interpretatie</th>
+                    <th>Actie</th>
+                    <th>Verwijderen</th>
+                </tr>
+            </thead>
+            <tbody>
+                <!-- Data wordt hier dynamisch toegevoegd -->
+            </tbody>
+        </table>
+        <button class="btn-add" onclick="addMacroRow()">+ Macro Indicator</button>
+    </div>
 
+    <!-- Technische Indicatoren Tabel -->
+    <div class="table-container">
+        <h2>📈 Technische Analyse</h2>
+        <table id="techTable">
+            <thead>
+                <tr>
+                    <th>Asset</th>
+                    <th>Timeframe</th>
+                    <th>RSI</th>
+                    <th>ATR</th>
+                    <th>Volume</th>
+                    <th>200MA</th>
+                    <th>Positie</th>
+                    <th>Verwijderen</th>
+                </tr>
+            </thead>
+            <tbody>
+                <!-- Data wordt hier dynamisch toegevoegd -->
+            </tbody>
+        </table>
+        <button class="btn-add" onclick="addTechRow()">+ Asset</button>
+        <button class="btn-add" onclick="addTechIndicator()">+ Indicator</button>
+    </div>
 </body>
 </html>
