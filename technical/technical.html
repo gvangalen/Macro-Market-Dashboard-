@@ -1,1 +1,36 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Technische Analyse</title>
+    <link rel="stylesheet" href="technical.css">
+</head>
+<body>
 
+    <h2>Technische Analyse</h2>
+    <button class="btn-add" onclick="addTechRow()">➕ Asset Toevoegen</button>
+    <button class="btn-add" onclick="addTechIndicator()">➕ Indicator Toevoegen</button>
+
+    <table id="techTable">
+        <thead>
+            <tr>
+                <th>Asset</th>
+                <th>Timeframe</th>
+                <th>RSI</th>
+                <th>ATR-Model</th>
+                <th>Volume (24u)</th>
+                <th>Volume Trend</th>
+                <th>200MA</th>
+                <th>Positie t.o.v. 200MA</th>
+                <th>Verwijderen</th>
+            </tr>
+        </thead>
+        <tbody>
+            <!-- Dynamische rijen worden hier toegevoegd -->
+        </tbody>
+    </table>
+
+    <script src="technical.js"></script>
+</body>
+</html>
