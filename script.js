@@ -156,7 +156,7 @@ function updateAllGauges() {
     fetchBitcoinData();
 }
 
-// ✅ **Functie om een macro-indicator toe te voegen**
+// ✅ **Macro-indicatoren toevoegen**
 function addMacroRow() {
     let table = document.getElementById("macroTable").getElementsByTagName('tbody')[0];
     let newRow = table.insertRow();
@@ -171,7 +171,7 @@ function addMacroRow() {
     `;
 }
 
-// ✅ **Functie om een technische indicator toe te voegen**
+// ✅ **Technische indicatoren toevoegen**
 function addTechIndicator() {
     let table = document.getElementById("techIndicatorsTable").getElementsByTagName('tbody')[0];
     let newRow = table.insertRow();
@@ -183,7 +183,25 @@ function addTechIndicator() {
     `;
 }
 
-// ✅ **Functie om een rij te verwijderen**
+// ✅ **Assets toevoegen aan technische analyse tabel**
+function addTechRow() {
+    let table = document.getElementById("techTable").getElementsByTagName('tbody')[0];
+    let newRow = table.insertRow();
+
+    newRow.innerHTML = `
+        <td><input type="text" placeholder="Naam Asset"></td>
+        <td><input type="text" placeholder="Timeframe"></td>
+        <td>Laden...</td>
+        <td>Laden...</td>
+        <td>Laden...</td>
+        <td>Laden...</td>
+        <td>Laden...</td>
+        <td>Laden...</td>
+        <td><button class="btn-remove" onclick="removeRow(this)">❌</button></td>
+    `;
+}
+
+// ✅ **Verwijder een rij (assets of indicatoren)**
 function removeRow(button) {
     let row = button.parentNode.parentNode;
     row.parentNode.removeChild(row);
