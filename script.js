@@ -149,6 +149,8 @@ async function fetchBitcoinData() {
         console.error("❌ Fout bij ophalen Bitcoin data:", error);
     }
 }
+window.addTechRow = addTechRow;
+window.addTechIndicator = addTechIndicator;
 
 // ✅ **Start updates bij laden**
 window.onload = function() {
