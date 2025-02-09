@@ -4,7 +4,7 @@ document.addEventListener("DOMContentLoaded", function () {
     // ✅ Direct de meters bijwerken met dummywaarden (totdat API-data werkt)
     updateMacroGauge(-2);
     updateTechnicalGauge(1);
-    updateSetupGauge(0);
+    checkActiveSetups(); // 🔥 Check of er actieve setups zijn en update de SetupGauge
 });
 
 // ✅ **Macro Gauge updaten**
@@ -20,8 +20,8 @@ function updateTechnicalGauge(score) {
 }
 
 // ✅ **Setup Gauge updaten**
-function updateSetupGauge(score) {
-    let percentage = ((score + 2) / 4) * 100;
+function updateSetupGauge(activeSetups) {
+    let percentage = activeSetups > 0 ? 100 : 0; // ✅ Groen als er een actieve setup is
     updateGauge("SetupGauge", percentage);
 }
 
@@ -44,4 +44,23 @@ function updateGauge(id, value) {
             <div class="gauge-value">${percentage}%</div>
         </div>
     `;
+}
+
+// ✅ **Check of een setup actief is en update SetupGauge**
+function checkActiveSetups() {
+    let setups = JSON.parse(localStorage.getItem("setups")) || [];
+    let activeSetups = 0;
+
+    setups.forEach(setup => {
+        let isActive = matchSetupToMarket(setup);
+        if (isActive) activeSetups++;
+    });
+
+    updateSetupGauge(activeSetups);
+}
+
+// ✅ **Simpele check of een setup actief is (later koppelen aan echte data)**
+function matchSetupToMarket(setup) {
+    let marketTrend = "bullish"; // 🔥 DIT LATER AUTOMATISCH OPHALEN
+    return setup.trend === marketTrend;
 }
