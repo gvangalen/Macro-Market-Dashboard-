@@ -1,22 +1,16 @@
 document.addEventListener("DOMContentLoaded", function () {
     console.log("📌 Macro Indicatoren geladen!");
-    ensureMacroRemoveButtons();
-    updateMacroData();
-    setInterval(updateMacroData, 60000);
-});
 
-document.addEventListener("DOMContentLoaded", function () {
-    console.log("📌 Macro Indicatoren geladen!");
-    
-    // ✅ Controleer of de tabel beschikbaar is voordat we de verwijderknoppen toevoegen
+    // Wacht totdat de tabel beschikbaar is en voeg verwijderknoppen toe
     setTimeout(ensureMacroRemoveButtons, 500);
 
     updateMacroData();
     setInterval(updateMacroData, 60000);
 });
 
+// ✅ **Voegt verwijderknoppen toe aan bestaande rijen**
 window.ensureMacroRemoveButtons = function () {
-    let tableBody = document.getElementById("macroTable").getElementsByTagName("tbody")[0];
+    let tableBody = document.getElementById("macroTable")?.getElementsByTagName("tbody")[0];
 
     if (!tableBody) {
         console.warn("⚠️ Macro tabel nog niet geladen, probeer opnieuw...");
@@ -25,9 +19,8 @@ window.ensureMacroRemoveButtons = function () {
     }
 
     for (let row of tableBody.rows) {
-        let lastCell = row.cells[row.cells.length - 1]; // Laatste cel in de rij
+        let lastCell = row.cells[row.cells.length - 1];
 
-        // ✅ Controleer of de knop al bestaat, anders toevoegen
         if (!lastCell.querySelector("button")) {
             lastCell.innerHTML = `<button class="btn-remove" onclick="removeRow(this)">❌</button>`;
         }
@@ -54,36 +47,17 @@ window.addMacroRow = function () {
     `;
 
     console.log(`✅ Indicator toegevoegd: ${indicatorName}`);
+
+    // ✅ Na toevoegen, direct de verwijderknoppen checken
+    ensureMacroRemoveButtons();
 };
 
-// ✅ **Rij verwijderen** (Maak globaal beschikbaar!)
+// ✅ **Rij verwijderen**
 window.removeRow = function (button) {
     let row = button.parentNode.parentNode;
     row.parentNode.removeChild(row);
-};
 
-
-window.addMacroRow = function () {
-    let indicatorName = prompt("Voer de naam van de indicator in:");
-    if (!indicatorName) return;
-
-    let table = document.getElementById("macroTable").getElementsByTagName('tbody')[0];
-    let newRow = table.insertRow();
-
-    newRow.innerHTML = `
-        <td>${indicatorName}</td>
-        <td>Laden...</td>
-        <td>N/A</td>
-        <td>N/A</td>
-        <td>N/A</td>
-        <td><button class="btn-remove" onclick="removeRow(this)">❌</button></td>
-    `;
-};
-
-// ✅ **Rij verwijderen** (Maak globaal beschikbaar!)
-window.removeRow = function (button) {
-    let row = button.parentNode.parentNode;
-    row.parentNode.removeChild(row);
+    console.log("❌ Indicator verwijderd!");
 };
 
 // ✅ **Macro Indicatoren updaten**
