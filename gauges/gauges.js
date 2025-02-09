@@ -1,61 +1,66 @@
 console.log("✅ gauges.js correct geladen!");
 
-function updateGauge(id, value) {
-    let gauge = document.getElementById(id);
-    if (!gauge) {
-        console.warn(`⚠️ Gauge '${id}' niet gevonden!`);
-        return;
-    }
+let macroGauge, technicalGauge, setupGauge;
 
-    let percentage = Math.max(0, Math.min(100, value)); // Zorg dat waarde tussen 0-100 blijft
-    let gaugeFill = gauge.querySelector(".gauge-fill");
-    let gaugeValue = gauge.querySelector(".gauge-value");
+// ✅ **Maak Chart.js Meters**
+document.addEventListener("DOMContentLoaded", function () {
+    console.log("🔄 Initialiseren van de meters...");
 
-    // 🎨 **Dynamische kleur instellen**
-    let color;
-    if (percentage < 30) {
-        color = "#d9534f"; // Rood (Bearish)
-    } else if (percentage < 60) {
-        color = "#f0ad4e"; // Geel/Oranje (Neutraal)
-    } else {
-        color = "#4caf50"; // Groen (Bullish)
-    }
+    const createGauge = (ctx, label) => new Chart(ctx, {
+        type: 'doughnut',
+        data: {
+            labels: ["Strong Sell", "Sell", "Neutral", "Buy", "Strong Buy"],
+            datasets: [{
+                data: [20, 20, 20, 20, 20], // Verdeling van 5 segmenten
+                backgroundColor: ["#ff3b30", "#ff9500", "#f0ad4e", "#4cd964", "#34c759"],
+                borderWidth: 0
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            rotation: -90, // Begin onderaan
+            circumference: 180, // Halve cirkel
+            cutout: "80%", // Dunne ring
+            plugins: {
+                legend: { display: false },
+                tooltip: { enabled: false },
+            }
+        }
+    });
 
-    // ✅ **Update de stijl van de meter**
-    if (gaugeFill) {
-        gaugeFill.style.background = `conic-gradient(${color} ${percentage * 3.6}deg, #ddd 0deg)`;
-        gaugeFill.style.transform = `rotate(${percentage * 1.8 - 90}deg)`; // -90 om op 'Neutral' te starten
-    }
+    macroGauge = createGauge(document.getElementById("macroGauge"), "Macro");
+    technicalGauge = createGauge(document.getElementById("technicalGauge"), "Technisch");
+    setupGauge = createGauge(document.getElementById("setupGauge"), "Setup");
+});
 
-    // ✅ **Update de tekstwaarde**
-    if (gaugeValue) {
-        gaugeValue.innerText = `${percentage}%`;
-    }
+// ✅ **Gauge bijwerken met score (-2 tot +2)**
+function updateGauge(gauge, score) {
+    if (!gauge) return;
+    let index = Math.max(0, Math.min(4, Math.round((score + 2) / 4 * 4))); // Zet -2 tot 2 om naar index 0-4
+    gauge.data.datasets[0].data = gauge.data.datasets[0].data.map((v, i) => (i === index ? 100 : 20)); // Zet wijzer op de juiste plek
+    gauge.update();
 }
 
-// ✅ **Functies om gauges extern te updaten**
+// ✅ **Extern aanroepbare functies**
 window.setMacroGauge = function (score) {
-    console.log(`🔄 Macro gauge bijwerken: ${score}`);
-    let percentage = ((score + 2) / 4) * 100; // Zet -2 tot 2 om naar 0-100%
-    updateGauge("MacroGauge", percentage);
+    console.log(`🔄 Macro gauge: ${score}`);
+    updateGauge(macroGauge, score);
 };
 
 window.setTechnicalGauge = function (score) {
-    console.log(`🔄 Technische gauge bijwerken: ${score}`);
-    let percentage = ((score + 2) / 4) * 100;
-    updateGauge("TechnicalGauge", percentage);
+    console.log(`🔄 Technische gauge: ${score}`);
+    updateGauge(technicalGauge, score);
 };
 
 window.setSetupGauge = function (score) {
-    console.log(`🔄 Setup gauge bijwerken: ${score}`);
-    let percentage = ((score + 2) / 4) * 100;
-    updateGauge("SetupGauge", percentage);
+    console.log(`🔄 Setup gauge: ${score}`);
+    updateGauge(setupGauge, score);
 };
 
-// ✅ **Gauges direct updaten met dummywaarden**
+// ✅ **Gauges direct instellen met dummywaarden**
 document.addEventListener("DOMContentLoaded", function () {
-    console.log("🔄 Dummywaarden instellen...");
-    setMacroGauge(-2);       // Bearish → Rood (0%)
-    setTechnicalGauge(1);    // Neutraal → Geel (tussen 40-60%)
-    setSetupGauge(0);        // Licht bearish → Geel/oranje (tussen 30-50%)
+    setMacroGauge(-1);   // Licht bearish
+    setTechnicalGauge(1); // Neutraal
+    setSetupGauge(2);    // Bullish
 });
