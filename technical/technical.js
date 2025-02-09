@@ -1,45 +1,55 @@
 document.addEventListener("DOMContentLoaded", function () {
     console.log("📌 Technische Analyse geladen!");
+    ensureTechButtons();
 });
+
+// ✅ Zorg ervoor dat elke rij en kolom standaard een verwijderknop heeft
+function ensureTechButtons() {
+    let tableBody = document.getElementById("analysisTable").getElementsByTagName("tbody")[0];
+    let headerRow = document.getElementById("analysisTable").getElementsByTagName("thead")[0].rows[0];
+
+    // ✅ Verwijderknoppen voor elke asset (rij)
+    for (let row of tableBody.rows) {
+        let lastCell = row.cells[row.cells.length - 1];
+        if (!lastCell.querySelector("button")) {
+            lastCell.innerHTML = `<button class="btn-remove" onclick="removeRow(this)">❌</button>`;
+        }
+    }
+
+    // ✅ Verwijderknoppen voor indicatoren (kolommen)
+    for (let i = 2; i < headerRow.cells.length - 1; i++) {
+        let cell = headerRow.cells[i];
+        if (!cell.querySelector("button")) {
+            cell.innerHTML += ` <button class="btn-remove" onclick="removeTechIndicator(this)">❌</button>`;
+        }
+    }
+}
 
 // ✅ **Asset toevoegen**
 window.addTechRow = function () {
     let assetName = prompt("Voer de naam van de asset in:");
     if (!assetName) return;
 
-    let table = document.getElementById("techTable").getElementsByTagName('tbody')[0];
+    let table = document.getElementById("analysisTable").getElementsByTagName('tbody')[0];
     let newRow = table.insertRow();
 
-    // ✅ Timeframe dropdown aanmaken
-    let timeframeCell = newRow.insertCell(1);
-    let timeframeSelect = document.createElement("select");
-    let timeframeOptions = ["1hr", "4hr", "1day", "1week"];
-
-    timeframeOptions.forEach(option => {
-        let opt = document.createElement("option");
-        opt.value = option;
-        opt.text = option;
-        timeframeSelect.appendChild(opt);
-    });
-
-    // ✅ Cellen invullen
-    newRow.insertCell(0).innerText = assetName; // Asset naam
-    timeframeCell.appendChild(timeframeSelect); // Timeframe dropdown
-
-    // ✅ Voeg dynamisch cellen toe voor bestaande indicatoren
-    let headerRow = document.getElementById("techTable").rows[0];
-    for (let i = 2; i < headerRow.cells.length - 1; i++) {
-        newRow.insertCell(i).innerHTML = "Laden...";
-    }
-
-    // ✅ Voeg standaard de verwijderknop toe
-    let deleteCell = newRow.insertCell(-1);
-    deleteCell.innerHTML = `<button class="btn-remove" onclick="removeRow(this)">❌</button>`;
+    // ✅ Timeframe wordt globaal aangepast
+    let timeframe = document.getElementById('globalTimeframe').value;
+    
+    newRow.innerHTML = `
+        <td>${assetName}</td>
+        <td class='timeframe'>${timeframe}</td>
+        <td class='indicator'>Laden...</td>
+        <td class='indicator'>N/A</td>
+        <td class='indicator'>Laden...</td>
+        <td class='indicator'>Laden...</td>
+        <td><button class='remove' onclick="removeRow(this)">❌</button></td>
+    `;
 };
 
 // ✅ **Indicator toevoegen**
 window.addTechIndicator = function () {
-    let table = document.getElementById("techTable");
+    let table = document.getElementById("analysisTable");
     let headerRow = table.getElementsByTagName("thead")[0].rows[0];
     let bodyRows = table.getElementsByTagName("tbody")[0].rows;
 
@@ -67,8 +77,8 @@ window.addTechIndicator = function () {
 
 // ✅ **Indicator verwijderen**
 window.removeTechIndicator = function (button) {
-    let headerRow = document.getElementById("techTable").getElementsByTagName("thead")[0].rows[0];
-    let tableBody = document.getElementById("techTable").getElementsByTagName("tbody")[0];
+    let headerRow = document.getElementById("analysisTable").getElementsByTagName("thead")[0].rows[0];
+    let tableBody = document.getElementById("analysisTable").getElementsByTagName("tbody")[0];
 
     let columnIndex = button.parentNode.cellIndex;
 
@@ -83,3 +93,15 @@ window.removeRow = function (button) {
     let row = button.parentNode.parentNode;
     row.parentNode.removeChild(row);
 };
+
+// ✅ **Timeframe veranderen voor de hele tabel**
+document.getElementById('globalTimeframe').addEventListener('change', function() {
+    let newTimeframe = this.value;
+    let timeCells = document.querySelectorAll('.timeframe');
+
+    timeCells.forEach(cell => {
+        cell.textContent = newTimeframe;
+    });
+
+    console.log(`✅ Timeframe veranderd naar ${newTimeframe}`);
+});
