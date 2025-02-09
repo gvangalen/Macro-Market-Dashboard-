@@ -16,6 +16,7 @@ function updateGauge(id, value) {
         gaugeFill.style.background = `conic-gradient(${color} ${percentage * 3.6}deg, #ddd 0deg)`;
         gaugeFill.style.transform = `rotate(${percentage * 1.8}deg)`; // Correcte schaal voor 360°
     }
+    console.log("✅ gauges.js correct geladen!");
 
     // ✅ **Update de tekstwaarde**
     if (gaugeValue) {
