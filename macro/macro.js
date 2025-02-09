@@ -5,14 +5,14 @@ document.addEventListener("DOMContentLoaded", function () {
     setInterval(updateMacroData, 60000);
 });
 
-// ✅ Zorg dat alle bestaande rijen de verwijderknop krijgen
+// ✅ Zorg dat alle bestaande rijen de verwijderknop hebben
 function ensureMacroRemoveButtons() {
     let tableBody = document.getElementById("macroTable").getElementsByTagName("tbody")[0];
 
     for (let row of tableBody.rows) {
-        let lastCell = row.cells[row.cells.length - 1];
+        let lastCell = row.cells[4]; // ✅ **Laatste kolom is ALTIJD 5e kolom**
 
-        // ✅ Als de laatste cel nog GEEN verwijderknop heeft, voeg deze toe
+        // ✅ Voeg verwijderknop toe ALS DIE ER NOG NIET IS
         if (!lastCell.querySelector("button")) {
             lastCell.innerHTML = `<button class="btn-remove" onclick="removeRow(this)">❌</button>`;
         }
@@ -21,7 +21,7 @@ function ensureMacroRemoveButtons() {
     console.log("✅ Verwijderknoppen gecontroleerd en toegevoegd!");
 }
 
-// ✅ **Indicator toevoegen (vaste structuur, geen extra kolommen!)**
+// ✅ **Indicator toevoegen (altijd 5 kolommen, geen extra kolom!)**
 window.addMacroRow = function () {
     let indicatorName = prompt("Voer de naam van de indicator in:");
     if (!indicatorName) return;
@@ -29,11 +29,10 @@ window.addMacroRow = function () {
     let table = document.getElementById("macroTable").getElementsByTagName('tbody')[0];
     let newRow = table.insertRow();
 
-    // ✅ Altijd exact 6 kolommen
+    // ✅ **Exact 5 kolommen blijven behouden**
     newRow.innerHTML = `
         <td>${indicatorName}</td>
         <td>Laden...</td>
-        <td>N/A</td>
         <td>N/A</td>
         <td>N/A</td>
         <td><button class="btn-remove" onclick="removeRow(this)">❌</button></td>
@@ -42,7 +41,7 @@ window.addMacroRow = function () {
     console.log(`✅ Indicator toegevoegd: ${indicatorName}`);
 };
 
-// ✅ **Rij verwijderen zonder tabelstructuur te verstoren**
+// ✅ **Rij verwijderen (niets anders aanpassen!)**
 window.removeRow = function (button) {
     let row = button.parentNode.parentNode;
     row.parentNode.removeChild(row);
