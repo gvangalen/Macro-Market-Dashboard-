@@ -3,12 +3,12 @@ document.addEventListener("DOMContentLoaded", function () {
     ensureTechButtons();
 });
 
-// ✅ Zorg ervoor dat elke rij en kolom standaard een verwijderknop heeft
+// ✅ **Zorg ervoor dat elke rij en kolom een verwijderknop heeft**
 function ensureTechButtons() {
     let tableBody = document.getElementById("techTable").getElementsByTagName("tbody")[0];
     let headerRow = document.getElementById("techTable").getElementsByTagName("thead")[0].rows[0];
 
-    // ✅ Verwijderknoppen voor elke asset (rij)
+    // ✅ **Voeg verwijderknoppen toe aan bestaande assets**
     for (let row of tableBody.rows) {
         let lastCell = row.cells[row.cells.length - 1];
         if (!lastCell.querySelector("button")) {
@@ -16,7 +16,7 @@ function ensureTechButtons() {
         }
     }
 
-    // ✅ Verwijderknoppen voor indicatoren (kolommen)
+    // ✅ **Voeg verwijderknoppen toe aan bestaande indicatoren**
     for (let i = 2; i < headerRow.cells.length - 1; i++) {
         let cell = headerRow.cells[i];
         if (!cell.querySelector("button")) {
@@ -25,7 +25,7 @@ function ensureTechButtons() {
     }
 }
 
-// ✅ **Asset toevoegen**
+// ✅ **Asset toevoegen (inclusief verwijderknop)**
 window.addTechRow = function () {
     let assetName = prompt("Voer de naam van de asset in:");
     if (!assetName) return;
@@ -33,33 +33,32 @@ window.addTechRow = function () {
     let table = document.getElementById("techTable").getElementsByTagName('tbody')[0];
     let newRow = table.insertRow();
 
-    // ✅ Timeframe dropdown aanmaken
+    // ✅ **Timeframe dropdown**
     let timeframeCell = newRow.insertCell(1);
     let timeframeSelect = document.createElement("select");
-    let timeframeOptions = ["1hr", "4hr", "1day", "1week"];
-
-    timeframeOptions.forEach(option => {
+    ["1hr", "4hr", "1day", "1week"].forEach(option => {
         let opt = document.createElement("option");
         opt.value = option;
         opt.text = option;
         timeframeSelect.appendChild(opt);
     });
 
-    // ✅ Cellen invullen
+    // ✅ **Bepaal het aantal kolommen correct**
+    let totalColumns = document.getElementById("techTable").rows[0].cells.length;
+
     newRow.insertCell(0).innerText = assetName; // Asset naam
     timeframeCell.appendChild(timeframeSelect); // Timeframe dropdown
 
-    // ✅ De rest van de standaard kolommen vullen
-    for (let i = 2; i < document.getElementById("techTable").rows[0].cells.length - 1; i++) {
+    for (let i = 2; i < totalColumns - 1; i++) {
         newRow.insertCell(i).innerHTML = "Laden...";
     }
 
-    // ✅ Voeg standaard de verwijderknop toe
+    // ✅ **Verwijderknop toevoegen voor asset**
     let deleteCell = newRow.insertCell(-1);
     deleteCell.innerHTML = `<button class="btn-remove" onclick="removeRow(this)">❌</button>`;
 };
 
-// ✅ **Indicator toevoegen**
+// ✅ **Indicator toevoegen met verwijderknop**
 window.addTechIndicator = function () {
     let table = document.getElementById("techTable");
     let headerRow = table.getElementsByTagName("thead")[0].rows[0];
@@ -68,7 +67,6 @@ window.addTechIndicator = function () {
     let indicatorName = prompt("Voer de naam van de indicator in:");
     if (!indicatorName) return;
 
-    // ✅ Controleer of de indicator al bestaat
     for (let cell of headerRow.cells) {
         if (cell.textContent.includes(indicatorName)) {
             alert("Deze indicator bestaat al!");
@@ -76,7 +74,7 @@ window.addTechIndicator = function () {
         }
     }
 
-    // ✅ Nieuwe kolom toevoegen zonder extra rijen aan te maken
+    // ✅ **Indicator kolom toevoegen**
     let newHeader = document.createElement("th");
     newHeader.innerHTML = `${indicatorName} <button class="btn-remove" onclick="removeTechIndicator(this)">❌</button>`;
     headerRow.insertBefore(newHeader, headerRow.cells[headerRow.cells.length - 1]);
