@@ -49,7 +49,7 @@ window.addTechRow = function () {
         timeframeSelect.appendChild(opt);
     });
 
-    // ✅ Vul de rij correct met het juiste aantal cellen
+    // ✅ Cellen invullen (matcht met bestaande kolommen!)
     newRow.insertCell(0).innerText = assetName; // Asset naam
     timeframeCell.appendChild(timeframeSelect); // Timeframe dropdown
 
@@ -58,7 +58,7 @@ window.addTechRow = function () {
         newRow.insertCell(i).innerHTML = "Laden...";
     }
 
-    // ✅ Voeg standaard de verwijderknop toe
+    // ✅ Voeg verwijderknop toe aan asset
     let deleteCell = newRow.insertCell(-1);
     deleteCell.innerHTML = `<button class="btn-remove" onclick="removeRow(this)">❌</button>`;
 };
