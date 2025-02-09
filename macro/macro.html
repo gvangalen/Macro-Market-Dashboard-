@@ -1,6 +1,7 @@
-<div class="table-container">
-    <h2>📉 Macro Indicatoren</h2>
+<div class="macro-container">
+    <h2>📊 Macro Indicatoren</h2>
     <button class="btn-add" onclick="addMacroRow()">➕ Indicator toevoegen</button>
+
     <table id="macroTable">
         <thead>
             <tr>
@@ -9,25 +10,32 @@
                 <th>Trend</th>
                 <th>Interpretatie</th>
                 <th>Actie</th>
+                <th>Score</th>
+                <th>Verwijderen</th>
             </tr>
         </thead>
         <tbody>
             <tr>
                 <td>Bitcoin Dominantie</td>
-                <td id="btcDominance">Laden...</td>
+                <td id="usdtDominance">Laden...</td>
                 <td>N/A</td>
                 <td>N/A</td>
                 <td>N/A</td>
+                <td class="macro-score">-</td>
                 <td><button class="btn-remove" onclick="removeRow(this)">❌</button></td>
             </tr>
             <tr>
-                <td>US Dollar Index (DXY)</td>
-                <td id="dxy">Laden...</td>
+                <td>Google Trends (Fear & Greed)</td>
+                <td id="googleTrends">Laden...</td>
                 <td>N/A</td>
                 <td>N/A</td>
                 <td>N/A</td>
+                <td class="macro-score">-</td>
                 <td><button class="btn-remove" onclick="removeRow(this)">❌</button></td>
             </tr>
         </tbody>
     </table>
+
+    <h3>🌍 Totale Macro Score: <span id="macroTotalScore">N/A</span></h3>
+    <h3>📈 Macro Advies: <span id="macroAdvice">Neutraal</span></h3>
 </div>
