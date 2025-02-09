@@ -11,17 +11,17 @@
 <div class="setup-container">
     <h2>➕ Setup Toevoegen</h2>
     <form id="setupForm">
-        <label>📛 Naam van Setup:</label>
-        <input type="text" id="setupName" required>
+        <label for="setupName">📛 Naam van Setup:</label>
+        <input type="text" id="setupName" placeholder="Bijv. A-Plus Setup" required>
 
-        <label>📉 Indicatoren (bijv. RSI < 30, SMA200 boven prijs):</label>
-        <input type="text" id="setupIndicators" required>
+        <label for="setupIndicators">📉 Indicatoren (bijv. RSI < 30, SMA200 boven prijs):</label>
+        <input type="text" id="setupIndicators" placeholder="Bijv. RSI < 30, SMA200 boven prijs" required>
 
-        <label>📊 Marktconditie (Bullish, Bearish, Neutraal):</label>
+        <label for="setupTrend">📊 Marktconditie:</label>
         <select id="setupTrend">
-            <option value="bullish">Bullish</option>
-            <option value="bearish">Bearish</option>
-            <option value="neutral">Neutraal</option>
+            <option value="bullish">📈 Bullish</option>
+            <option value="bearish">📉 Bearish</option>
+            <option value="neutral">⚖️ Neutraal</option>
         </select>
 
         <button type="submit">✅ Opslaan</button>
