@@ -1,14 +1,14 @@
 document.addEventListener("DOMContentLoaded", function () {
     console.log("📌 Macro Indicatoren geladen!");
-
-    // Wacht tot de tabel volledig is geladen en voeg verwijderknoppen toe
+    
+    // ✅ Wacht tot de tabel volledig geladen is en voeg verwijderknoppen toe
     setTimeout(ensureMacroRemoveButtons, 500);
 
     updateMacroData();
     setInterval(updateMacroData, 60000);
 });
 
-// ✅ **Voegt verwijderknoppen toe aan bestaande rijen**
+// ✅ **Verwijderknoppen toevoegen aan ALLE bestaande rijen**
 window.ensureMacroRemoveButtons = function () {
     let tableBody = document.getElementById("macroTable")?.getElementsByTagName("tbody")[0];
 
@@ -19,17 +19,18 @@ window.ensureMacroRemoveButtons = function () {
     }
 
     for (let row of tableBody.rows) {
-        let lastCell = row.cells[row.cells.length - 1]; // Zorgt ervoor dat de knop in de laatste cel blijft
+        let lastCell = row.cells[row.cells.length - 1]; // Pak de laatste kolom
 
-        if (!lastCell || lastCell.innerHTML.trim() === "") {
+        // ✅ Controleer of de knop al bestaat, zo niet: voeg toe
+        if (!lastCell.querySelector("button")) {
             lastCell.innerHTML = `<button class="btn-remove" onclick="removeRow(this)">❌</button>`;
         }
     }
 
-    console.log("✅ Verwijderknoppen correct toegevoegd!");
+    console.log("✅ Verwijderknoppen correct toegevoegd aan alle rijen!");
 };
 
-// ✅ **Indicator toevoegen met prompt**
+// ✅ **Indicator toevoegen (gebruikt een prompt)**
 window.addMacroRow = function () {
     let indicatorName = prompt("Voer de naam van de indicator in:");
     if (!indicatorName) return;
@@ -37,21 +38,21 @@ window.addMacroRow = function () {
     let table = document.getElementById("macroTable").getElementsByTagName('tbody')[0];
     let newRow = table.insertRow();
 
-    // ✅ Voeg de exacte hoeveelheid cellen toe zodat de layout consistent blijft
+    // ✅ Exacte hoeveelheid kolommen toevoegen (Voorkomt extra kolommen)
     newRow.insertCell(0).innerText = indicatorName;
     newRow.insertCell(1).innerText = "Laden...";
     newRow.insertCell(2).innerText = "N/A";
     newRow.insertCell(3).innerText = "N/A";
     newRow.insertCell(4).innerText = "N/A";
 
-    // ✅ Verwijderknop in de laatste kolom
+    // ✅ Verwijderknop in de juiste kolom
     let deleteCell = newRow.insertCell(5);
     deleteCell.innerHTML = `<button class="btn-remove" onclick="removeRow(this)">❌</button>`;
 
     console.log(`✅ Indicator toegevoegd: ${indicatorName}`);
 };
 
-// ✅ **Rij verwijderen**
+// ✅ **Rij verwijderen zonder extra kolommen**
 window.removeRow = function (button) {
     let row = button.parentNode.parentNode;
     row.parentNode.removeChild(row);
