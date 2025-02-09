@@ -1,43 +1,52 @@
 document.addEventListener("DOMContentLoaded", function () {
-    const setupForm = document.getElementById("setupForm");
-    const setupList = document.getElementById("setupList");
-    let setups = JSON.parse(localStorage.getItem("setups")) || [];
-
-    function renderSetups() {
-        setupList.innerHTML = "";
-        setups.forEach((setup, index) => {
-            const li = document.createElement("li");
-            li.textContent = `${setup.name} - ${setup.indicators} - ${setup.trend}`;
-            
-            const deleteBtn = document.createElement("button");
-            deleteBtn.textContent = "Verwijderen";
-            deleteBtn.classList.add("delete-btn");
-            deleteBtn.onclick = () => deleteSetup(index);
-            
-            li.appendChild(deleteBtn);
-            setupList.appendChild(li);
-        });
-    }
-
-    function deleteSetup(index) {
-        setups.splice(index, 1);
-        localStorage.setItem("setups", JSON.stringify(setups));
-        renderSetups();
-    }
-
-    setupForm.addEventListener("submit", function (e) {
-        e.preventDefault();
-        const setupName = document.getElementById("setupName").value;
-        const indicators = document.getElementById("indicators").value;
-        const trend = document.getElementById("trend").value;
-
-        const newSetup = { name: setupName, indicators, trend };
-        setups.push(newSetup);
-        localStorage.setItem("setups", JSON.stringify(setups));
-        setupForm.reset();
-        renderSetups();
-    });
-
-    renderSetups();
+    console.log("✅ setup.js geladen!");
+    loadSetups(); // Laad bestaande setups
 });
 
+document.getElementById("setupForm").addEventListener("submit", function (e) {
+    e.preventDefault();
+
+    let name = document.getElementById("setupName").value.trim();
+    let indicators = document.getElementById("setupIndicators").value.trim();
+    let trend = document.getElementById("setupTrend").value;
+
+    if (!name || !indicators) {
+        alert("⚠️ Vul alle velden in!");
+        return;
+    }
+
+    let setup = { name, indicators, trend };
+    saveSetup(setup);
+    document.getElementById("setupForm").reset();
+});
+
+function saveSetup(setup) {
+    let setups = JSON.parse(localStorage.getItem("setups")) || [];
+    if (setups.length >= 5) {
+        alert("⚠️ Maximaal 5 setups toegestaan!");
+        return;
+    }
+    setups.push(setup);
+    localStorage.setItem("setups", JSON.stringify(setups));
+    loadSetups();
+}
+
+function loadSetups() {
+    let setups = JSON.parse(localStorage.getItem("setups")) || [];
+    let list = document.getElementById("setupList");
+    list.innerHTML = "";
+
+    setups.forEach((setup, index) => {
+        let li = document.createElement("li");
+        li.innerHTML = `${setup.name} (${setup.trend}) 
+                        <button onclick="deleteSetup(${index})">❌</button>`;
+        list.appendChild(li);
+    });
+}
+
+function deleteSetup(index) {
+    let setups = JSON.parse(localStorage.getItem("setups")) || [];
+    setups.splice(index, 1);
+    localStorage.setItem("setups", JSON.stringify(setups));
+    loadSetups();
+}
