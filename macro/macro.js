@@ -1,7 +1,7 @@
 document.addEventListener("DOMContentLoaded", function () {
     console.log("📌 Macro Indicatoren geladen!");
 
-    // Wacht totdat de tabel beschikbaar is en voeg verwijderknoppen toe
+    // Wacht tot de tabel volledig is geladen en voeg verwijderknoppen toe
     setTimeout(ensureMacroRemoveButtons, 500);
 
     updateMacroData();
@@ -19,14 +19,14 @@ window.ensureMacroRemoveButtons = function () {
     }
 
     for (let row of tableBody.rows) {
-        let lastCell = row.cells[row.cells.length - 1];
+        let lastCell = row.cells[row.cells.length - 1]; // Zorgt ervoor dat de knop in de laatste cel blijft
 
-        if (!lastCell.querySelector("button")) {
+        if (!lastCell || lastCell.innerHTML.trim() === "") {
             lastCell.innerHTML = `<button class="btn-remove" onclick="removeRow(this)">❌</button>`;
         }
     }
 
-    console.log("✅ Verwijderknoppen toegevoegd aan alle rijen!");
+    console.log("✅ Verwijderknoppen correct toegevoegd!");
 };
 
 // ✅ **Indicator toevoegen met prompt**
@@ -37,26 +37,24 @@ window.addMacroRow = function () {
     let table = document.getElementById("macroTable").getElementsByTagName('tbody')[0];
     let newRow = table.insertRow();
 
-    newRow.innerHTML = `
-        <td>${indicatorName}</td>
-        <td>Laden...</td>
-        <td>N/A</td>
-        <td>N/A</td>
-        <td>N/A</td>
-        <td><button class="btn-remove" onclick="removeRow(this)">❌</button></td>
-    `;
+    // ✅ Voeg de exacte hoeveelheid cellen toe zodat de layout consistent blijft
+    newRow.insertCell(0).innerText = indicatorName;
+    newRow.insertCell(1).innerText = "Laden...";
+    newRow.insertCell(2).innerText = "N/A";
+    newRow.insertCell(3).innerText = "N/A";
+    newRow.insertCell(4).innerText = "N/A";
+
+    // ✅ Verwijderknop in de laatste kolom
+    let deleteCell = newRow.insertCell(5);
+    deleteCell.innerHTML = `<button class="btn-remove" onclick="removeRow(this)">❌</button>`;
 
     console.log(`✅ Indicator toegevoegd: ${indicatorName}`);
-
-    // ✅ Na toevoegen, direct de verwijderknoppen checken
-    ensureMacroRemoveButtons();
 };
 
 // ✅ **Rij verwijderen**
 window.removeRow = function (button) {
     let row = button.parentNode.parentNode;
     row.parentNode.removeChild(row);
-
     console.log("❌ Indicator verwijderd!");
 };
 
