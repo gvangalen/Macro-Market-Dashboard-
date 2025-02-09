@@ -8,7 +8,7 @@ function ensureTechButtons() {
     let tableBody = document.getElementById("techTable").getElementsByTagName("tbody")[0];
     let headerRow = document.getElementById("techTable").getElementsByTagName("thead")[0].rows[0];
 
-    // ✅ Voeg standaard verwijderknoppen toe aan assets (rijen)
+    // ✅ Verwijderknoppen voor elke asset (rij)
     for (let row of tableBody.rows) {
         let lastCell = row.cells[row.cells.length - 1];
         if (!lastCell.querySelector("button")) {
@@ -16,11 +16,17 @@ function ensureTechButtons() {
         }
     }
 
-    // ✅ Voeg standaard verwijderknoppen toe aan indicatoren (kolommen)
+    // ✅ Verwijderknoppen voor standaard indicatoren (kolommen)
     for (let i = 2; i < headerRow.cells.length - 1; i++) {
         let cell = headerRow.cells[i];
+
+        // **FIXED: Controleer of de verwijderknop al bestaat**
         if (!cell.querySelector("button")) {
-            cell.innerHTML += ` <button class="btn-remove" onclick="removeTechIndicator(this)">❌</button>`;
+            let button = document.createElement("button");
+            button.innerHTML = "❌";
+            button.classList.add("btn-remove");
+            button.onclick = function () { removeTechIndicator(button); };
+            cell.appendChild(button);
         }
     }
 }
