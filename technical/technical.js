@@ -36,7 +36,7 @@ window.addTechRow = function () {
     // ✅ Voeg de asset naam toe
     newRow.insertCell(0).innerText = assetName;
 
-    // ✅ Haal bestaande indicatoren op en voeg cellen toe
+    // ✅ Bepaal hoeveel indicatoren er zijn en voeg die toe aan de nieuwe rij
     let headerRow = document.getElementById("analysisTable").getElementsByTagName("thead")[0].rows[0];
     let indicatorCount = headerRow.cells.length - 2; // Asset en Actie kolommen tellen niet mee
 
