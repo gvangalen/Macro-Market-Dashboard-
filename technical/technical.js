@@ -34,8 +34,8 @@ function removeTechIndicatorByIndex(index) {
     ensureTechIndicatorRemoveButtons();
 }
 
-// ✅ **Asset toevoegen via pop-up**
-function addTechRow() {
+// ✅ **Asset toevoegen via pop-up** (MAAK GLOBAAL BESCHIKBAAR)
+window.addTechRow = function () {
     let assetName = prompt("Voer de naam van de asset in:");
     if (!assetName) return;
 
@@ -64,10 +64,10 @@ function addTechRow() {
     // ✅ Voeg de "Verwijderen"-knop toe
     let deleteCell = newRow.insertCell(-1);
     deleteCell.innerHTML = `<button class="btn-remove" onclick="removeRow(this)">❌</button>`;
-}
+};
 
-// ✅ **Indicator toevoegen voor alle assets**
-function addTechIndicator() {
+// ✅ **Indicator toevoegen voor alle assets** (MAAK GLOBAAL BESCHIKBAAR)
+window.addTechIndicator = function () {
     let table = document.getElementById("techTable");
     let headerRow = table.getElementsByTagName("thead")[0].rows[0];
     let bodyRows = table.getElementsByTagName("tbody")[0].rows;
@@ -91,10 +91,10 @@ function addTechIndicator() {
         let newCell = row.insertCell(row.cells.length - 1);
         newCell.innerHTML = "Laden...";
     }
-}
+};
 
-// ✅ **Indicator verwijderen uit ALLE assets**
-function removeTechIndicator(button) {
+// ✅ **Indicator verwijderen uit ALLE assets** (MAAK GLOBAAL BESCHIKBAAR)
+window.removeTechIndicator = function (button) {
     let headerRow = document.getElementById("techTable").getElementsByTagName("thead")[0].rows[0];
     let tableBody = document.getElementById("techTable").getElementsByTagName("tbody")[0];
 
@@ -105,10 +105,10 @@ function removeTechIndicator(button) {
     for (let row of tableBody.rows) {
         row.deleteCell(columnIndex);
     }
-}
+};
 
-// ✅ **Rij verwijderen (asset)**
-function removeRow(button) {
+// ✅ **Rij verwijderen (asset)** (MAAK GLOBAAL BESCHIKBAAR)
+window.removeRow = function (button) {
     let row = button.parentNode.parentNode;
     row.parentNode.removeChild(row);
-}
+};
