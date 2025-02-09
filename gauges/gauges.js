@@ -8,7 +8,7 @@ function updateGauge(id, value) {
     gauge.innerHTML = `
         <div class="gauge-label">${gauge.dataset.label}</div>
         <div class="gauge-circle">
-            <div class="gauge-fill" style="transform: rotate(${percentage * 1.8}deg)"></div>
+            <div class="gauge-fill" style="transform: rotate(${percentage * 1.5}deg)"></div>
             <div class="gauge-mask"></div>
             <div class="gauge-value">${percentage}%</div>
         </div>
@@ -33,7 +33,7 @@ window.setSetupGauge = function (score) {
 
 // ✅ **Gauges bij laden alvast invullen met dummywaarden**
 document.addEventListener("DOMContentLoaded", function () {
-    updateGauge("MacroGauge", 50);
-    updateGauge("TechnicalGauge", 65);
-    updateGauge("SetupGauge", 80);
+    setMacroGauge(-2);       // -2 → Bearish (0% richting groen)
+    setTechnicalGauge(1);    // 1 → Neutraal
+    setSetupGauge(0);        // 0 → Tussen neutraal en bearish
 });
