@@ -13,6 +13,7 @@
     justify-content: center;
     font-size: 14px;
     font-weight: bold;
+    position: relative;
 }
 
 .gauge-circle {
@@ -21,19 +22,13 @@
     height: 100px;
 }
 
-.gauge-circle::before {
-    content: "";
-    display: block;
-    padding-top: 100%;
-}
-
 .gauge-fill {
     position: absolute;
     width: 100%;
     height: 100%;
-    background: conic-gradient(#4caf50 0deg, #ddd 0deg);
     border-radius: 50%;
     clip-path: polygon(50% 50%, 100% 50%, 100% 100%, 50% 100%);
+    transition: transform 0.5s ease-in-out;
 }
 
 .gauge-mask {
@@ -52,5 +47,6 @@
     text-align: center;
     font-size: 16px;
     font-weight: bold;
-    top: 40%;
+    top: 50%;
+    transform: translateY(-50%);
 }
