@@ -5,7 +5,23 @@ document.addEventListener("DOMContentLoaded", function () {
     setInterval(updateMacroData, 60000);
 });
 
-// ✅ **Indicator toevoegen met correcte structuur**
+// ✅ Zorg dat alle bestaande rijen de verwijderknop krijgen
+function ensureMacroRemoveButtons() {
+    let tableBody = document.getElementById("macroTable").getElementsByTagName("tbody")[0];
+
+    for (let row of tableBody.rows) {
+        let lastCell = row.cells[row.cells.length - 1];
+
+        // ✅ Als de laatste cel nog GEEN verwijderknop heeft, voeg deze toe
+        if (!lastCell.querySelector("button")) {
+            lastCell.innerHTML = `<button class="btn-remove" onclick="removeRow(this)">❌</button>`;
+        }
+    }
+
+    console.log("✅ Verwijderknoppen gecontroleerd en toegevoegd!");
+}
+
+// ✅ **Indicator toevoegen (vaste structuur, geen extra kolommen!)**
 window.addMacroRow = function () {
     let indicatorName = prompt("Voer de naam van de indicator in:");
     if (!indicatorName) return;
@@ -13,7 +29,7 @@ window.addMacroRow = function () {
     let table = document.getElementById("macroTable").getElementsByTagName('tbody')[0];
     let newRow = table.insertRow();
 
-    // ✅ Altijd exact 6 kolommen, zodat de tabel niet verspringt
+    // ✅ Altijd exact 6 kolommen
     newRow.innerHTML = `
         <td>${indicatorName}</td>
         <td>Laden...</td>
@@ -26,7 +42,7 @@ window.addMacroRow = function () {
     console.log(`✅ Indicator toegevoegd: ${indicatorName}`);
 };
 
-// ✅ **Rij verwijderen (globaal beschikbaar)**
+// ✅ **Rij verwijderen zonder tabelstructuur te verstoren**
 window.removeRow = function (button) {
     let row = button.parentNode.parentNode;
     row.parentNode.removeChild(row);
@@ -57,7 +73,7 @@ async function fetchBTCDominance() {
         let response = await fetch("https://api.coingecko.com/api/v3/global");
         let data = await response.json();
         let btcDominance = parseFloat(data.data.market_cap_percentage.btc.toFixed(2));
-        document.getElementById("usdtDominance").innerText = btcDominance + "%";
+        document.getElementById("btcDominance").innerText = btcDominance + "%";
     } catch (error) {
         console.error("❌ Fout bij ophalen BTC Dominantie:", error);
     }
