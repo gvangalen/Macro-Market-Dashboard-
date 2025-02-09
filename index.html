@@ -11,13 +11,42 @@
     <h1>Macro Market Dashboard</h1>
     <p>Welkom bij de live Bitcoin marktgegevens en macro-indicatoren.</p>
 
-    <!-- ✅ Containers waarin we de externe HTML-bestanden gaan inladen -->
-    <div id="market-container"></div>
+    <!-- ✅ Dashboard Sectie met 3 Meters -->
     <div id="dashboard-container"></div>
+
+    <!-- ✅ Market Data Tabel - Alleen Bitcoin -->
+    <div class="table-container">
+        <h2>📊 Bitcoin Market Data</h2>
+        <table id="marketDataTable">
+            <thead>
+                <tr>
+                    <th>Open</th>
+                    <th>High</th>
+                    <th>Low</th>
+                    <th>Close</th>
+                    <th>24h % Verandering</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td id="btcOpen">Laden...</td>
+                    <td id="btcHigh">Laden...</td>
+                    <td id="btcLow">Laden...</td>
+                    <td id="btcClose">Laden...</td>
+                    <td id="btcChange">Laden...</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <!-- ✅ Macro Indicatoren -->
     <div id="macro-container"></div>
+
+    <!-- ✅ Technische Analyse -->
     <div id="technical-container"></div>
 
     <script>
+        // ✅ Laad externe HTML-bestanden in index.html
         function loadHTML(id, url) {
             fetch(url)
                 .then(response => response.text())
@@ -28,16 +57,12 @@
         }
 
         // ✅ Laad alle secties
-        loadHTML("market-container", "market/market.html");
         loadHTML("dashboard-container", "dashboard/dashboard.html");
+        loadHTML("market-container", "market/market.html");
         loadHTML("macro-container", "macro/macro.html");
         loadHTML("technical-container", "technical/technical.html");
     </script>
 
     <script src="script/script.js"></script>
-    <script src="gauges/gauges.js"></script>
-    <script src="api/api.js"></script>
-    <script src="market/market.js"></script>
-
 </body>
 </html>
