@@ -8,7 +8,7 @@ function ensureTechButtons() {
     let tableBody = document.getElementById("techTable").getElementsByTagName("tbody")[0];
     let headerRow = document.getElementById("techTable").getElementsByTagName("thead")[0].rows[0];
 
-    // ✅ Zorg dat elke asset een verwijderknop heeft
+    // ✅ Voeg standaard verwijderknoppen toe aan assets (rijen)
     for (let row of tableBody.rows) {
         let lastCell = row.cells[row.cells.length - 1];
         if (!lastCell.querySelector("button")) {
@@ -16,7 +16,7 @@ function ensureTechButtons() {
         }
     }
 
-    // ✅ Zorg dat elke indicator een verwijderknop heeft
+    // ✅ Voeg standaard verwijderknoppen toe aan indicatoren (kolommen)
     for (let i = 2; i < headerRow.cells.length - 1; i++) {
         let cell = headerRow.cells[i];
         if (!cell.querySelector("button")) {
@@ -55,9 +55,9 @@ window.addTechRow = function () {
         newRow.insertCell(i).innerHTML = "Laden...";
     }
 
-    // ✅ Voeg verwijderknop toe aan asset
+    // ✅ Voeg standaard de verwijderknop toe
     let deleteCell = newRow.insertCell(-1);
-    deleteCell.innerHTML = `<button class='btn-remove' onclick="removeRow(this)">❌</button>`;
+    deleteCell.innerHTML = `<button class="btn-remove" onclick="removeRow(this)">❌</button>`;
 };
 
 // ✅ **Indicator toevoegen**
