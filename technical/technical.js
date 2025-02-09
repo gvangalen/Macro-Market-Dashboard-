@@ -45,16 +45,18 @@ window.addTechRow = function () {
         timeframeSelect.appendChild(opt);
     });
 
-    // ✅ Cellen invullen
+    // ✅ Standaard kolommen bepalen op basis van de header
+    let totalColumns = document.getElementById("techTable").rows[0].cells.length;
+
     newRow.insertCell(0).innerText = assetName; // Asset naam
     timeframeCell.appendChild(timeframeSelect); // Timeframe dropdown
 
-    // ✅ De rest van de standaard kolommen vullen
-    for (let i = 2; i < document.getElementById("techTable").rows[0].cells.length - 1; i++) {
+    // ✅ De rest van de kolommen vullen zonder extra lege cellen toe te voegen
+    for (let i = 2; i < totalColumns - 1; i++) {
         newRow.insertCell(i).innerHTML = "Laden...";
     }
 
-    // ✅ Voeg standaard de verwijderknop toe
+    // ✅ Voeg standaard de verwijderknop toe aan de asset
     let deleteCell = newRow.insertCell(-1);
     deleteCell.innerHTML = `<button class="btn-remove" onclick="removeRow(this)">❌</button>`;
 };
