@@ -17,13 +17,15 @@ function ensureMacroRemoveButtons() {
     }
 }
 
-// ✅ **Indicator toevoegen** (Maak globaal beschikbaar!)
 window.addMacroRow = function () {
+    let indicatorName = prompt("Voer de naam van de indicator in:");
+    if (!indicatorName) return;
+
     let table = document.getElementById("macroTable").getElementsByTagName('tbody')[0];
     let newRow = table.insertRow();
 
     newRow.innerHTML = `
-        <td><input type="text" placeholder="Naam Indicator"></td>
+        <td>${indicatorName}</td>
         <td>Laden...</td>
         <td>N/A</td>
         <td>N/A</td>
