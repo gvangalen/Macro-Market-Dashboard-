@@ -11,13 +11,13 @@
     <h1>Macro Market Dashboard</h1>
     <p>Welkom bij de live Bitcoin marktgegevens en macro-indicatoren.</p>
 
-    <!-- Containers waarin we de externe HTML-bestanden gaan inladen -->
+    <!-- ✅ Containers waarin we de externe HTML-bestanden gaan inladen -->
+    <div id="market-container"></div>
     <div id="dashboard-container"></div>
     <div id="macro-container"></div>
     <div id="technical-container"></div>
 
     <script>
-        // ✅ Laad externe HTML-bestanden in index.html
         function loadHTML(id, url) {
             fetch(url)
                 .then(response => response.text())
@@ -28,11 +28,16 @@
         }
 
         // ✅ Laad alle secties
+        loadHTML("market-container", "market/market.html");
         loadHTML("dashboard-container", "dashboard/dashboard.html");
         loadHTML("macro-container", "macro/macro.html");
         loadHTML("technical-container", "technical/technical.html");
     </script>
 
     <script src="script/script.js"></script>
+    <script src="gauges/gauges.js"></script>
+    <script src="api/api.js"></script>
+    <script src="market/market.js"></script>
+
 </body>
 </html>
