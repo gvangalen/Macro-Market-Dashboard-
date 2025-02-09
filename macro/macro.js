@@ -39,14 +39,16 @@ window.addMacroRow = function () {
     let table = document.getElementById("macroTable").getElementsByTagName('tbody')[0];
     let newRow = table.insertRow();
 
-    // ✅ Correct aantal kolommen: 5 (exact zoals de tabelstructuur)
-    newRow.insertCell(0).innerText = indicatorName; // Indicator Naam
-    newRow.insertCell(1).innerText = "Laden...";    // Huidig Niveau
-    newRow.insertCell(2).innerText = "N/A";         // Trend
-    newRow.insertCell(3).innerText = "N/A";         // Interpretatie
+    // ✅ Ophalen hoeveel kolommen er in de tabelkop zitten
+    let columnCount = document.getElementById("macroTable").getElementsByTagName("thead")[0].rows[0].cells.length;
+    
+    // ✅ Zorg ervoor dat de nieuwe rij exact evenveel cellen krijgt als de bestaande rijen
+    for (let i = 0; i < columnCount - 1; i++) {  // -1 omdat de laatste kolom voor de verwijderknop is
+        newRow.insertCell(i).innerText = i === 0 ? indicatorName : "N/A";
+    }
 
     // ✅ Laatste cel: verwijderknop
-    let deleteCell = newRow.insertCell(4);
+    let deleteCell = newRow.insertCell(columnCount - 1);
     deleteCell.innerHTML = `<button class="btn-remove" onclick="removeRow(this)">❌</button>`;
 
     console.log(`✅ Indicator toegevoegd: ${indicatorName}`);
