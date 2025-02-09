@@ -25,7 +25,7 @@ function ensureTechButtons() {
     }
 }
 
-// ✅ **Asset toevoegen zonder Timeframe-kolom**
+// ✅ **Asset toevoegen en bestaande indicatoren meenemen**
 window.addTechRow = function () {
     let assetName = prompt("Voer de naam van de asset in:");
     if (!assetName) return;
@@ -33,13 +33,23 @@ window.addTechRow = function () {
     let table = document.getElementById("analysisTable").getElementsByTagName('tbody')[0];
     let newRow = table.insertRow();
 
-    newRow.innerHTML = `
-        <td>${assetName}</td>
-        <td><button class='btn-remove' onclick="removeRow(this)">❌</button></td>
-    `;
+    // ✅ Voeg de asset naam toe
+    newRow.insertCell(0).innerText = assetName;
+
+    // ✅ Voeg cellen toe voor alle bestaande indicatoren
+    let headerRow = document.getElementById("analysisTable").getElementsByTagName("thead")[0].rows[0];
+    let indicatorCount = headerRow.cells.length - 2; // Asset en Actie kolom tellen niet mee
+
+    for (let i = 0; i < indicatorCount; i++) {
+        newRow.insertCell(i + 1).innerHTML = "Laden...";
+    }
+
+    // ✅ Voeg verwijderknop toe
+    let deleteCell = newRow.insertCell(-1);
+    deleteCell.innerHTML = `<button class="btn-remove" onclick="removeRow(this)">❌</button>`;
 };
 
-// ✅ **Indicator toevoegen**
+// ✅ **Indicator toevoegen aan alle assets**
 window.addTechIndicator = function () {
     let table = document.getElementById("analysisTable");
     let headerRow = table.getElementsByTagName("thead")[0].rows[0];
@@ -56,11 +66,12 @@ window.addTechIndicator = function () {
         }
     }
 
-    // ✅ Nieuwe kolom toevoegen zonder extra rijen aan te maken
+    // ✅ Nieuwe kolom toevoegen aan de tabelheader
     let newHeader = document.createElement("th");
     newHeader.innerHTML = `${indicatorName} <button class="btn-remove" onclick="removeTechIndicator(this)">❌</button>`;
     headerRow.insertBefore(newHeader, headerRow.cells[headerRow.cells.length - 1]);
 
+    // ✅ Voeg de nieuwe indicator toe aan alle bestaande assets
     for (let row of bodyRows) {
         let newCell = row.insertCell(row.cells.length - 1);
         newCell.innerHTML = "Laden...";
@@ -86,7 +97,7 @@ window.removeRow = function (button) {
     row.parentNode.removeChild(row);
 };
 
-// ✅ **Timeframe dropdown werkt voor de hele tabel**
+// ✅ **Timeframe dropdown blijft ongewijzigd**
 document.getElementById('globalTimeframe').addEventListener('change', function() {
     let newTimeframe = this.value;
     console.log(`✅ Timeframe veranderd naar ${newTimeframe}`);
