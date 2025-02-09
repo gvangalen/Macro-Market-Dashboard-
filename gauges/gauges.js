@@ -7,8 +7,7 @@ function updateGauge(id, value) {
         return;
     }
 
-    let percentage = Math.max(0, Math.min(100, value)); // Zorgt dat waarde tussen 0-100 blijft
-
+    let percentage = Math.max(0, Math.min(100, value)); // Zorg dat waarde tussen 0-100 blijft
     let gaugeFill = gauge.querySelector(".gauge-fill");
     let gaugeValue = gauge.querySelector(".gauge-value");
 
@@ -25,6 +24,7 @@ function updateGauge(id, value) {
     // ✅ **Update de stijl van de meter**
     if (gaugeFill) {
         gaugeFill.style.background = `conic-gradient(${color} ${percentage * 3.6}deg, #ddd 0deg)`;
+        gaugeFill.style.transform = `rotate(${percentage * 1.8 - 90}deg)`; // -90 om op 'Neutral' te starten
     }
 
     // ✅ **Update de tekstwaarde**
@@ -35,22 +35,26 @@ function updateGauge(id, value) {
 
 // ✅ **Functies om gauges extern te updaten**
 window.setMacroGauge = function (score) {
+    console.log(`🔄 Macro gauge bijwerken: ${score}`);
     let percentage = ((score + 2) / 4) * 100; // Zet -2 tot 2 om naar 0-100%
     updateGauge("MacroGauge", percentage);
 };
 
 window.setTechnicalGauge = function (score) {
+    console.log(`🔄 Technische gauge bijwerken: ${score}`);
     let percentage = ((score + 2) / 4) * 100;
     updateGauge("TechnicalGauge", percentage);
 };
 
 window.setSetupGauge = function (score) {
+    console.log(`🔄 Setup gauge bijwerken: ${score}`);
     let percentage = ((score + 2) / 4) * 100;
     updateGauge("SetupGauge", percentage);
 };
 
 // ✅ **Gauges direct updaten met dummywaarden**
 document.addEventListener("DOMContentLoaded", function () {
+    console.log("🔄 Dummywaarden instellen...");
     setMacroGauge(-2);       // Bearish → Rood (0%)
     setTechnicalGauge(1);    // Neutraal → Geel (tussen 40-60%)
     setSetupGauge(0);        // Licht bearish → Geel/oranje (tussen 30-50%)
