@@ -24,37 +24,28 @@
     <div id="technical-container"></div>
 
     <script>
-        // ✅ Laad externe HTML-bestanden in index.html
+        // ✅ **Laad externe HTML-bestanden dynamisch**
         function loadHTML(id, url) {
             fetch(url)
                 .then(response => response.text())
                 .then(data => {
                     document.getElementById(id).innerHTML = data;
                 })
-                .catch(error => console.error(`Fout bij laden van ${url}:`, error));
+                .catch(error => console.error(`❌ Fout bij laden van ${url}:`, error));
         }
 
-        // ✅ Laad alle secties
+        // ✅ **Laad alle secties**
         loadHTML("dashboard-container", "dashboard/dashboard.html");
-        loadHTML("market-container", "market/market.html"); <!-- Hier wordt de market.html ingeladen -->
+        loadHTML("market-container", "market/market.html"); 
         loadHTML("macro-container", "macro/macro.html");
         loadHTML("technical-container", "technical/technical.html");
     </script>
 
-    <!-- ✅ Laad Bitcoin Market Data -->
-    <script src="market/market.js"></script>
-    <script src="script/script.js"></script>
-    <!-- ✅ Laad algemene functies -->
-<script src="script/script.js"></script>
-
-<!-- ✅ Laad macro-indicator script -->
-<script src="macro/macro.js"></script>
-
-<!-- ✅ Laad technische analyse script -->
-<script src="technical/technical.js"></script>
-
-<!-- ✅ Laad market data script -->
-<script src="market/market.js"></script>
+    <!-- ✅ **Laad de juiste scripts op de juiste plek** -->
+    <script src="script/script.js"></script>  <!-- Algemene functies -->
+    <script src="market/market.js"></script>  <!-- Bitcoin Market Data -->
+    <script src="macro/macro.js"></script>    <!-- Macro Indicatoren -->
+    <script src="technical/technical.js"></script>  <!-- Technische Analyse -->
 
 </body>
 </html>
