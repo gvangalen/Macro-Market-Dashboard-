@@ -1,74 +1,45 @@
-/* Algemene styling voor de setup sectie */
 .setup-container {
-    width: 100%;
-    max-width: 600px;
-    margin: 20px auto;
+    max-width: 400px;
+    margin: auto;
     padding: 20px;
-    border: 1px solid #ddd;
+    background: white;
     border-radius: 8px;
-    background: #f9f9f9;
-    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
 }
 
-.setup-container h2 {
+h2, h3 {
     text-align: center;
-    margin-bottom: 20px;
 }
 
-.setup-form label {
-    font-weight: bold;
-    display: block;
-    margin-top: 10px;
-}
-
-.setup-form input, .setup-form select {
+input, select, button {
     width: 100%;
-    padding: 8px;
-    margin-top: 5px;
-    border: 1px solid #ccc;
-    border-radius: 4px;
-}
-
-.setup-form button {
-    width: 100%;
+    margin: 10px 0;
     padding: 10px;
-    margin-top: 15px;
+    border-radius: 5px;
+    border: 1px solid #ccc;
+}
+
+button {
     background: #4caf50;
     color: white;
     border: none;
-    border-radius: 4px;
     cursor: pointer;
-    font-size: 16px;
 }
 
-.setup-form button:hover {
+button:hover {
     background: #45a049;
 }
 
-.setup-list {
-    margin-top: 20px;
+#setupList {
+    list-style: none;
+    padding: 0;
 }
 
-.setup-list-item {
-    background: white;
+#setupList li {
     padding: 10px;
-    border-radius: 4px;
-    border: 1px solid #ddd;
-    margin-bottom: 10px;
+    background: #f8f9fa;
+    border-radius: 5px;
+    margin: 5px 0;
     display: flex;
     justify-content: space-between;
-    align-items: center;
-}
-
-.remove-btn {
-    background: #d9534f;
-    color: white;
-    border: none;
-    padding: 5px 10px;
-    border-radius: 4px;
-    cursor: pointer;
-}
-
-.remove-btn:hover {
-    background: #c9302c;
 }
