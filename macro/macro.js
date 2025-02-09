@@ -17,8 +17,8 @@ function ensureMacroRemoveButtons() {
     }
 }
 
-// ✅ **Indicator toevoegen**
-function addMacroRow() {
+// ✅ **Indicator toevoegen** (Maak globaal beschikbaar!)
+window.addMacroRow = function () {
     let table = document.getElementById("macroTable").getElementsByTagName('tbody')[0];
     let newRow = table.insertRow();
 
@@ -30,13 +30,13 @@ function addMacroRow() {
         <td>N/A</td>
         <td><button class="btn-remove" onclick="removeRow(this)">❌</button></td>
     `;
-}
+};
 
-// ✅ **Rij verwijderen**
-function removeRow(button) {
+// ✅ **Rij verwijderen** (Maak globaal beschikbaar!)
+window.removeRow = function (button) {
     let row = button.parentNode.parentNode;
     row.parentNode.removeChild(row);
-}
+};
 
 // ✅ **Macro Indicatoren updaten**
 async function updateMacroData() {
@@ -66,4 +66,4 @@ async function fetchBTCDominance() {
     } catch (error) {
         console.error("❌ Fout bij ophalen BTC Dominantie:", error);
     }
-}
+};
