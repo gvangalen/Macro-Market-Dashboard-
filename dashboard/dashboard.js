@@ -4,12 +4,15 @@ document.addEventListener("DOMContentLoaded", function () {
     // ✅ Direct de meters bijwerken met dummywaarden (totdat API-data werkt)
     updateMacroGauge(-2);
     updateTechnicalGauge(1);
-    checkActiveSetups(); // 🔥 Check of er actieve setups zijn en update de SetupGauge
+    checkActiveSetups();
+
+    // ✅ Elke minuut setups opnieuw checken en bijwerken
+    setInterval(checkActiveSetups, 60000);
 });
 
 // ✅ **Macro Gauge updaten**
 function updateMacroGauge(score) {
-    let percentage = ((score + 2) / 4) * 100; // Schaal omzetten naar 0-100%
+    let percentage = ((score + 2) / 4) * 100;
     updateGauge("MacroGauge", percentage);
 }
 
@@ -33,8 +36,8 @@ function updateGauge(id, value) {
         return;
     }
 
-    let percentage = Math.max(0, Math.min(100, value)); // Zorgt dat waarde tussen 0-100 blijft
-    let label = gauge.dataset.label || "Gauge"; // Zorgt dat er altijd een label is
+    let percentage = Math.max(0, Math.min(100, value));
+    let label = gauge.dataset.label || "Gauge"; 
 
     gauge.innerHTML = `
         <div class="gauge-label">${label}</div>
@@ -46,21 +49,36 @@ function updateGauge(id, value) {
     `;
 }
 
-// ✅ **Check of een setup actief is en update SetupGauge**
+// ✅ **Check of setups actief zijn en update SetupGauge**
 function checkActiveSetups() {
     let setups = JSON.parse(localStorage.getItem("setups")) || [];
     let activeSetups = 0;
 
     setups.forEach(setup => {
-        let isActive = matchSetupToMarket(setup);
-        if (isActive) activeSetups++;
+        if (matchSetupToMarket(setup)) {
+            activeSetups++;
+        }
     });
 
+    console.log(`🔎 Actieve setups gevonden: ${activeSetups}`);
     updateSetupGauge(activeSetups);
 }
 
-// ✅ **Simpele check of een setup actief is (later koppelen aan echte data)**
+// ✅ **Setup matching met marktanalyse**
 function matchSetupToMarket(setup) {
-    let marketTrend = "bullish"; // 🔥 DIT LATER AUTOMATISCH OPHALEN
-    return setup.trend === marketTrend;
+    let marketData = getCurrentMarketData(); // ✅ Haal live marktdata op
+    if (!marketData) return false;
+
+    // 🔥 Simpele vergelijking (later uitbreiden met extra checks)
+    return setup.trend === marketData.trend && 
+           setup.indicator === marketData.indicator;
+}
+
+// ✅ **Mockup: Live marktdata ophalen**
+function getCurrentMarketData() {
+    // 🚀 Hier API koppelen voor real-time data
+    return {
+        trend: "bullish",  // 🔥 Dummywaarde (later API-data)
+        indicator: "RSI-overbought"
+    };
 }
