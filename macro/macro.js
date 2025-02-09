@@ -5,28 +5,6 @@ document.addEventListener("DOMContentLoaded", function () {
     setInterval(updateMacroData, 60000);
 });
 
-// ✅ **Verwijderknoppen toevoegen aan ALLE bestaande rijen**
-window.ensureMacroRemoveButtons = function () {
-    let tableBody = document.getElementById("macroTable").getElementsByTagName("tbody")[0];
-
-    if (!tableBody) {
-        console.warn("⚠️ Macro tabel niet gevonden, probeer opnieuw...");
-        setTimeout(ensureMacroRemoveButtons, 500);
-        return;
-    }
-
-    for (let row of tableBody.rows) {
-        let lastCell = row.cells[row.cells.length - 1];
-
-        // ✅ Als de knop niet bestaat, voeg deze toe
-        if (!lastCell.querySelector("button")) {
-            lastCell.innerHTML = `<button class="btn-remove" onclick="removeRow(this)">❌</button>`;
-        }
-    }
-
-    console.log("✅ Verwijderknoppen toegevoegd aan alle rijen!");
-};
-
 // ✅ **Indicator toevoegen met correcte structuur**
 window.addMacroRow = function () {
     let indicatorName = prompt("Voer de naam van de indicator in:");
@@ -35,7 +13,7 @@ window.addMacroRow = function () {
     let table = document.getElementById("macroTable").getElementsByTagName('tbody')[0];
     let newRow = table.insertRow();
 
-    // ✅ Elke rij krijgt exact 6 kolommen
+    // ✅ Altijd exact 6 kolommen, zodat de tabel niet verspringt
     newRow.innerHTML = `
         <td>${indicatorName}</td>
         <td>Laden...</td>
@@ -48,17 +26,12 @@ window.addMacroRow = function () {
     console.log(`✅ Indicator toegevoegd: ${indicatorName}`);
 };
 
-// ✅ **Verwijderen van rijen**
+// ✅ **Rij verwijderen (globaal beschikbaar)**
 window.removeRow = function (button) {
     let row = button.parentNode.parentNode;
     row.parentNode.removeChild(row);
     console.log("❌ Indicator verwijderd!");
 };
-
-// ✅ **Zorg dat verwijderknoppen worden toegevoegd bij paginalading**
-document.addEventListener("DOMContentLoaded", function () {
-    ensureMacroRemoveButtons();
-});
 
 // ✅ **Macro Indicatoren updaten**
 async function updateMacroData() {
