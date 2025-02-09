@@ -17,7 +17,7 @@ function ensureTechButtons() {
     }
 
     // ✅ Voeg verwijderknoppen toe voor bestaande indicatoren
-    for (let i = 2; i < headerRow.cells.length - 1; i++) {
+    for (let i = 1; i < headerRow.cells.length - 1; i++) {
         let cell = headerRow.cells[i];
         if (!cell.querySelector("button")) {
             cell.innerHTML += ` <button class="btn-remove" onclick="removeTechIndicator(this)">❌</button>`;
@@ -25,7 +25,7 @@ function ensureTechButtons() {
     }
 }
 
-// ✅ **Asset toevoegen**
+// ✅ **Asset toevoegen zonder Timeframe-kolom**
 window.addTechRow = function () {
     let assetName = prompt("Voer de naam van de asset in:");
     if (!assetName) return;
@@ -33,12 +33,8 @@ window.addTechRow = function () {
     let table = document.getElementById("analysisTable").getElementsByTagName('tbody')[0];
     let newRow = table.insertRow();
 
-    // ✅ Timeframe uit dropdown halen
-    let timeframe = document.getElementById('globalTimeframe').value;
-    
     newRow.innerHTML = `
         <td>${assetName}</td>
-        <td class='timeframe'>${timeframe}</td>
         <td><button class='btn-remove' onclick="removeRow(this)">❌</button></td>
     `;
 };
@@ -90,14 +86,8 @@ window.removeRow = function (button) {
     row.parentNode.removeChild(row);
 };
 
-// ✅ **Timeframe veranderen voor de hele tabel**
+// ✅ **Timeframe dropdown werkt voor de hele tabel**
 document.getElementById('globalTimeframe').addEventListener('change', function() {
     let newTimeframe = this.value;
-    let timeCells = document.querySelectorAll('.timeframe');
-
-    timeCells.forEach(cell => {
-        cell.textContent = newTimeframe;
-    });
-
     console.log(`✅ Timeframe veranderd naar ${newTimeframe}`);
 });
