@@ -1,23 +1,31 @@
-// ✅ **Gauge dynamisch updaten met juiste kleuren & correcte rotatie**
 console.log("✅ gauges.js correct geladen!");
+
 function updateGauge(id, value) {
     let gauge = document.getElementById(id);
-    if (!gauge) return;
+    if (!gauge) {
+        console.warn(`⚠️ Gauge '${id}' niet gevonden!`);
+        return;
+    }
 
-    let percentage = Math.max(0, Math.min(100, value)); // Zorg dat waarde tussen 0-100 blijft
+    let percentage = Math.max(0, Math.min(100, value)); // Zorgt dat waarde tussen 0-100 blijft
 
     let gaugeFill = gauge.querySelector(".gauge-fill");
     let gaugeValue = gauge.querySelector(".gauge-value");
 
     // 🎨 **Dynamische kleur instellen**
-    let color = percentage < 40 ? "#d9534f" : percentage > 60 ? "#4caf50" : "#f0ad4e"; // Rood / Geel / Groen
+    let color;
+    if (percentage < 30) {
+        color = "#d9534f"; // Rood (Bearish)
+    } else if (percentage < 60) {
+        color = "#f0ad4e"; // Geel/Oranje (Neutraal)
+    } else {
+        color = "#4caf50"; // Groen (Bullish)
+    }
 
     // ✅ **Update de stijl van de meter**
     if (gaugeFill) {
         gaugeFill.style.background = `conic-gradient(${color} ${percentage * 3.6}deg, #ddd 0deg)`;
-        gaugeFill.style.transform = `rotate(${percentage * 1.8}deg)`; // Correcte schaal voor 360°
     }
-    
 
     // ✅ **Update de tekstwaarde**
     if (gaugeValue) {
@@ -25,9 +33,9 @@ function updateGauge(id, value) {
     }
 }
 
-// ✅ **Functies om gauges van buitenaf te updaten**
+// ✅ **Functies om gauges extern te updaten**
 window.setMacroGauge = function (score) {
-    let percentage = ((score + 2) / 4) * 100; // -2 tot 2 omzetten naar 0-100%
+    let percentage = ((score + 2) / 4) * 100; // Zet -2 tot 2 om naar 0-100%
     updateGauge("MacroGauge", percentage);
 };
 
