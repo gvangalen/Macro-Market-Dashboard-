@@ -1,41 +1,66 @@
+/* Algemene styling */
 body {
     font-family: Arial, sans-serif;
     text-align: center;
     background-color: #f4f4f4;
+    margin: 0;
+    padding: 0;
 }
 
+/* Titel */
 h2 {
     margin-top: 20px;
 }
 
+/* Container voor knoppen */
+.controls {
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+    margin-bottom: 15px;
+}
+
+/* Tabellen styling */
 table {
     width: 90%;
     margin: 20px auto;
     border-collapse: collapse;
     background: white;
+    box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+    border-radius: 8px;
 }
 
+/* Tabellen cellen */
 th, td {
     padding: 10px;
     border: 1px solid #ddd;
     text-align: center;
 }
 
+/* Tabellen hoofding */
 th {
-    background: #4caf50;
+    background: #388e3c;
     color: white;
+    font-weight: bold;
 }
 
+/* Toevoegknoppen */
 .btn-add {
     background-color: #4caf50;
     color: white;
     border: none;
-    padding: 10px;
-    margin: 10px;
+    padding: 10px 15px;
     cursor: pointer;
     border-radius: 5px;
+    font-size: 14px;
+    transition: background 0.3s ease;
 }
 
+.btn-add:hover {
+    background-color: #388e3c;
+}
+
+/* Verwijderknoppen */
 .btn-remove {
     background-color: #d9534f;
     color: white;
@@ -43,4 +68,10 @@ th {
     padding: 5px;
     cursor: pointer;
     border-radius: 5px;
+    font-size: 14px;
+    transition: background 0.3s ease;
+}
+
+.btn-remove:hover {
+    background-color: #c9302c;
 }
