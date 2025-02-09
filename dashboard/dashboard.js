@@ -53,9 +53,10 @@ function updateGauge(id, value) {
 function checkActiveSetups() {
     let setups = JSON.parse(localStorage.getItem("setups")) || [];
     let activeSetups = 0;
+    let marketData = getCurrentMarketData(); // ✅ Haal live marktdata op
 
     setups.forEach(setup => {
-        if (matchSetupToMarket(setup)) {
+        if (matchSetupToMarket(setup, marketData)) {
             activeSetups++;
         }
     });
@@ -64,21 +65,24 @@ function checkActiveSetups() {
     updateSetupGauge(activeSetups);
 }
 
-// ✅ **Setup matching met marktanalyse**
-function matchSetupToMarket(setup) {
-    let marketData = getCurrentMarketData(); // ✅ Haal live marktdata op
+// ✅ **Setup matching met live marktanalyse**
+function matchSetupToMarket(setup, marketData) {
     if (!marketData) return false;
 
-    // 🔥 Simpele vergelijking (later uitbreiden met extra checks)
-    return setup.trend === marketData.trend && 
-           setup.indicator === marketData.indicator;
+    // 🔥 Setup moet minstens deels matchen (niet 100% strikte match)
+    let trendMatch = setup.trend === marketData.trend;
+    let indicatorMatch = marketData.indicator.includes(setup.indicators);
+
+    console.log(`📊 Check setup: ${setup.name} | Trend: ${setup.trend} vs. Markt: ${marketData.trend} | Indicator: ${setup.indicators} vs. Markt: ${marketData.indicator}`);
+    
+    return trendMatch || indicatorMatch; // ✅ Als één van beiden klopt, is de setup actief
 }
 
-// ✅ **Mockup: Live marktdata ophalen**
+// ✅ **Mockup: Live marktdata ophalen (later API koppelen)**
 function getCurrentMarketData() {
     // 🚀 Hier API koppelen voor real-time data
     return {
         trend: "bullish",  // 🔥 Dummywaarde (later API-data)
-        indicator: "RSI-overbought"
+        indicator: "RSI-overbought" // 🔥 Dummy indicator
     };
 }
