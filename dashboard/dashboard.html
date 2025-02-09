@@ -5,13 +5,14 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>📊 Dashboard</title>
     <link rel="stylesheet" href="dashboard.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script> <!-- ✅ Chart.js geladen -->
 </head>
 <body>
 
 <div class="table-container">
     <h2>📊 Dashboard</h2>
     <div class="dashboard-container">
-       <div id="MacroGauge" class="gauge-container" data-label="📉 Macro">
+        <div id="MacroGauge" class="gauge-container" data-label="📉 Macro">
             <div class="gauge-circle">
                 <div class="gauge-fill"></div>
                 <div class="gauge-mask"></div>
@@ -30,7 +31,6 @@
         </div>
 
         <div id="SetupGauge" class="gauge-container" data-label="📊 Setup">
-            <div class="gauge-circle">
             <div class="gauge-circle">
                 <div class="gauge-fill"></div>
                 <div class="gauge-mask"></div>
