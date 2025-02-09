@@ -5,17 +5,26 @@ document.addEventListener("DOMContentLoaded", function () {
     setInterval(updateMacroData, 60000);
 });
 
-// ✅ Voeg verwijderknoppen toe aan bestaande indicatoren
-function ensureMacroRemoveButtons() {
+window.ensureMacroRemoveButtons = function () {
     let tableBody = document.getElementById("macroTable").getElementsByTagName("tbody")[0];
 
     for (let row of tableBody.rows) {
-        if (!row.cells[5].querySelector("button")) { 
-            let deleteCell = row.cells[5];
-            deleteCell.innerHTML = `<button class="btn-remove" onclick="removeRow(this)">❌</button>`;
+        let lastCell = row.cells[row.cells.length - 1]; // Laatste cel in de rij
+
+        // ✅ Controleer of de knop al bestaat, anders toevoegen
+        if (!lastCell.querySelector("button")) {
+            lastCell.innerHTML = `<button class="btn-remove" onclick="removeRow(this)">❌</button>`;
         }
     }
-}
+};
+
+// ✅ Roep deze functie aan bij het laden van de pagina
+document.addEventListener("DOMContentLoaded", function () {
+    console.log("📌 Macro Indicatoren geladen!");
+    ensureMacroRemoveButtons(); // ✅ Nu worden alle rijen direct voorzien van een verwijderknop
+    updateMacroData();
+    setInterval(updateMacroData, 60000);
+});
 
 window.addMacroRow = function () {
     let indicatorName = prompt("Voer de naam van de indicator in:");
