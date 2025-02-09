@@ -20,18 +20,22 @@ function ensureTechButtons() {
     for (let i = 2; i < headerRow.cells.length - 1; i++) {
         let cell = headerRow.cells[i];
         if (!cell.querySelector("button")) {
-            cell.innerHTML += ` <button class="btn-remove" onclick="removeTechIndicator(this)">❌</button>`;
+            let removeButton = document.createElement("button");
+            removeButton.innerHTML = "❌";
+            removeButton.classList.add("btn-remove");
+            removeButton.onclick = function () { removeTechIndicatorByIndex(i); };
+            cell.appendChild(removeButton);
         }
     }
 }
 
-// ✅ **Asset toevoegen**
+// ✅ **Asset toevoegen zonder extra kolommen**
 window.addTechRow = function () {
     let assetName = prompt("Voer de naam van de asset in:");
     if (!assetName) return;
 
-    let table = document.getElementById("techTable").getElementsByTagName('tbody')[0];
-    let newRow = table.insertRow();
+    let tableBody = document.getElementById("techTable").getElementsByTagName("tbody")[0];
+    let newRow = tableBody.insertRow();
 
     // ✅ Timeframe dropdown aanmaken
     let timeframeCell = newRow.insertCell(1);
@@ -45,21 +49,21 @@ window.addTechRow = function () {
         timeframeSelect.appendChild(opt);
     });
 
-    // ✅ Cellen invullen
+    // ✅ Vul de rij correct in (exact evenveel kolommen als de header!)
     newRow.insertCell(0).innerText = assetName; // Asset naam
     timeframeCell.appendChild(timeframeSelect); // Timeframe dropdown
 
-    // ✅ De rest van de standaard kolommen vullen
-    for (let i = 2; i < document.getElementById("techTable").rows[0].cells.length - 1; i++) {
+    let columnCount = document.getElementById("techTable").rows[0].cells.length;
+    for (let i = 2; i < columnCount - 1; i++) {
         newRow.insertCell(i).innerHTML = "Laden...";
     }
 
-    // ✅ Voeg standaard de verwijderknop toe
+    // ✅ Voeg verwijderknop toe aan asset
     let deleteCell = newRow.insertCell(-1);
     deleteCell.innerHTML = `<button class="btn-remove" onclick="removeRow(this)">❌</button>`;
 };
 
-// ✅ **Indicator toevoegen**
+// ✅ **Indicator toevoegen zonder extra rijen**
 window.addTechIndicator = function () {
     let table = document.getElementById("techTable");
     let headerRow = table.getElementsByTagName("thead")[0].rows[0];
@@ -76,7 +80,7 @@ window.addTechIndicator = function () {
         }
     }
 
-    // ✅ Nieuwe kolom toevoegen zonder extra rijen aan te maken
+    // ✅ Nieuwe kolom toevoegen zonder extra rijen
     let newHeader = document.createElement("th");
     newHeader.innerHTML = `${indicatorName} <button class="btn-remove" onclick="removeTechIndicator(this)">❌</button>`;
     headerRow.insertBefore(newHeader, headerRow.cells[headerRow.cells.length - 1]);
@@ -87,7 +91,7 @@ window.addTechIndicator = function () {
     }
 };
 
-// ✅ **Indicator verwijderen**
+// ✅ **Indicator verwijderen zonder extra problemen**
 window.removeTechIndicator = function (button) {
     let headerRow = document.getElementById("techTable").getElementsByTagName("thead")[0].rows[0];
     let tableBody = document.getElementById("techTable").getElementsByTagName("tbody")[0];
@@ -100,7 +104,7 @@ window.removeTechIndicator = function (button) {
     }
 };
 
-// ✅ **Asset verwijderen**
+// ✅ **Rij verwijderen (asset) zonder extra problemen**
 window.removeRow = function (button) {
     let row = button.parentNode.parentNode;
     row.parentNode.removeChild(row);
