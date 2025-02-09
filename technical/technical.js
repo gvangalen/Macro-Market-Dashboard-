@@ -25,7 +25,7 @@ function ensureTechButtons() {
     }
 }
 
-// ✅ **Asset toevoegen en bestaande indicatoren meenemen**
+// ✅ **Asset toevoegen met bestaande indicatoren**
 window.addTechRow = function () {
     let assetName = prompt("Voer de naam van de asset in:");
     if (!assetName) return;
@@ -36,12 +36,13 @@ window.addTechRow = function () {
     // ✅ Voeg de asset naam toe
     newRow.insertCell(0).innerText = assetName;
 
-    // ✅ Voeg cellen toe voor alle bestaande indicatoren
+    // ✅ Haal aantal indicatoren op en voeg cellen toe
     let headerRow = document.getElementById("analysisTable").getElementsByTagName("thead")[0].rows[0];
     let indicatorCount = headerRow.cells.length - 2; // Asset en Actie kolom tellen niet mee
 
     for (let i = 0; i < indicatorCount; i++) {
-        newRow.insertCell(i + 1).innerHTML = "Laden...";
+        let newCell = newRow.insertCell(i + 1);
+        newCell.innerHTML = "Laden...";
     }
 
     // ✅ Voeg verwijderknop toe
