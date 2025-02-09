@@ -12,35 +12,23 @@
 <div class="table-container">
     <h2>📊 Dashboard</h2>
     <div class="dashboard-container">
-        <div id="MacroGauge" class="gauge-container" data-label="📉 Macro">
-            <div class="gauge-circle">
-                <div class="gauge-fill"></div>
-                <div class="gauge-mask"></div>
-                <div class="gauge-value">0%</div>
-            </div>
+        <div class="gauge-wrapper">
+            <canvas id="macroGauge"></canvas>
             <span>📉 Macro</span>
         </div>
 
-        <div id="TechnicalGauge" class="gauge-container" data-label="📈 Technisch">
-            <div class="gauge-circle">
-                <div class="gauge-fill"></div>
-                <div class="gauge-mask"></div>
-                <div class="gauge-value">0%</div>
-            </div>
+        <div class="gauge-wrapper">
+            <canvas id="technicalGauge"></canvas>
             <span>📈 Technisch</span>
         </div>
 
-        <div id="SetupGauge" class="gauge-container" data-label="📊 Setup">
-            <div class="gauge-circle">
-                <div class="gauge-fill"></div>
-                <div class="gauge-mask"></div>
-                <div class="gauge-value">0%</div>
-            </div>
+        <div class="gauge-wrapper">
+            <canvas id="setupGauge"></canvas>
             <span>📊 Setup</span>
         </div>
     </div>
 </div>
-<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
 <script src="gauges/gauges.js"></script>
 <script src="dashboard.js"></script>
 
