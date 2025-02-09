@@ -3,31 +3,34 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Setup Beheer</title>
+    <title>📊 Setup Toevoegen</title>
     <link rel="stylesheet" href="setup.css">
 </head>
 <body>
-    <div class="container">
-        <h2>📊 Trade Setup Beheer</h2>
-        <form id="setupForm">
-            <label for="setupName">Setup Naam:</label>
-            <input type="text" id="setupName" required>
-            
-            <label for="indicators">Indicatoren (comma gescheiden):</label>
-            <input type="text" id="indicators" required>
-            
-            <label for="trend">Trend:</label>
-            <select id="trend">
-                <option value="bullish">Bullish</option>
-                <option value="bearish">Bearish</option>
-                <option value="neutraal">Neutraal</option>
-            </select>
-            
-            <button type="submit">Setup Toevoegen</button>
-        </form>
-        <h3>Huidige Setups</h3>
-        <ul id="setupList"></ul>
-    </div>
-    <script src="setup.js"></script>
+
+<div class="setup-container">
+    <h2>➕ Setup Toevoegen</h2>
+    <form id="setupForm">
+        <label>📛 Naam van Setup:</label>
+        <input type="text" id="setupName" required>
+
+        <label>📉 Indicatoren (bijv. RSI < 30, SMA200 boven prijs):</label>
+        <input type="text" id="setupIndicators" required>
+
+        <label>📊 Marktconditie (Bullish, Bearish, Neutraal):</label>
+        <select id="setupTrend">
+            <option value="bullish">Bullish</option>
+            <option value="bearish">Bearish</option>
+            <option value="neutral">Neutraal</option>
+        </select>
+
+        <button type="submit">✅ Opslaan</button>
+    </form>
+
+    <h3>📜 Opgeslagen Setups</h3>
+    <ul id="setupList"></ul>
+</div>
+
+<script src="setup.js"></script>
 </body>
 </html>
