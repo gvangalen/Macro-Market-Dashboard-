@@ -1,15 +1,39 @@
-// ✅ **Gauge updaten**
+// ✅ **Gauge opmaken met CSS en dynamisch updaten**
 function updateGauge(id, value) {
     let gauge = document.getElementById(id);
     if (!gauge) return;
 
-    gauge.innerText = value + "%"; // Eenvoudige weergave
-    gauge.style.background = `conic-gradient(#4caf50 ${value * 3.6}deg, #ddd 0deg)`;
+    let percentage = Math.max(0, Math.min(100, value)); // Zorg dat waarde tussen 0-100 blijft
+
+    gauge.innerHTML = `
+        <div class="gauge-label">${gauge.dataset.label}</div>
+        <div class="gauge-circle">
+            <div class="gauge-fill" style="transform: rotate(${percentage * 1.8}deg)"></div>
+            <div class="gauge-mask"></div>
+            <div class="gauge-value">${percentage}%</div>
+        </div>
+    `;
 }
 
-// ✅ **Dummy waardes laden**
+// ✅ **Functies om gauges van buitenaf te updaten**
+window.setMacroGauge = function (score) {
+    let percentage = ((score + 2) / 4) * 100; // Schaal omzetten naar 0-100%
+    updateGauge("MacroGauge", percentage);
+};
+
+window.setTechnicalGauge = function (score) {
+    let percentage = ((score + 2) / 4) * 100;
+    updateGauge("TechnicalGauge", percentage);
+};
+
+window.setSetupGauge = function (score) {
+    let percentage = ((score + 2) / 4) * 100;
+    updateGauge("SetupGauge", percentage);
+};
+
+// ✅ **Gauges bij laden alvast invullen met dummywaarden**
 document.addEventListener("DOMContentLoaded", function () {
-    updateGauge("macroGauge", 50);
-    updateGauge("technicalGauge", 65);
-    updateGauge("setupGauge", 80);
+    updateGauge("MacroGauge", 50);
+    updateGauge("TechnicalGauge", 65);
+    updateGauge("SetupGauge", 80);
 });
