@@ -1,21 +1,16 @@
 document.addEventListener("DOMContentLoaded", function () {
     console.log("📌 Macro Indicatoren geladen!");
-    
-    setTimeout(() => {
-        ensureMacroRemoveButtons();
-        console.log("✅ Verwijderknoppen gecontroleerd.");
-    }, 500);
-
+    ensureMacroRemoveButtons();
     updateMacroData();
     setInterval(updateMacroData, 60000);
 });
 
-// ✅ **Voegt verwijderknoppen toe aan bestaande rijen**
+// ✅ **Verwijderknoppen toevoegen aan bestaande rijen**
 window.ensureMacroRemoveButtons = function () {
-    let tableBody = document.getElementById("macroTable")?.getElementsByTagName("tbody")[0];
+    let tableBody = document.getElementById("macroTable").getElementsByTagName("tbody")[0];
 
     if (!tableBody) {
-        console.warn("⚠️ Macro tabel niet gevonden. Probeer opnieuw over 500ms...");
+        console.warn("⚠️ Macro tabel niet gevonden, probeer opnieuw...");
         setTimeout(ensureMacroRemoveButtons, 500);
         return;
     }
@@ -23,15 +18,16 @@ window.ensureMacroRemoveButtons = function () {
     for (let row of tableBody.rows) {
         let lastCell = row.cells[row.cells.length - 1];
 
-        // ✅ Controleer of de knop al bestaat
+        // ✅ Controleer of de knop al bestaat, anders toevoegen
         if (!lastCell.querySelector("button")) {
             lastCell.innerHTML = `<button class="btn-remove" onclick="removeRow(this)">❌</button>`;
-            console.log("✅ Verwijderknop toegevoegd aan bestaande rij.");
         }
     }
+
+    console.log("✅ Verwijderknoppen toegevoegd aan alle rijen!");
 };
 
-// ✅ **Indicator toevoegen zonder extra kolommen**
+// ✅ **Indicator toevoegen met vaste kolommen**
 window.addMacroRow = function () {
     let indicatorName = prompt("Voer de naam van de indicator in:");
     if (!indicatorName) return;
@@ -39,17 +35,15 @@ window.addMacroRow = function () {
     let table = document.getElementById("macroTable").getElementsByTagName('tbody')[0];
     let newRow = table.insertRow();
 
-    // ✅ Ophalen hoeveel kolommen er in de tabelkop zitten
-    let columnCount = document.getElementById("macroTable").getElementsByTagName("thead")[0].rows[0].cells.length;
-    
-    // ✅ Zorg ervoor dat de nieuwe rij exact evenveel cellen krijgt als de bestaande rijen
-    for (let i = 0; i < columnCount - 1; i++) {  // -1 omdat de laatste kolom voor de verwijderknop is
-        newRow.insertCell(i).innerText = i === 0 ? indicatorName : "N/A";
-    }
-
-    // ✅ Laatste cel: verwijderknop
-    let deleteCell = newRow.insertCell(columnCount - 1);
-    deleteCell.innerHTML = `<button class="btn-remove" onclick="removeRow(this)">❌</button>`;
+    // ✅ VASTE KOLOMMENSTRUCTUUR
+    newRow.innerHTML = `
+        <td>${indicatorName}</td>
+        <td>Laden...</td>
+        <td>N/A</td>
+        <td>N/A</td>
+        <td>N/A</td>
+        <td><button class="btn-remove" onclick="removeRow(this)">❌</button></td>
+    `;
 
     console.log(`✅ Indicator toegevoegd: ${indicatorName}`);
 };
