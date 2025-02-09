@@ -4,15 +4,7 @@ document.addEventListener("DOMContentLoaded", function () {
     setInterval(updateAllGauges, 60000);
 });
 
-// ✅ **Alle meters updaten**
-function updateAllGauges() {
-    console.log("🔄 Data ophalen en meters updaten...");
-    
-    fetchGoogleTrends();
-    fetchBTCDominance();
-    fetchRSIBitcoin();
-    fetchBitcoinData();
-}
+
 
 // ✅ **Macro Gauge updaten**
 function updateMacroGauge(score) {
