@@ -3,7 +3,7 @@ document.addEventListener("DOMContentLoaded", function () {
     ensureTechButtons();
 });
 
-// ✅ Zorg ervoor dat elke rij en kolom standaard een verwijderknop heeft
+// ✅ Zorg ervoor dat elke rij en kolom een verwijderknop heeft
 function ensureTechButtons() {
     let tableBody = document.getElementById("techTable").getElementsByTagName("tbody")[0];
     let headerRow = document.getElementById("techTable").getElementsByTagName("thead")[0].rows[0];
@@ -49,7 +49,7 @@ window.addTechRow = function () {
         timeframeSelect.appendChild(opt);
     });
 
-    // ✅ Vul de rij correct in (exact evenveel kolommen als de header!)
+    // ✅ Cellen invullen (matcht met bestaande kolommen!)
     newRow.insertCell(0).innerText = assetName; // Asset naam
     timeframeCell.appendChild(timeframeSelect); // Timeframe dropdown
 
