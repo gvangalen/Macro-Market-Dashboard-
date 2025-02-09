@@ -1,36 +1,37 @@
 document.addEventListener("DOMContentLoaded", function () {
     console.log("📌 Macro Indicatoren geladen!");
     
-    // ✅ Wacht tot de tabel volledig geladen is en voeg verwijderknoppen toe
-    setTimeout(ensureMacroRemoveButtons, 500);
+    setTimeout(() => {
+        ensureMacroRemoveButtons();
+        console.log("✅ Verwijderknoppen gecontroleerd.");
+    }, 500);
 
     updateMacroData();
     setInterval(updateMacroData, 60000);
 });
 
-// ✅ **Verwijderknoppen toevoegen aan ALLE bestaande rijen**
+// ✅ **Voegt verwijderknoppen toe aan bestaande rijen**
 window.ensureMacroRemoveButtons = function () {
     let tableBody = document.getElementById("macroTable")?.getElementsByTagName("tbody")[0];
 
     if (!tableBody) {
-        console.warn("⚠️ Macro tabel nog niet geladen, probeer opnieuw...");
+        console.warn("⚠️ Macro tabel niet gevonden. Probeer opnieuw over 500ms...");
         setTimeout(ensureMacroRemoveButtons, 500);
         return;
     }
 
     for (let row of tableBody.rows) {
-        let lastCell = row.cells[row.cells.length - 1]; // Pak de laatste kolom
+        let lastCell = row.cells[row.cells.length - 1];
 
-        // ✅ Controleer of de knop al bestaat, zo niet: voeg toe
+        // ✅ Controleer of de knop al bestaat
         if (!lastCell.querySelector("button")) {
             lastCell.innerHTML = `<button class="btn-remove" onclick="removeRow(this)">❌</button>`;
+            console.log("✅ Verwijderknop toegevoegd aan bestaande rij.");
         }
     }
-
-    console.log("✅ Verwijderknoppen correct toegevoegd aan alle rijen!");
 };
 
-// ✅ **Indicator toevoegen (gebruikt een prompt)**
+// ✅ **Indicator toevoegen zonder extra kolommen**
 window.addMacroRow = function () {
     let indicatorName = prompt("Voer de naam van de indicator in:");
     if (!indicatorName) return;
@@ -38,21 +39,27 @@ window.addMacroRow = function () {
     let table = document.getElementById("macroTable").getElementsByTagName('tbody')[0];
     let newRow = table.insertRow();
 
-    // ✅ Exacte hoeveelheid kolommen toevoegen (Voorkomt extra kolommen)
-    newRow.insertCell(0).innerText = indicatorName;
-    newRow.insertCell(1).innerText = "Laden...";
-    newRow.insertCell(2).innerText = "N/A";
-    newRow.insertCell(3).innerText = "N/A";
-    newRow.insertCell(4).innerText = "N/A";
+    // ✅ Correct aantal kolommen: 4 data + 1 verwijderknop = 5
+    let cells = [
+        indicatorName,  // Indicator naam
+        "Laden...",     // Huidig Niveau
+        "N/A",          // Trend
+        "N/A",          // Interpretatie
+    ];
 
-    // ✅ Verwijderknop in de juiste kolom
-    let deleteCell = newRow.insertCell(5);
+    cells.forEach(text => {
+        let cell = newRow.insertCell();
+        cell.innerText = text;
+    });
+
+    // ✅ Laatste cel: verwijderknop
+    let deleteCell = newRow.insertCell();
     deleteCell.innerHTML = `<button class="btn-remove" onclick="removeRow(this)">❌</button>`;
 
     console.log(`✅ Indicator toegevoegd: ${indicatorName}`);
 };
 
-// ✅ **Rij verwijderen zonder extra kolommen**
+// ✅ **Rij verwijderen**
 window.removeRow = function (button) {
     let row = button.parentNode.parentNode;
     row.parentNode.removeChild(row);
