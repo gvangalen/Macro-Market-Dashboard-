@@ -1,1 +1,33 @@
-
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Setup Beheer</title>
+    <link rel="stylesheet" href="setup.css">
+</head>
+<body>
+    <div class="container">
+        <h2>📊 Trade Setup Beheer</h2>
+        <form id="setupForm">
+            <label for="setupName">Setup Naam:</label>
+            <input type="text" id="setupName" required>
+            
+            <label for="indicators">Indicatoren (comma gescheiden):</label>
+            <input type="text" id="indicators" required>
+            
+            <label for="trend">Trend:</label>
+            <select id="trend">
+                <option value="bullish">Bullish</option>
+                <option value="bearish">Bearish</option>
+                <option value="neutraal">Neutraal</option>
+            </select>
+            
+            <button type="submit">Setup Toevoegen</button>
+        </form>
+        <h3>Huidige Setups</h3>
+        <ul id="setupList"></ul>
+    </div>
+    <script src="setup.js"></script>
+</body>
+</html>
