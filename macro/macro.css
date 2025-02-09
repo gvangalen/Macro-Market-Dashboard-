@@ -7,6 +7,19 @@ body {
 h2 {
     margin-top: 20px;
 }
+.macro-container {
+    text-align: center;
+    padding: 20px;
+}
+
+.macro-score {
+    font-weight: bold;
+}
+
+#macroAdvice {
+    font-size: 1.5rem;
+    font-weight: bold;
+}
 
 table {
     width: 80%;
