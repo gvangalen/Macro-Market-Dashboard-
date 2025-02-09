@@ -5,8 +5,24 @@ document.addEventListener("DOMContentLoaded", function () {
     setInterval(updateMacroData, 60000);
 });
 
+document.addEventListener("DOMContentLoaded", function () {
+    console.log("📌 Macro Indicatoren geladen!");
+    
+    // ✅ Controleer of de tabel beschikbaar is voordat we de verwijderknoppen toevoegen
+    setTimeout(ensureMacroRemoveButtons, 500);
+
+    updateMacroData();
+    setInterval(updateMacroData, 60000);
+});
+
 window.ensureMacroRemoveButtons = function () {
     let tableBody = document.getElementById("macroTable").getElementsByTagName("tbody")[0];
+
+    if (!tableBody) {
+        console.warn("⚠️ Macro tabel nog niet geladen, probeer opnieuw...");
+        setTimeout(ensureMacroRemoveButtons, 500);
+        return;
+    }
 
     for (let row of tableBody.rows) {
         let lastCell = row.cells[row.cells.length - 1]; // Laatste cel in de rij
@@ -16,15 +32,36 @@ window.ensureMacroRemoveButtons = function () {
             lastCell.innerHTML = `<button class="btn-remove" onclick="removeRow(this)">❌</button>`;
         }
     }
+
+    console.log("✅ Verwijderknoppen toegevoegd aan alle rijen!");
 };
 
-// ✅ Roep deze functie aan bij het laden van de pagina
-document.addEventListener("DOMContentLoaded", function () {
-    console.log("📌 Macro Indicatoren geladen!");
-    ensureMacroRemoveButtons(); // ✅ Nu worden alle rijen direct voorzien van een verwijderknop
-    updateMacroData();
-    setInterval(updateMacroData, 60000);
-});
+// ✅ **Indicator toevoegen met prompt**
+window.addMacroRow = function () {
+    let indicatorName = prompt("Voer de naam van de indicator in:");
+    if (!indicatorName) return;
+
+    let table = document.getElementById("macroTable").getElementsByTagName('tbody')[0];
+    let newRow = table.insertRow();
+
+    newRow.innerHTML = `
+        <td>${indicatorName}</td>
+        <td>Laden...</td>
+        <td>N/A</td>
+        <td>N/A</td>
+        <td>N/A</td>
+        <td><button class="btn-remove" onclick="removeRow(this)">❌</button></td>
+    `;
+
+    console.log(`✅ Indicator toegevoegd: ${indicatorName}`);
+};
+
+// ✅ **Rij verwijderen** (Maak globaal beschikbaar!)
+window.removeRow = function (button) {
+    let row = button.parentNode.parentNode;
+    row.parentNode.removeChild(row);
+};
+
 
 window.addMacroRow = function () {
     let indicatorName = prompt("Voer de naam van de indicator in:");
