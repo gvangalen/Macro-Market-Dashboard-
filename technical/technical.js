@@ -3,12 +3,12 @@ document.addEventListener("DOMContentLoaded", function () {
     ensureTechButtons();
 });
 
-// ✅ Zorg ervoor dat elke rij en kolom standaard een verwijderknop heeft
+// ✅ Zorg ervoor dat elke rij en kolom een verwijderknop heeft
 function ensureTechButtons() {
     let tableBody = document.getElementById("analysisTable").getElementsByTagName("tbody")[0];
     let headerRow = document.getElementById("analysisTable").getElementsByTagName("thead")[0].rows[0];
 
-    // ✅ Verwijderknoppen voor elke asset (rij)
+    // ✅ Voeg verwijderknoppen toe voor bestaande assets
     for (let row of tableBody.rows) {
         let lastCell = row.cells[row.cells.length - 1];
         if (!lastCell.querySelector("button")) {
@@ -16,7 +16,7 @@ function ensureTechButtons() {
         }
     }
 
-    // ✅ Verwijderknoppen voor indicatoren (kolommen)
+    // ✅ Voeg verwijderknoppen toe voor bestaande indicatoren
     for (let i = 2; i < headerRow.cells.length - 1; i++) {
         let cell = headerRow.cells[i];
         if (!cell.querySelector("button")) {
@@ -33,17 +33,13 @@ window.addTechRow = function () {
     let table = document.getElementById("analysisTable").getElementsByTagName('tbody')[0];
     let newRow = table.insertRow();
 
-    // ✅ Timeframe wordt globaal aangepast
+    // ✅ Timeframe uit dropdown halen
     let timeframe = document.getElementById('globalTimeframe').value;
     
     newRow.innerHTML = `
         <td>${assetName}</td>
         <td class='timeframe'>${timeframe}</td>
-        <td class='indicator'>Laden...</td>
-        <td class='indicator'>N/A</td>
-        <td class='indicator'>Laden...</td>
-        <td class='indicator'>Laden...</td>
-        <td><button class='remove' onclick="removeRow(this)">❌</button></td>
+        <td><button class='btn-remove' onclick="removeRow(this)">❌</button></td>
     `;
 };
 
