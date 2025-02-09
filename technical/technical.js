@@ -1,48 +1,16 @@
 document.addEventListener("DOMContentLoaded", function () {
     console.log("📌 Technische Analyse geladen!");
-    ensureTechButtons();
 });
-
-// ✅ Zorg ervoor dat elke rij en kolom standaard een verwijderknop heeft
-function ensureTechButtons() {
-    let tableBody = document.getElementById("techTable").getElementsByTagName("tbody")[0];
-    let headerRow = document.getElementById("techTable").getElementsByTagName("thead")[0].rows[0];
-
-    // ✅ Verwijderknoppen voor elke asset (rij)
-    for (let row of tableBody.rows) {
-        let lastCell = row.cells[row.cells.length - 1];
-        if (!lastCell.querySelector("button")) {
-            lastCell.innerHTML = `<button class="btn-remove" onclick="removeRow(this)">❌</button>`;
-        }
-    }
-
-    // ✅ Verwijderknoppen voor standaard indicatoren (kolommen)
-    for (let i = 2; i < headerRow.cells.length - 1; i++) {
-        let cell = headerRow.cells[i];
-
-        // **FIXED: Controleer of de verwijderknop al bestaat**
-        if (!cell.querySelector("button")) {
-            let button = document.createElement("button");
-            button.innerHTML = "❌";
-            button.classList.add("btn-remove");
-            button.onclick = function () { removeTechIndicator(button); };
-            cell.appendChild(button);
-        }
-    }
-}
 
 // ✅ **Asset toevoegen**
 window.addTechRow = function () {
     let assetName = prompt("Voer de naam van de asset in:");
     if (!assetName) return;
 
-    let tableBody = document.getElementById("techTable").getElementsByTagName("tbody")[0];
-    let newRow = tableBody.insertRow();
-    let columns = document.getElementById("techTable").rows[0].cells.length;
+    let table = document.getElementById("techTable").getElementsByTagName('tbody')[0];
+    let newRow = table.insertRow();
 
-    // ✅ Voeg asset naam en timeframe dropdown toe
-    newRow.insertCell(0).innerText = assetName;
-
+    // ✅ Timeframe dropdown aanmaken
     let timeframeCell = newRow.insertCell(1);
     let timeframeSelect = document.createElement("select");
     let timeframeOptions = ["1hr", "4hr", "1day", "1week"];
@@ -54,10 +22,13 @@ window.addTechRow = function () {
         timeframeSelect.appendChild(opt);
     });
 
-    timeframeCell.appendChild(timeframeSelect);
+    // ✅ Cellen invullen
+    newRow.insertCell(0).innerText = assetName; // Asset naam
+    timeframeCell.appendChild(timeframeSelect); // Timeframe dropdown
 
-    // ✅ Vul de rest van de rij met "Laden..." voor bestaande indicatoren
-    for (let i = 2; i < columns - 1; i++) {
+    // ✅ Voeg dynamisch cellen toe voor bestaande indicatoren
+    let headerRow = document.getElementById("techTable").rows[0];
+    for (let i = 2; i < headerRow.cells.length - 1; i++) {
         newRow.insertCell(i).innerHTML = "Laden...";
     }
 
@@ -83,7 +54,7 @@ window.addTechIndicator = function () {
         }
     }
 
-    // ✅ Nieuwe kolom toevoegen zonder extra rijen
+    // ✅ Nieuwe kolom toevoegen zonder extra rijen aan te maken
     let newHeader = document.createElement("th");
     newHeader.innerHTML = `${indicatorName} <button class="btn-remove" onclick="removeTechIndicator(this)">❌</button>`;
     headerRow.insertBefore(newHeader, headerRow.cells[headerRow.cells.length - 1]);
