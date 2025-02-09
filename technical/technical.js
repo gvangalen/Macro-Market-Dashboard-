@@ -36,10 +36,11 @@ window.addTechRow = function () {
     // ✅ Voeg de asset naam toe
     newRow.insertCell(0).innerText = assetName;
 
-    // ✅ Bepaal hoeveel indicatoren er zijn en voeg die toe aan de nieuwe rij
+    // ✅ Haal het aantal indicatoren op uit de header
     let headerRow = document.getElementById("analysisTable").getElementsByTagName("thead")[0].rows[0];
-    let indicatorCount = headerRow.cells.length - 2; // Asset en Actie kolommen tellen niet mee
+    let indicatorCount = headerRow.cells.length - 2; // Asset en Actie tellen niet mee
 
+    // ✅ Voeg bestaande indicatoren toe aan de nieuwe asset
     for (let i = 0; i < indicatorCount; i++) {
         let newCell = newRow.insertCell(i + 1);
         newCell.innerHTML = "Laden...";
