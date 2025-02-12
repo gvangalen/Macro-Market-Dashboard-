@@ -4,54 +4,7 @@
     margin-top: 20px;
 }
 
-.gauge-container {
-    width: 120px;
-    height: 120px;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    font-size: 14px;
-    font-weight: bold;
-    position: relative;
-}
-
-.gauge-circle {
-    position: relative;
-    width: 100px;
-    height: 100px;
-    border-radius: 50%;
-    overflow: hidden;
-}
-
-.gauge-fill {
-    position: absolute;
-    width: 100%;
-    height: 100%;
-    border-radius: 50%;
-    background: conic-gradient(#4caf50 0deg, #ddd 0deg);
-    transition: transform 0.5s ease-in-out;
-    clip-path: polygon(50% 50%, 100% 50%, 100% 100%, 50% 100%);
-}
-
-.gauge-mask {
-    position: absolute;
-    width: 80%;
-    height: 80%;
-    background: white;
-    border-radius: 50%;
-    top: 10%;
-    left: 10%;
-    z-index: 2; /* Zorgt ervoor dat masker niet over de fill zit */
-}
-
-.gauge-value {
-    position: absolute;
-    width: 100%;
+.gauge-wrapper {
     text-align: center;
-    font-size: 16px;
-    font-weight: bold;
-    top: 50%;
-    transform: translateY(-50%);
-    z-index: 3;
+    width: 150px;
 }
