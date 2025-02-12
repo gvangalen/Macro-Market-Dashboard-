@@ -1,83 +1,76 @@
 document.addEventListener("DOMContentLoaded", function () {
     console.log("📌 Dashboard geladen!");
+    
+    // ✅ Maak gauges aan met Chart.js
+    const macroGauge = createGauge("macroGauge", "Macro");
+    const technicalGauge = createGauge("technicalGauge", "Technisch");
+    const setupGauge = createGauge("setupGauge", "Setup");
 
-    // ✅ Live data ophalen en dashboard bijwerken
-    fetchMarketData();
-    setInterval(fetchMarketData, 3600000); // Elk uur updaten
+    // ✅ API ophalen en dashboard updaten
+    fetchMarketData(macroGauge, technicalGauge, setupGauge);
+    setInterval(() => fetchMarketData(macroGauge, technicalGauge, setupGauge), 3600000); // Elk uur verversen
 });
 
-// ✅ **Live Market Data ophalen via API**
-async function fetchMarketData() {
-    try {
-        const response = await fetch("http://127.0.0.1:5002/market_data"); // 🚀 Pas aan naar jouw API URL
-        if (!response.ok) throw new Error("❌ API fout: " + response.status);
-        
-        const data = await response.json();
-        console.log("📊 Marktdata ontvangen:", data);
-        
-        // ✅ Update dashboard met marktdata
-        updateDashboard(data);
-        checkActiveSetups(data);
-    } catch (error) {
-        console.error("⚠️ Kon market data niet ophalen:", error);
-    }
+// ✅ **Functie om Chart.js gauges te maken**
+function createGauge(elementId, label) {
+    const ctx = document.getElementById(elementId).getContext("2d");
+    return new Chart(ctx, {
+        type: "doughnut",
+        data: {
+            labels: ["Sterke Sell", "Sell", "Neutraal", "Buy", "Sterke Buy"],
+            datasets: [{
+                data: [20, 20, 20, 20, 20], // Evenredige verdeling
+                backgroundColor: ["#ff3b30", "#ff9500", "#f0ad4e", "#4cd964", "#34c759"],
+                borderWidth: 0
+            }]
+        },
+        options: {
+            rotation: -90,
+            circumference: 180,
+            cutout: "80%",
+            plugins: {
+                legend: { display: false },
+                tooltip: { enabled: false },
+            }
+        }
+    });
 }
 
-// ✅ **Dashboard met API-data bijwerken**
-function updateDashboard(data) {
-    document.getElementById("btc_price").textContent = `$${data.crypto.bitcoin.price}`;
-    document.getElementById("sol_price").textContent = `$${data.crypto.solana.price}`;
-    document.getElementById("macro_fear_greed").textContent = data.fear_greed_index;
-    
-    updateMacroGauge(data.fear_greed_index);
-    updateTechnicalGauge(data.crypto.bitcoin.change_24h);
+// ✅ **Data ophalen en meters updaten**
+function fetchMarketData(macroGauge, technicalGauge, setupGauge) {
+    fetch("http://127.0.0.1:5002/market_data")
+        .then(response => response.json())
+        .then(data => {
+            console.log("📊 Ontvangen API-data:", data);
+
+            // ✅ Marktcondities ophalen uit API
+            updateGauge(macroGauge, data.macro_score);
+            updateGauge(technicalGauge, data.technical_score);
+
+            // ✅ Check of setup actief is
+            checkActiveSetups(setupGauge, data);
+        })
+        .catch(error => console.error("❌ API-fout:", error));
 }
 
-// ✅ **Macro Gauge updaten**
-function updateMacroGauge(score) {
-    let percentage = ((score - 0) / 100) * 100;
-    updateGauge("MacroGauge", percentage);
+// ✅ **Update gauge met nieuwe waarde**
+function updateGauge(gauge, score) {
+    let index = Math.max(0, Math.min(4, Math.round((score + 2) / 4 * 4))); // Zet -2 tot 2 om naar 0-4 index
+    gauge.data.datasets[0].data = gauge.data.datasets[0].data.map((v, i) => (i === index ? 100 : 20));
+    gauge.update();
 }
 
-// ✅ **Technische Gauge updaten**
-function updateTechnicalGauge(change24h) {
-    let percentage = ((change24h + 5) / 10) * 100;
-    updateGauge("TechnicalGauge", percentage);
-}
-
-// ✅ **Setup Gauge updaten**
-function updateSetupGauge(activeSetups) {
-    let percentage = activeSetups > 0 ? 100 : 0;
-    updateGauge("SetupGauge", percentage);
-}
-
-// ✅ **Gauge opmaken en visueel updaten**
-function updateGauge(id, value) {
-    let gauge = document.getElementById(id);
-    if (!gauge) {
-        console.warn(`⚠️ Gauge met ID '${id}' niet gevonden!");
-        return;
-    }
-    let percentage = Math.max(0, Math.min(100, value));
-    gauge.innerHTML = `
-        <div class="gauge-label">${id}</div>
-        <div class="gauge-circle">
-            <div class="gauge-fill" style="transform: rotate(${percentage * 1.5}deg)"></div>
-            <div class="gauge-mask"></div>
-            <div class="gauge-value">${percentage}%</div>
-        </div>
-    `;
-}
-
-// ✅ **Check of setups actief zijn en update SetupGauge**
-function checkActiveSetups(marketData) {
+// ✅ **Check actieve setups en update SetupGauge**
+function checkActiveSetups(setupGauge, marketData) {
     let setups = JSON.parse(localStorage.getItem("setups")) || [];
-    let activeSetups = setups.filter(setup => matchSetupToMarket(setup, marketData)).length;
-    console.log(`🔎 Actieve setups gevonden: ${activeSetups}`);
-    updateSetupGauge(activeSetups);
-}
+    let activeSetups = 0;
 
-// ✅ **Setup matching met live marktanalyse**
-function matchSetupToMarket(setup, marketData) {
-    return setup.trend === marketData.trend || marketData.indicator.includes(setup.indicators);
+    setups.forEach(setup => {
+        if (setup.trend === marketData.trend && marketData.indicators.includes(setup.indicators)) {
+            activeSetups++;
+        }
+    });
+
+    console.log(`🔎 Actieve setups gevonden: ${activeSetups}`);
+    updateGauge(setupGauge, activeSetups > 0 ? 2 : -2); // ✅ Groen als een setup actief is
 }
