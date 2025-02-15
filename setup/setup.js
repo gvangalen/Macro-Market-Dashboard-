@@ -3,8 +3,10 @@ document.addEventListener("DOMContentLoaded", function () {
     loadSetups(); // Laad bestaande setups bij het starten
 });
 
+const apiUrl = "http://13.60.235.90:5002/setups"; // AWS API endpoint
+
 // ✅ **Setup toevoegen**
-document.getElementById("setupForm").addEventListener("submit", function (e) {
+document.getElementById("setupForm").addEventListener("submit", async function (e) {
     e.preventDefault();
 
     let name = document.getElementById("setupName").value.trim();
@@ -17,55 +19,61 @@ document.getElementById("setupForm").addEventListener("submit", function (e) {
     }
 
     let setup = { name, indicators, trend };
-    saveSetup(setup);
+    await saveSetup(setup);
     document.getElementById("setupForm").reset();
 });
 
-// ✅ **Setup opslaan in LocalStorage**
-function saveSetup(setup) {
-    let setups = JSON.parse(localStorage.getItem("setups")) || [];
-
-    // ✅ Controleer of setup al bestaat
-    if (setups.some(s => s.name.toLowerCase() === setup.name.toLowerCase())) {
-        alert("⚠️ Deze setup bestaat al!");
-        return;
+// ✅ **Setup opslaan op AWS-server**
+async function saveSetup(setup) {
+    try {
+        let response = await fetch(apiUrl, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(setup)
+        });
+        
+        if (!response.ok) throw new Error("Fout bij opslaan setup");
+        loadSetups();
+    } catch (error) {
+        console.error("❌ Setup opslaan mislukt:", error);
     }
-
-    if (setups.length >= 5) {
-        alert("⚠️ Maximaal 5 setups toegestaan!");
-        return;
-    }
-
-    setups.push(setup);
-    localStorage.setItem("setups", JSON.stringify(setups));
-    loadSetups();
 }
 
-// ✅ **Setups laden en tonen in de lijst**
-function loadSetups() {
-    let setups = JSON.parse(localStorage.getItem("setups")) || [];
-    let list = document.getElementById("setupList");
-    list.innerHTML = "";
+// ✅ **Setups laden van AWS-server**
+async function loadSetups() {
+    try {
+        let response = await fetch(apiUrl);
+        if (!response.ok) throw new Error("Fout bij ophalen setups");
+        
+        let setups = await response.json();
+        let list = document.getElementById("setupList");
+        list.innerHTML = "";
 
-    if (setups.length === 0) {
-        list.innerHTML = "<li>🚫 Geen setups opgeslagen</li>";
-        return;
+        if (setups.length === 0) {
+            list.innerHTML = "<li>🚫 Geen setups opgeslagen</li>";
+            return;
+        }
+
+        setups.forEach((setup) => {
+            let li = document.createElement("li");
+            li.innerHTML = `
+                <span><strong>${setup.name}</strong> (${setup.trend}) - ${setup.indicators}</span>
+                <button class="delete-btn" onclick="deleteSetup('${setup.id}')">❌</button>
+            `;
+            list.appendChild(li);
+        });
+    } catch (error) {
+        console.error("❌ Setup laden mislukt:", error);
     }
-
-    setups.forEach((setup, index) => {
-        let li = document.createElement("li");
-        li.innerHTML = `
-            <span><strong>${setup.name}</strong> (${setup.trend}) - ${setup.indicators}</span>
-            <button class="delete-btn" onclick="deleteSetup(${index})">❌</button>
-        `;
-        list.appendChild(li);
-    });
 }
 
-// ✅ **Setup verwijderen**
-function deleteSetup(index) {
-    let setups = JSON.parse(localStorage.getItem("setups")) || [];
-    setups.splice(index, 1);
-    localStorage.setItem("setups", JSON.stringify(setups));
-    loadSetups();
+// ✅ **Setup verwijderen op AWS-server**
+async function deleteSetup(id) {
+    try {
+        let response = await fetch(`${apiUrl}/${id}`, { method: "DELETE" });
+        if (!response.ok) throw new Error("Fout bij verwijderen setup");
+        loadSetups();
+    } catch (error) {
+        console.error("❌ Setup verwijderen mislukt:", error);
+    }
 }
