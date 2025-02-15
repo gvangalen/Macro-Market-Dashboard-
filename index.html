@@ -34,11 +34,11 @@
                 .catch(error => console.error(`❌ Fout bij laden van ${url}:`, error));
         }
 
-        // ✅ **Laad alle secties**
-        loadHTML("dashboard-container", "dashboard/dashboard.html");
-        loadHTML("market-container", "market/market.html"); 
-        loadHTML("macro-container", "macro/macro.html");
-        loadHTML("technical-container", "technical/technical.html");
+        // ✅ **Laad alle secties vanaf AWS**
+        loadHTML("dashboard-container", "http://13.60.235.90:5002/dashboard");
+        loadHTML("market-container", "http://13.60.235.90:5002/market"); 
+        loadHTML("macro-container", "http://13.60.235.90:5002/macro");
+        loadHTML("technical-container", "http://13.60.235.90:5002/technical");
     </script>
 
     <!-- ✅ **Laad de juiste scripts op de juiste plek** -->
