@@ -1,7 +1,7 @@
 document.addEventListener("DOMContentLoaded", function () {
-    console.log("📌 DOM geladen!");
+    console.log("📌 Dashboard geladen!");
     updateAllData();
-    setInterval(updateAllData, 60000); // Elke minuut updaten
+    setInterval(updateAllData, 60000); // Elke minuut verversen
 
     // ✅ Event Listeners koppelen voor knoppen
     document.getElementById("addMacroIndicatorBtn")?.addEventListener("click", addMacroRow);
@@ -9,65 +9,32 @@ document.addEventListener("DOMContentLoaded", function () {
     document.getElementById("addTechAssetBtn")?.addEventListener("click", addTechRow);
 });
 
-// ✅ **Update alle data tegelijk**
-function updateAllData() {
-    console.log("🔄 Data ophalen en bijwerken...");
-    fetchGoogleTrends();
-    fetchBTCDominance();
-    fetchRSIBitcoin();
-    fetchBitcoinData();
-}
-
-// ✅ **Google Trends ophalen**
-async function fetchGoogleTrends() {
+// ✅ **Update alle data vanaf de AWS-server**
+async function updateAllData() {
     try {
-        let response = await fetch("https://api.alternative.me/fng/");
+        let response = await fetch("http://13.60.235.90:5002/market_data");
         let data = await response.json();
-        let fearGreed = parseInt(data.data[0].value);
-        document.getElementById("googleTrends").innerText = fearGreed;
+        console.log("📊 Ontvangen API-data:", data);
+
+        // ✅ Update macro-indicatoren
+        document.getElementById("googleTrends").innerText = data.fear_greed_index;
+        document.getElementById("usdtDominance").innerText = `${data.crypto.bitcoin.volume.toLocaleString()}%`;
+
+        // ✅ Update Bitcoin en Solana gegevens
+        updateCryptoData("btc", data.crypto.bitcoin);
+        updateCryptoData("sol", data.crypto.solana);
     } catch (error) {
-        console.error("❌ Google Trends Error:", error);
+        console.error("❌ Fout bij ophalen market data van AWS:", error);
     }
 }
 
-// ✅ **BTC Dominantie ophalen**
-async function fetchBTCDominance() {
-    try {
-        let response = await fetch("https://api.coingecko.com/api/v3/global");
-        let data = await response.json();
-        let btcDominance = parseFloat(data.data.market_cap_percentage.btc.toFixed(2));
-        document.getElementById("usdtDominance").innerText = btcDominance + "%";
-    } catch (error) {
-        console.error("❌ BTC Dominantie Error:", error);
-    }
-}
-
-// ✅ **RSI Bitcoin ophalen**
-async function fetchRSIBitcoin() {
-    try {
-        let response = await fetch("https://api.binance.com/api/v3/ticker/24hr?symbol=BTCUSDT");
-        let data = await response.json();
-        let priceChangePercent = Math.abs(parseFloat(data.priceChangePercent));
-        document.getElementById("rsiBitcoin").innerText = priceChangePercent;
-    } catch (error) {
-        console.error("❌ RSI Bitcoin Error:", error);
-    }
-}
-
-// ✅ **Bitcoin Marktgegevens ophalen**
-async function fetchBitcoinData() {
-    try {
-        let response = await fetch("https://api.coingecko.com/api/v3/simple/price?ids=bitcoin&vs_currencies=usd&include_market_cap=true&include_24hr_vol=true&include_24hr_change=true");
-        let data = await response.json();
-        let btc = data.bitcoin;
-
-        document.getElementById("btcClose").innerText = `$${btc.usd.toLocaleString()}`;
-        document.getElementById("btcChange").innerText = `${btc.usd_24h_change.toFixed(2)}%`;
-        document.getElementById("btcMarketCap").innerText = `$${(btc.usd_market_cap / 1e9).toFixed(2)}B`;
-        document.getElementById("btcVolume").innerText = `$${(btc.usd_24h_vol / 1e9).toFixed(2)}B`;
-    } catch (error) {
-        console.error("❌ Bitcoin Marktgegevens Error:", error);
-    }
+// ✅ **Crypto Data bijwerken (Bitcoin & Solana)**
+function updateCryptoData(prefix, cryptoData) {
+    document.getElementById(`${prefix}Close`).innerText = `$${cryptoData.price.toFixed(2)}`;
+    document.getElementById(`${prefix}Change`).innerText = `${cryptoData.change_24h.toFixed(2)}%`;
+    document.getElementById(`${prefix}MarketCap`).innerText = `$${(cryptoData.volume / 1e9).toFixed(2)}B`;
+    document.getElementById(`${prefix}Volume`).innerText = `$${(cryptoData.volume / 1e9).toFixed(2)}B`;
+    document.getElementById(`${prefix}Change`).style.color = cryptoData.change_24h >= 0 ? "green" : "red";
 }
 
 // ✅ **Macro Indicator Toevoegen**
@@ -94,7 +61,6 @@ function addTechIndicator() {
     let indicatorName = prompt("Voer de naam van de indicator in:");
     if (!indicatorName) return;
 
-    // ✅ Controleer of indicator al bestaat
     for (let cell of headerRow.cells) {
         if (cell.textContent.includes(indicatorName)) {
             alert("Deze indicator bestaat al!");
@@ -102,12 +68,10 @@ function addTechIndicator() {
         }
     }
 
-    // ✅ Nieuwe kolom toevoegen
     let newHeader = document.createElement("th");
     newHeader.innerHTML = `${indicatorName} <button class="btn-remove">❌</button>`;
     headerRow.insertBefore(newHeader, headerRow.cells[headerRow.cells.length - 1]);
 
-    // ✅ Lege cel toevoegen in elke rij
     for (let row of bodyRows) {
         let newCell = row.insertCell(row.cells.length - 1);
         newCell.innerHTML = "Laden...";
@@ -115,22 +79,7 @@ function addTechIndicator() {
     updateRemoveButtons();
 }
 
-// ✅ **Technische Indicator Verwijderen**
-function removeTechIndicator(event) {
-    let button = event.target;
-    let columnIndex = button.closest("th").cellIndex;
-
-    let table = document.getElementById("techTable");
-    let headerRow = table.getElementsByTagName("thead")[0].rows[0];
-    let bodyRows = table.getElementsByTagName("tbody")[0].rows;
-
-    headerRow.deleteCell(columnIndex);
-    for (let row of bodyRows) {
-        row.deleteCell(columnIndex);
-    }
-}
-
-// ✅ **Rij verwijderen (asset of macro-indicator)**
+// ✅ **Rij verwijderen (macro/technisch)**
 function removeRow(event) {
     let row = event.target.closest("tr");
     row.remove();
@@ -144,7 +93,6 @@ function addTechRow() {
     let table = document.getElementById("techTable").getElementsByTagName('tbody')[0];
     let newRow = table.insertRow();
 
-    // ✅ Timeframe dropdown
     let timeframeOptions = ["1hr", "4hr", "1day", "1week"];
     let timeframeSelect = document.createElement("select");
     timeframeOptions.forEach(option => {
@@ -154,7 +102,6 @@ function addTechRow() {
         timeframeSelect.appendChild(opt);
     });
 
-    // ✅ Voeg cellen toe aan de rij
     newRow.insertCell(0).innerText = assetName;
     let timeframeCell = newRow.insertCell(1);
     timeframeCell.appendChild(timeframeSelect);
@@ -163,21 +110,16 @@ function addTechRow() {
         newRow.insertCell(i).innerHTML = "Laden...";
     }
 
-    // ✅ Verwijderknop toevoegen
     let deleteCell = newRow.insertCell(-1);
     deleteCell.innerHTML = `<button class="btn-remove">❌</button>`;
     updateRemoveButtons();
 }
 
-// ✅ **Event Listeners updaten**
+// ✅ **Verwijderknoppen bijwerken**
 function updateRemoveButtons() {
     document.querySelectorAll(".btn-remove").forEach(button => {
         button.addEventListener("click", function (event) {
-            if (this.closest("tr")) {
-                removeRow(event);
-            } else {
-                removeTechIndicator(event);
-            }
+            removeRow(event);
         });
     });
 }
