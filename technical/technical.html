@@ -30,9 +30,40 @@
             </tr>
         </thead>
         <tbody>
-            <!-- Dynamische rijen worden hier toegevoegd -->
+            <!-- Dynamische rijen worden hier automatisch geladen vanuit AWS -->
         </tbody>
     </table>
+
+    <script>
+        // ✅ Laad technische analyse data vanaf AWS
+        async function loadTechAnalysis() {
+            try {
+                let response = await fetch("http://13.60.235.90:5002/technical_analysis");
+                if (!response.ok) throw new Error("Fout bij ophalen technische analyse");
+                let data = await response.json();
+                renderTechTable(data);
+            } catch (error) {
+                console.error("❌ Fout bij laden technische analyse:", error);
+            }
+        }
+
+        // ✅ Tabel vullen met data van de server
+        function renderTechTable(data) {
+            let tableBody = document.getElementById("analysisTable").getElementsByTagName("tbody")[0];
+            tableBody.innerHTML = "";
+
+            data.assets.forEach(asset => {
+                let newRow = tableBody.insertRow();
+                newRow.insertCell(0).innerText = asset.name;
+                
+                let deleteCell = newRow.insertCell(-1);
+                deleteCell.innerHTML = `<button class="btn-remove" onclick="removeTechRow('${asset.id}')">❌</button>`;
+            });
+        }
+
+        // ✅ Laad de technische analyse data zodra de pagina opent
+        document.addEventListener("DOMContentLoaded", loadTechAnalysis);
+    </script>
 
     <script src="js/technical.js"></script>
 </body>
