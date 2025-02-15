@@ -1,93 +1,48 @@
 document.addEventListener("DOMContentLoaded", function () {
     console.log("📌 Macro Indicatoren geladen!");
-    ensureMacroRemoveButtons();
     updateMacroData();
-    setInterval(updateMacroData, 60000);
+    setInterval(updateMacroData, 60000); // Elke minuut verversen
 });
 
-// ✅ Voeg verwijderknoppen toe aan bestaande indicatoren
-function ensureMacroRemoveButtons() {
-    let tableBody = document.getElementById("macroTable").getElementsByTagName("tbody")[0];
-
-    for (let row of tableBody.rows) {
-        if (!row.cells[6].querySelector("button")) { 
-            let deleteCell = row.cells[6];
-            deleteCell.innerHTML = `<button class="btn-remove" onclick="removeRow(this)">❌</button>`;
-        }
-    }
-}
-
-// ✅ **Indicator toevoegen**
-function addMacroRow() {
-    let table = document.getElementById("macroTable").getElementsByTagName('tbody')[0];
-    let newRow = table.insertRow();
-
-    newRow.innerHTML = `
-        <td><input type="text" placeholder="Naam Indicator"></td>
-        <td>Laden...</td>
-        <td>N/A</td>
-        <td>N/A</td>
-        <td>N/A</td>
-        <td class="macro-score">-</td>
-        <td><button class="btn-remove" onclick="removeRow(this)">❌</button></td>
-    `;
-}
-
-// ✅ **Rij verwijderen**
-function removeRow(button) {
-    let row = button.parentNode.parentNode;
-    row.parentNode.removeChild(row);
-    updateMacroScore(); // Herbereken de totale score bij verwijderen
-}
-
-// ✅ **Macro Indicatoren updaten**
-async function updateMacroData() {
-    fetchGoogleTrends();
-    fetchBTCDominance();
-}
-
-// ✅ **Google Trends ophalen**
-async function fetchGoogleTrends() {
+// ✅ **Macro Data ophalen van AWS-server**
+async function fetchMacroData() {
     try {
-        let response = await fetch("https://api.alternative.me/fng/");
+        let response = await fetch("http://13.60.235.90:5002/market_data");
         let data = await response.json();
-        let fearGreed = parseInt(data.data[0].value);
+        
+        let fearGreed = parseInt(data.fear_greed_index);
+        let btcDominance = parseFloat(data.crypto.bitcoin.volume / 1000000000).toFixed(2); // Omzetten naar percentage
+        
+        console.log("📊 API Macro Data:", { fearGreed, btcDominance });
+        
+        // ✅ Update DOM & scores
         document.getElementById("googleTrends").innerText = fearGreed;
         updateScore("googleTrends", fearGreed);
-    } catch (error) {
-        console.error("❌ Fout bij ophalen Google Trends:", error);
-    }
-}
-
-// ✅ **BTC Dominantie ophalen**
-async function fetchBTCDominance() {
-    try {
-        let response = await fetch("https://api.coingecko.com/api/v3/global");
-        let data = await response.json();
-        let btcDominance = parseFloat(data.data.market_cap_percentage.btc.toFixed(2));
+        
         document.getElementById("usdtDominance").innerText = btcDominance + "%";
         updateScore("usdtDominance", btcDominance);
+        
     } catch (error) {
-        console.error("❌ Fout bij ophalen BTC Dominantie:", error);
+        console.error("❌ Fout bij ophalen macro-data:", error);
     }
 }
 
-// ✅ **Score berekenen voor een indicator**
+// ✅ **Update macro scores op basis van indicatoren**
 function updateScore(indicator, value) {
     let score = 0;
 
     if (indicator === "googleTrends") {
-        if (value > 70) score = 2; // Bullish
+        if (value > 70) score = 2;
         else if (value > 50) score = 1;
         else if (value > 30) score = -1;
-        else score = -2; // Bearish
+        else score = -2;
     }
 
     if (indicator === "usdtDominance") {
-        if (value < 3) score = 2; // Bullish (lage USDT dominantie)
+        if (value < 3) score = 2;
         else if (value < 5) score = 1;
         else if (value < 7) score = -1;
-        else score = -2; // Bearish (hoge USDT dominantie)
+        else score = -2;
     }
 
     let scoreCell = document.getElementById(indicator).parentNode.querySelector(".macro-score");
@@ -122,4 +77,27 @@ function updateMacroAdvice(score) {
     else if (score <= -1.5) advice = "Bearish 🔴";
     
     document.getElementById("macroAdvice").innerText = advice;
+}
+
+// ✅ **Indicator toevoegen**
+function addMacroRow() {
+    let table = document.getElementById("macroTable").getElementsByTagName('tbody')[0];
+    let newRow = table.insertRow();
+
+    newRow.innerHTML = `
+        <td><input type="text" placeholder="Naam Indicator"></td>
+        <td>Laden...</td>
+        <td>N/A</td>
+        <td>N/A</td>
+        <td>N/A</td>
+        <td class="macro-score">-</td>
+        <td><button class="btn-remove" onclick="removeRow(this)">❌</button></td>
+    `;
+}
+
+// ✅ **Rij verwijderen**
+function removeRow(button) {
+    let row = button.parentNode.parentNode;
+    row.parentNode.removeChild(row);
+    updateMacroScore();
 }
