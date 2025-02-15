@@ -1,8 +1,8 @@
 document.addEventListener("DOMContentLoaded", function () {
     console.log("Market.js geladen ✅");
 
-    // ✅ API URL voor Bitcoin market data (CoinGecko)
-    const apiUrl = "https://api.coingecko.com/api/v3/coins/bitcoin/market_chart?vs_currency=usd&days=1&interval=daily";
+    // ✅ API URL van jouw AWS-server
+    const apiUrl = "http://13.60.235.90:5002/market_data";
 
     // ✅ HTML-elementen koppelen
     const btcOpen = document.getElementById("btcOpen");
@@ -10,36 +10,40 @@ document.addEventListener("DOMContentLoaded", function () {
     const btcLow = document.getElementById("btcLow");
     const btcClose = document.getElementById("btcClose");
     const btcChange = document.getElementById("btcChange");
+    
+    const solOpen = document.getElementById("solOpen");
+    const solHigh = document.getElementById("solHigh");
+    const solLow = document.getElementById("solLow");
+    const solClose = document.getElementById("solClose");
+    const solChange = document.getElementById("solChange");
 
-    // ✅ Haal Bitcoin market data op
+    // ✅ Haal market data op van AWS
     fetch(apiUrl)
         .then(response => response.json())
         .then(data => {
-            const prices = data.prices;
-            const openPrice = prices[0][1]; // Eerste prijs van de dag
-            const closePrice = prices[prices.length - 1][1]; // Laatste prijs van de dag
-            const highPrice = Math.max(...prices.map(p => p[1])); // Hoogste prijs
-            const lowPrice = Math.min(...prices.map(p => p[1])); // Laagste prijs
+            console.log("📊 API Market Data ontvangen:", data);
 
-            // ✅ Bereken 24h % verandering
-            const percentChange = ((closePrice - openPrice) / openPrice) * 100;
+            // ✅ Bitcoin Data
+            const btcData = data.crypto.bitcoin;
+            btcOpen.textContent = `$${btcData.price.toFixed(2)}`;
+            btcHigh.textContent = `Volume: ${btcData.volume.toLocaleString()}`;
+            btcLow.textContent = `24h Change: ${btcData.change_24h.toFixed(2)}%`;
+            btcClose.textContent = "N/A";
+            btcChange.textContent = `${btcData.change_24h.toFixed(2)}%`;
+            btcChange.style.color = btcData.change_24h >= 0 ? "green" : "red";
 
-            // ✅ Zet waarden in tabel
-            btcOpen.textContent = `$${openPrice.toFixed(2)}`;
-            btcHigh.textContent = `$${highPrice.toFixed(2)}`;
-            btcLow.textContent = `$${lowPrice.toFixed(2)}`;
-            btcClose.textContent = `$${closePrice.toFixed(2)}`;
-            btcChange.textContent = `${percentChange.toFixed(2)}%`;
-
-            // ✅ Positieve of negatieve kleur
-            btcChange.style.color = percentChange >= 0 ? "green" : "red";
+            // ✅ Solana Data
+            const solData = data.crypto.solana;
+            solOpen.textContent = `$${solData.price.toFixed(2)}`;
+            solHigh.textContent = `Volume: ${solData.volume.toLocaleString()}`;
+            solLow.textContent = `24h Change: ${solData.change_24h.toFixed(2)}%`;
+            solClose.textContent = "N/A";
+            solChange.textContent = `${solData.change_24h.toFixed(2)}%`;
+            solChange.style.color = solData.change_24h >= 0 ? "green" : "red";
         })
         .catch(error => {
-            console.error("❌ Fout bij ophalen Bitcoin market data:", error);
-            btcOpen.textContent = "Error";
-            btcHigh.textContent = "Error";
-            btcLow.textContent = "Error";
-            btcClose.textContent = "Error";
-            btcChange.textContent = "Error";
+            console.error("❌ Fout bij ophalen market data van AWS:", error);
+            [btcOpen, btcHigh, btcLow, btcClose, btcChange, solOpen, solHigh, solLow, solClose, solChange]
+                .forEach(el => el.textContent = "Error");
         });
 });
