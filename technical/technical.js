@@ -1,106 +1,99 @@
 document.addEventListener("DOMContentLoaded", function () {
     console.log("📌 Technische Analyse geladen!");
-    ensureTechButtons();
+    loadTechAnalysis(); // Laad bestaande analyses van AWS
 });
 
-// ✅ Zorg ervoor dat elke rij en kolom een verwijderknop heeft
-function ensureTechButtons() {
-    let tableBody = document.getElementById("analysisTable").getElementsByTagName("tbody")[0];
-    let headerRow = document.getElementById("analysisTable").getElementsByTagName("thead")[0].rows[0];
+const apiUrl = "http://13.60.235.90:5002/technical_analysis"; // AWS API endpoint
 
-    // ✅ Voeg verwijderknoppen toe voor bestaande assets
-    for (let row of tableBody.rows) {
-        let lastCell = row.cells[row.cells.length - 1];
-        if (!lastCell.querySelector("button")) {
-            lastCell.innerHTML = `<button class="btn-remove" onclick="removeRow(this)">❌</button>`;
-        }
-    }
-
-    // ✅ Voeg verwijderknoppen toe voor bestaande indicatoren
-    for (let i = 1; i < headerRow.cells.length - 1; i++) {
-        let cell = headerRow.cells[i];
-        if (!cell.querySelector("button")) {
-            cell.innerHTML += ` <button class="btn-remove" onclick="removeTechIndicator(this)">❌</button>`;
-        }
+// ✅ **Technische Analyse laden vanaf AWS**
+async function loadTechAnalysis() {
+    try {
+        let response = await fetch(apiUrl);
+        if (!response.ok) throw new Error("Fout bij ophalen technische analyse");
+        let data = await response.json();
+        console.log("📊 Ontvangen technische analyse data:", data);
+        renderTechTable(data);
+    } catch (error) {
+        console.error("❌ Fout bij laden technische analyse:", error);
     }
 }
 
+// ✅ **Tabel vullen met data**
+function renderTechTable(data) {
+    let tableBody = document.getElementById("analysisTable").getElementsByTagName("tbody")[0];
+    let headerRow = document.getElementById("analysisTable").getElementsByTagName("thead")[0].rows[0];
+    tableBody.innerHTML = "";
+
+    data.assets.forEach(asset => {
+        let newRow = tableBody.insertRow();
+        newRow.insertCell(0).innerText = asset.name;
+        
+        asset.indicators.forEach(indicator => {
+            let newCell = newRow.insertCell(-1);
+            newCell.innerText = indicator.value;
+        });
+        
+        let deleteCell = newRow.insertCell(-1);
+        deleteCell.innerHTML = `<button class="btn-remove" onclick="removeTechRow('${asset.id}')">❌</button>`;
+    });
+}
+
 // ✅ **Asset toevoegen met bestaande indicatoren**
-window.addTechRow = function () {
+window.addTechRow = async function () {
     let assetName = prompt("Voer de naam van de asset in:");
     if (!assetName) return;
 
-    let table = document.getElementById("analysisTable").getElementsByTagName('tbody')[0];
-    let newRow = table.insertRow();
-
-    // ✅ Voeg de asset naam toe
-    newRow.insertCell(0).innerText = assetName;
-
-    // ✅ Haal bestaande indicatoren op uit de header (behalve 'Asset' en 'Actie')
-    let headerRow = document.getElementById("analysisTable").getElementsByTagName("thead")[0].rows[0];
-    let indicatorCount = headerRow.cells.length - 2; // Asset en Actie tellen niet mee
-
-    // ✅ Voeg cellen toe voor elke bestaande indicator
-    for (let i = 0; i < indicatorCount; i++) {
-        let newCell = newRow.insertCell(i + 1);
-        newCell.innerHTML = "Laden...";
+    try {
+        let response = await fetch(apiUrl, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ name: assetName, indicators: [] })
+        });
+        if (!response.ok) throw new Error("Fout bij toevoegen asset");
+        loadTechAnalysis();
+    } catch (error) {
+        console.error("❌ Asset toevoegen mislukt:", error);
     }
-
-    // ✅ Voeg verwijderknop toe
-    let deleteCell = newRow.insertCell(-1);
-    deleteCell.innerHTML = `<button class="btn-remove" onclick="removeRow(this)">❌</button>`;
 };
 
 // ✅ **Indicator toevoegen aan alle assets**
-window.addTechIndicator = function () {
-    let table = document.getElementById("analysisTable");
-    let headerRow = table.getElementsByTagName("thead")[0].rows[0];
-    let bodyRows = table.getElementsByTagName("tbody")[0].rows;
-
+window.addTechIndicator = async function () {
     let indicatorName = prompt("Voer de naam van de indicator in:");
     if (!indicatorName) return;
-
-    // ✅ Controleer of de indicator al bestaat
-    for (let cell of headerRow.cells) {
-        if (cell.textContent.includes(indicatorName)) {
-            alert("Deze indicator bestaat al!");
-            return;
-        }
-    }
-
-    // ✅ Nieuwe kolom toevoegen aan de tabelheader
-    let newHeader = document.createElement("th");
-    newHeader.innerHTML = `${indicatorName} <button class="btn-remove" onclick="removeTechIndicator(this)">❌</button>`;
-    headerRow.insertBefore(newHeader, headerRow.cells[headerRow.cells.length - 1]);
-
-    // ✅ Voeg de nieuwe indicator toe aan alle bestaande assets
-    for (let row of bodyRows) {
-        let newCell = row.insertCell(row.cells.length - 1);
-        newCell.innerHTML = "Laden...";
+    
+    try {
+        let response = await fetch(`${apiUrl}/indicators`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ name: indicatorName })
+        });
+        if (!response.ok) throw new Error("Fout bij toevoegen indicator");
+        loadTechAnalysis();
+    } catch (error) {
+        console.error("❌ Indicator toevoegen mislukt:", error);
     }
 };
 
 // ✅ **Indicator verwijderen**
-window.removeTechIndicator = function (button) {
-    let headerRow = document.getElementById("analysisTable").getElementsByTagName("thead")[0].rows[0];
-    let tableBody = document.getElementById("analysisTable").getElementsByTagName("tbody")[0];
-
-    let columnIndex = button.parentNode.cellIndex;
-
-    headerRow.deleteCell(columnIndex);
-    for (let row of tableBody.rows) {
-        row.deleteCell(columnIndex);
+window.removeTechIndicator = async function (button) {
+    let indicatorName = button.parentNode.textContent.trim();
+    
+    try {
+        let response = await fetch(`${apiUrl}/indicators/${indicatorName}`, { method: "DELETE" });
+        if (!response.ok) throw new Error("Fout bij verwijderen indicator");
+        loadTechAnalysis();
+    } catch (error) {
+        console.error("❌ Indicator verwijderen mislukt:", error);
     }
 };
 
 // ✅ **Asset verwijderen**
-window.removeRow = function (button) {
-    let row = button.parentNode.parentNode;
-    row.parentNode.removeChild(row);
+window.removeTechRow = async function (assetId) {
+    try {
+        let response = await fetch(`${apiUrl}/${assetId}`, { method: "DELETE" });
+        if (!response.ok) throw new Error("Fout bij verwijderen asset");
+        loadTechAnalysis();
+    } catch (error) {
+        console.error("❌ Asset verwijderen mislukt:", error);
+    }
 };
-
-// ✅ **Timeframe dropdown blijft ongewijzigd**
-document.getElementById('globalTimeframe').addEventListener('change', function() {
-    let newTimeframe = this.value;
-    console.log(`✅ Timeframe veranderd naar ${newTimeframe}`);
-});
