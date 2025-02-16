@@ -1,5 +1,5 @@
 // api/api.js
-const apiBaseUrl = "http://13.60.235.90:5002"; // ✅ AWS API-endpoint
+const apiBaseUrl = "http://13.60.235.90:5002"; // ✅ AWS API-endpoint 
 
 async function fetchMacroData() {
     try {
