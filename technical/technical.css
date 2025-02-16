@@ -10,12 +10,14 @@ body {
 /* Titel */
 h2 {
     margin-top: 20px;
+    color: #333;
 }
 
 /* Container voor knoppen */
 .controls {
     display: flex;
     justify-content: center;
+    flex-wrap: wrap;
     gap: 10px;
     margin-bottom: 15px;
 }
@@ -28,11 +30,21 @@ table {
     background: white;
     box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
     border-radius: 8px;
+    overflow: hidden;
+}
+
+/* Responsieve tabel voor kleine schermen */
+@media (max-width: 768px) {
+    table {
+        display: block;
+        overflow-x: auto;
+        white-space: nowrap;
+    }
 }
 
 /* Tabellen cellen */
 th, td {
-    padding: 10px;
+    padding: 12px;
     border: 1px solid #ddd;
     text-align: center;
 }
@@ -74,4 +86,12 @@ th {
 
 .btn-remove:hover {
     background-color: #c9302c;
+}
+
+/* ✅ Laadtoestand */
+.loading {
+    text-align: center;
+    font-size: 16px;
+    color: #777;
+    margin-top: 20px;
 }
