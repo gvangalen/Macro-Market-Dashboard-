@@ -1,46 +1,45 @@
 // api/api.js
-async function fetchGoogleTrends() {
+const apiBaseUrl = "http://13.60.235.90:5002"; // ✅ AWS API-endpoint
+
+async function fetchMacroData() {
     try {
-        let response = await fetch("https://api.alternative.me/fng/");
+        let response = await fetch(`${apiBaseUrl}/macro_data`);
+        if (!response.ok) throw new Error("Fout bij ophalen macro-data");
+        
         let data = await response.json();
-        document.getElementById("googleTrends").innerText = data.data[0].value;
+        document.getElementById("googleTrends").innerText = data.fear_greed;
+        document.getElementById("usdtDominance").innerText = `${data.usdt_dominance}%`;
+        updateScore("googleScore", data.fear_greed, [30, 50, 70], true);
+        updateScore("usdtScore", data.usdt_dominance, [3, 5, 7], false);
     } catch (error) {
-        console.error("❌ Fout bij ophalen Google Trends:", error);
+        console.error("❌ Fout bij ophalen macro-data:", error);
     }
 }
 
-async function fetchBTCDominance() {
+async function fetchMarketData() {
     try {
-        let response = await fetch("https://api.coingecko.com/api/v3/global");
+        let response = await fetch(`${apiBaseUrl}/market_data`);
+        if (!response.ok) throw new Error("Fout bij ophalen marktdata");
+        
         let data = await response.json();
-        document.getElementById("usdtDominance").innerText = data.data.market_cap_percentage.btc.toFixed(2) + "%";
-    } catch (error) {
-        console.error("❌ Fout bij ophalen BTC Dominantie:", error);
-    }
-}
-
-async function fetchRSIBitcoin() {
-    try {
-        let response = await fetch("https://api.binance.com/api/v3/ticker/24hr?symbol=BTCUSDT");
-        let data = await response.json();
-        document.getElementById("rsiBitcoin").innerText = Math.abs(parseFloat(data.priceChangePercent));
-    } catch (error) {
-        console.error("❌ Fout bij ophalen RSI Bitcoin:", error);
-    }
-}
-
-async function fetchBitcoinData() {
-    try {
-        let response = await fetch("https://api.coingecko.com/api/v3/simple/price?ids=bitcoin&vs_currencies=usd&include_market_cap=true&include_24hr_vol=true&include_24hr_change=true");
-        let data = await response.json();
-        let btc = data.bitcoin;
-
-        document.getElementById("btcClose").innerText = `$${btc.usd.toLocaleString()}`;
-        document.getElementById("btcChange").innerText = `${btc.usd_24h_change.toFixed(2)}%`;
-        document.getElementById("btcMarketCap").innerText = `$${(btc.usd_market_cap / 1e9).toFixed(2)}B`;
-        document.getElementById("btcVolume").innerText = `$${(btc.usd_24h_vol / 1e9).toFixed(2)}B`;
+        let btc = data.crypto.bitcoin;
+        
+        document.getElementById("btcClose").innerText = `$${btc.price.toLocaleString()}`;
+        document.getElementById("btcChange").innerText = `${btc.change_24h.toFixed(2)}%`;
+        document.getElementById("btcMarketCap").innerText = `$${(btc.market_cap / 1e9).toFixed(2)}B`;
+        document.getElementById("btcVolume").innerText = `$${(btc.volume / 1e9).toFixed(2)}B`;
     } catch (error) {
         console.error("❌ Fout bij ophalen Bitcoin data:", error);
     }
 }
 
+// ✅ **Alle data in één keer ophalen**
+async function fetchAllData() {
+    fetchMacroData();
+    fetchMarketData();
+}
+
+document.addEventListener("DOMContentLoaded", function () {
+    fetchAllData();
+    setInterval(fetchAllData, 60000); // Elke minuut updaten
+});
