@@ -3,7 +3,7 @@ document.addEventListener("DOMContentLoaded", function () {
     loadTechAnalysis(); // Laad bestaande analyses van AWS
 });
 
-const apiUrl = "http://13.60.235.90:5002/technical_analysis"; // AWS API endpoint
+const apiUrl = "http://13.60.235.90:5003/technical_analysis"; // AWS API endpoint
 
 // ✅ **Technische Analyse laden vanaf AWS**
 async function loadTechAnalysis() {
