@@ -39,7 +39,7 @@ function createGauge(elementId, label) {
 // ✅ **Data ophalen en meters updaten**
 async function fetchMarketData(macroGauge, technicalGauge, setupGauge) {
     try {
-        let response = await fetch("http://13.60.235.90:5002/market_data"); // ✅ AWS-server gebruiken
+        let response = await fetch("http://13.60.235.90:5002/market_data"); // ✅ AWS-server 
         if (!response.ok) throw new Error("API-fout bij ophalen market data");
         
         let data = await response.json();
