@@ -18,19 +18,19 @@
             <tr>
                 <td>Bitcoin Dominantie</td>
                 <td id="usdtDominance">Laden...</td>
-                <td>N/A</td>
-                <td>N/A</td>
-                <td>N/A</td>
-                <td class="macro-score">-</td>
+                <td id="usdtTrend">N/A</td>
+                <td id="usdtInterpretation">N/A</td>
+                <td id="usdtAction">N/A</td>
+                <td class="macro-score" id="usdtScore">-</td>
                 <td><button class="btn-remove" onclick="removeRow(this)">❌</button></td>
             </tr>
             <tr>
                 <td>Google Trends (Fear & Greed)</td>
                 <td id="googleTrends">Laden...</td>
-                <td>N/A</td>
-                <td>N/A</td>
-                <td>N/A</td>
-                <td class="macro-score">-</td>
+                <td id="googleTrend">N/A</td>
+                <td id="googleInterpretation">N/A</td>
+                <td id="googleAction">N/A</td>
+                <td class="macro-score" id="googleScore">-</td>
                 <td><button class="btn-remove" onclick="removeRow(this)">❌</button></td>
             </tr>
         </tbody>
@@ -38,4 +38,76 @@
 
     <h3>🌍 Totale Macro Score: <span id="macroTotalScore">N/A</span></h3>
     <h3>📈 Macro Advies: <span id="macroAdvice">Neutraal</span></h3>
+    <p id="macroStatus" class="loading">📡 Data laden...</p>
 </div>
+
+<script>
+    const macroApiUrl = "http://13.60.235.90:5002/macro_data"; // AWS API endpoint
+
+    async function fetchMacroData() {
+        try {
+            let response = await fetch(macroApiUrl);
+            if (!response.ok) throw new Error("Fout bij ophalen macro-data");
+            
+            let data = await response.json();
+            
+            document.getElementById("usdtDominance").textContent = `${data.usdt_dominance}%`;
+            document.getElementById("googleTrends").textContent = data.fear_greed;
+            
+            updateScore("usdtScore", data.usdt_dominance, [3, 5, 7], false);
+            updateScore("googleScore", data.fear_greed, [30, 50, 70], true);
+            
+            updateMacroScore();
+            document.getElementById("macroStatus").textContent = "✅ Macrodata up-to-date";
+        } catch (error) {
+            console.error("❌ Macrodata ophalen mislukt:", error);
+            document.getElementById("macroStatus").textContent = "❌ Fout bij ophalen macro-data.";
+        }
+    }
+
+    function updateScore(id, value, thresholds, positive) {
+        let score = 0;
+        if (positive) {
+            if (value > thresholds[2]) score = 2;
+            else if (value > thresholds[1]) score = 1;
+            else if (value > thresholds[0]) score = -1;
+            else score = -2;
+        } else {
+            if (value < thresholds[0]) score = 2;
+            else if (value < thresholds[1]) score = 1;
+            else if (value < thresholds[2]) score = -1;
+            else score = -2;
+        }
+        document.getElementById(id).textContent = score;
+    }
+
+    function updateMacroScore() {
+        let scores = document.querySelectorAll(".macro-score");
+        let totalScore = 0, count = 0;
+        
+        scores.forEach(cell => {
+            let score = parseInt(cell.textContent);
+            if (!isNaN(score)) {
+                totalScore += score;
+                count++;
+            }
+        });
+        
+        let avgScore = count > 0 ? (totalScore / count).toFixed(1) : "N/A";
+        document.getElementById("macroTotalScore").textContent = avgScore;
+        updateMacroAdvice(avgScore);
+    }
+
+    function updateMacroAdvice(score) {
+        let advice = "Neutraal";
+        if (score >= 1.5) advice = "Bullish 🟢";
+        else if (score <= -1.5) advice = "Bearish 🔴";
+        
+        document.getElementById("macroAdvice").textContent = advice;
+    }
+
+    document.addEventListener("DOMContentLoaded", function () {
+        fetchMacroData();
+        setInterval(fetchMacroData, 60000); // Elke minuut updaten
+    });
+</script>
