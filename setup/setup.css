@@ -1,4 +1,4 @@
-/* Algemene container styling */
+/* ✅ Algemene container styling */
 .setup-container {
     max-width: 450px;
     margin: auto;
@@ -19,7 +19,7 @@ h2, h3 {
     color: #333;
 }
 
-/* Formulier styling */
+/* ✅ Formulier styling */
 input, select, button {
     width: 100%;
     margin: 10px 0;
@@ -30,14 +30,14 @@ input, select, button {
     transition: all 0.3s ease-in-out;
 }
 
-/* Input velden focus effect */
+/* ✅ Input velden focus effect */
 input:focus, select:focus {
     border-color: #4caf50;
     outline: none;
     box-shadow: 0px 0px 8px rgba(76, 175, 80, 0.3);
 }
 
-/* Knop styling */
+/* ✅ Knop styling */
 button {
     background: #4caf50;
     color: white;
@@ -52,14 +52,14 @@ button:hover {
     background: #388e3c;
 }
 
-/* Lijst van setups */
+/* ✅ Lijst van setups */
 #setupList {
     list-style: none;
     padding: 0;
     margin-top: 15px;
 }
 
-/* Individuele setup items */
+/* ✅ Individuele setup items */
 #setupList li {
     padding: 12px;
     background: #f8f9fa;
@@ -75,7 +75,7 @@ button:hover {
     background: #e0f2f1;
 }
 
-/* Verwijderen knop in lijst */
+/* ✅ Verwijderen knop in lijst */
 .delete-btn {
     background: #d9534f;
     color: white;
@@ -88,4 +88,30 @@ button:hover {
 
 .delete-btn:hover {
     background: #c9302c;
+}
+
+/* ✅ Laadtoestand voor setup-lijst */
+.loading {
+    text-align: center;
+    font-size: 16px;
+    color: #777;
+    margin-top: 10px;
+    font-style: italic;
+}
+
+/* ✅ Responsieve optimalisatie */
+@media (max-width: 600px) {
+    .setup-container {
+        max-width: 90%;
+        padding: 15px;
+    }
+
+    input, select, button {
+        font-size: 14px;
+        padding: 10px;
+    }
+
+    .delete-btn {
+        padding: 6px 10px;
+    }
 }
