@@ -21,4 +21,38 @@
             </tr>
         </tbody>
     </table>
+    <p id="marketStatus" class="loading">📡 Data laden...</p>
 </div>
+
+<script>
+    const marketApiUrl = "http://13.60.235.90:5002/market_data"; // AWS API endpoint
+
+    async function fetchMarketData() {
+        try {
+            let response = await fetch(marketApiUrl);
+            if (!response.ok) throw new Error("Fout bij ophalen marktdata");
+            
+            let data = await response.json();
+            
+            document.getElementById("btcOpen").textContent = `$${data.crypto.bitcoin.open.toFixed(2)}`;
+            document.getElementById("btcHigh").textContent = `$${data.crypto.bitcoin.high.toFixed(2)}`;
+            document.getElementById("btcLow").textContent = `$${data.crypto.bitcoin.low.toFixed(2)}`;
+            document.getElementById("btcClose").textContent = `$${data.crypto.bitcoin.close.toFixed(2)}`;
+            
+            let change = data.crypto.bitcoin.change_24h.toFixed(2);
+            let changeElement = document.getElementById("btcChange");
+            changeElement.textContent = `${change}%`;
+            changeElement.style.color = change >= 0 ? "green" : "red";
+            
+            document.getElementById("marketStatus").textContent = "✅ Marktdata up-to-date";
+        } catch (error) {
+            console.error("❌ Marktdata ophalen mislukt:", error);
+            document.getElementById("marketStatus").textContent = "❌ Fout bij ophalen marktdata.";
+        }
+    }
+
+    document.addEventListener("DOMContentLoaded", function () {
+        fetchMarketData();
+        setInterval(fetchMarketData, 60000); // Elke minuut updaten
+    });
+</script>
