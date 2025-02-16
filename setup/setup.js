@@ -6,7 +6,7 @@ document.addEventListener("DOMContentLoaded", function () {
 const apiUrl = "http://13.60.235.90:5002/setups"; // AWS API endpoint
 
 // ✅ **Setup toevoegen**
-document.getElementById("setupForm").addEventListener("submit", async function (e) {
+document.getElementById("setupForm")?.addEventListener("submit", async function (e) {
     e.preventDefault();
 
     let name = document.getElementById("setupName").value.trim();
@@ -33,7 +33,7 @@ async function saveSetup(setup) {
         });
         
         if (!response.ok) throw new Error("Fout bij opslaan setup");
-        loadSetups();
+        await loadSetups();
     } catch (error) {
         console.error("❌ Setup opslaan mislukt:", error);
     }
@@ -47,21 +47,14 @@ async function loadSetups() {
         
         let setups = await response.json();
         let list = document.getElementById("setupList");
-        list.innerHTML = "";
-
-        if (setups.length === 0) {
-            list.innerHTML = "<li>🚫 Geen setups opgeslagen</li>";
-            return;
-        }
-
-        setups.forEach((setup) => {
-            let li = document.createElement("li");
-            li.innerHTML = `
-                <span><strong>${setup.name}</strong> (${setup.trend}) - ${setup.indicators}</span>
-                <button class="delete-btn" onclick="deleteSetup('${setup.id}')">❌</button>
-            `;
-            list.appendChild(li);
-        });
+        list.innerHTML = setups.length === 0 
+            ? "<li>🚫 Geen setups opgeslagen</li>"
+            : setups.map(setup => `
+                <li>
+                    <span><strong>${setup.name}</strong> (${setup.trend}) - ${setup.indicators}</span>
+                    <button class="delete-btn" onclick="deleteSetup('${setup.id}')">❌</button>
+                </li>
+            `).join("");
     } catch (error) {
         console.error("❌ Setup laden mislukt:", error);
     }
@@ -72,7 +65,7 @@ async function deleteSetup(id) {
     try {
         let response = await fetch(`${apiUrl}/${id}`, { method: "DELETE" });
         if (!response.ok) throw new Error("Fout bij verwijderen setup");
-        loadSetups();
+        await loadSetups();
     } catch (error) {
         console.error("❌ Setup verwijderen mislukt:", error);
     }
