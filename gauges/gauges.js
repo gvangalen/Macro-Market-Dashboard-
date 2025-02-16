@@ -9,7 +9,7 @@ document.addEventListener("DOMContentLoaded", function () {
     const createGauge = (ctx, label) => new Chart(ctx, {
         type: 'doughnut',
         data: {
-            labels: ["Strong Sell", "Sell", "Neutral", "Buy", "Strong Buy"],
+            labels: ["Sterke Sell", "Sell", "Neutraal", "Buy", "Sterke Buy"],
             datasets: [{
                 data: [20, 20, 20, 20, 20],
                 backgroundColor: ["#ff3b30", "#ff9500", "#f0ad4e", "#4cd964", "#34c759"],
@@ -50,12 +50,13 @@ function updateGauge(gauge, score) {
 async function fetchMarketData() {
     try {
         let response = await fetch("http://13.60.235.90:5002/market_data");
-        let data = await response.json();
+        if (!response.ok) throw new Error("API-fout bij ophalen market data");
         
+        let data = await response.json();
         console.log("📊 Ontvangen API-data:", data);
-
+        
         // ✅ Update gauges met ontvangen scores
-        updateGauge(macroGauge, parseFloat(data.fear_greed_index));
+        updateGauge(macroGauge, calculateMacroScore(data.fear_greed_index));
         updateGauge(technicalGauge, calculateTechnicalScore(data.crypto));
         checkActiveSetups(setupGauge, data);
     } catch (error) {
@@ -63,24 +64,35 @@ async function fetchMarketData() {
     }
 }
 
-// ✅ **Technische score berekenen**
+// ✅ **Bereken Macro Score**
+function calculateMacroScore(fearGreed) {
+    if (fearGreed > 75) return 2; // Zeer bullish
+    if (fearGreed > 50) return 1; // Bullish
+    if (fearGreed > 25) return -1; // Bearish
+    return -2; // Zeer bearish
+}
+
+// ✅ **Bereken Technische Score**
 function calculateTechnicalScore(cryptoData) {
     let btc = cryptoData.bitcoin;
     let sol = cryptoData.solana;
     
     let score = 0;
-    if (btc.change_24h > 2 || sol.change_24h > 2) score += 1;
-    if (btc.volume > 5000000000 || sol.volume > 1000000000) score += 1;
-    if (btc.change_24h < -2 || sol.change_24h < -2) score -= 1;
-    
-    return Math.max(-2, Math.min(2, score)); // Beperk tussen -2 en 2
+    if (btc.change_24h > 3 || sol.change_24h > 3) score += 2;
+    else if (btc.change_24h > 1.5 || sol.change_24h > 1.5) score += 1;
+    else if (btc.change_24h < -3 || sol.change_24h < -3) score -= 2;
+    else score -= 1;
+
+    if (btc.volume > 50000000000) score += 1; // Hoge volume bullish
+    if (sol.volume > 5000000000) score += 1;
+
+    return Math.max(-2, Math.min(2, score)); // Limiteer score tussen -2 en 2
 }
 
 // ✅ **Check actieve setups en update SetupGauge**
 function checkActiveSetups(setupGauge, marketData) {
     let activeSetups = 0;
     
-    // Placeholder setup validatie
     if (marketData.fear_greed_index > 50) activeSetups++;
     if (marketData.crypto.bitcoin.change_24h > 2) activeSetups++;
     
