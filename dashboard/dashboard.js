@@ -37,32 +37,33 @@ function createGauge(elementId, label) {
 }
 
 // ✅ **Data ophalen en meters updaten**
-function fetchMarketData(macroGauge, technicalGauge, setupGauge) {
-    fetch("http://13.60.235.90:5002/market_data")  // ✅ AWS-server gebruiken
-        .then(response => response.json())
-        .then(data => {
-            console.log("📊 Ontvangen API-data:", data);
+async function fetchMarketData(macroGauge, technicalGauge, setupGauge) {
+    try {
+        let response = await fetch("http://13.60.235.90:5002/market_data"); // ✅ AWS-server gebruiken
+        if (!response.ok) throw new Error("API-fout bij ophalen market data");
+        
+        let data = await response.json();
+        console.log("📊 Ontvangen API-data:", data);
+        
+        if (!data.crypto || !data.fear_greed_index) {
+            throw new Error("Ongeldige API-response");
+        }
 
-            if (!data.crypto || !data.fear_greed_index) {
-                throw new Error("Ongeldige API-response");
-            }
-
-            // ✅ Update gauges
-            updateGauge(macroGauge, calculateMacroScore(data.fear_greed_index));
-            updateGauge(technicalGauge, calculateTechnicalScore(data.crypto));
-
-            // ✅ Check setups
-            checkActiveSetups(setupGauge, data);
-        })
-        .catch(error => console.error("❌ API-fout:", error));
+        // ✅ Update gauges
+        updateGauge(macroGauge, calculateMacroScore(data.fear_greed_index));
+        updateGauge(technicalGauge, calculateTechnicalScore(data.crypto));
+        checkActiveSetups(setupGauge, data);
+    } catch (error) {
+        console.error("❌ API-fout:", error);
+    }
 }
 
 // ✅ **Bereken Macro Score**
 function calculateMacroScore(fearGreed) {
-    if (fearGreed > 70) return 2; // Bullish
-    if (fearGreed > 50) return 1;
-    if (fearGreed > 30) return -1;
-    return -2; // Bearish
+    if (fearGreed > 75) return 2; // Zeer bullish
+    if (fearGreed > 50) return 1; // Bullish
+    if (fearGreed > 25) return -1; // Bearish
+    return -2; // Zeer bearish
 }
 
 // ✅ **Bereken Technische Score**
@@ -71,12 +72,15 @@ function calculateTechnicalScore(cryptoData) {
     let sol = cryptoData.solana;
 
     let score = 0;
-    if (btc.change_24h > 2 || sol.change_24h > 2) score += 2;
-    else if (btc.change_24h > 1 || sol.change_24h > 1) score += 1;
-    else if (btc.change_24h < -2 || sol.change_24h < -2) score -= 2;
+    if (btc.change_24h > 3 || sol.change_24h > 3) score += 2;
+    else if (btc.change_24h > 1.5 || sol.change_24h > 1.5) score += 1;
+    else if (btc.change_24h < -3 || sol.change_24h < -3) score -= 2;
     else score -= 1;
 
-    return score;
+    if (btc.volume > 50000000000) score += 1; // Hoge volume bullish
+    if (sol.volume > 5000000000) score += 1;
+
+    return Math.max(-2, Math.min(2, score)); // Limiteer score tussen -2 en 2
 }
 
 // ✅ **Update gauge met nieuwe waarde**
