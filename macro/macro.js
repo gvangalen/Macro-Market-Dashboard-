@@ -8,10 +8,11 @@ document.addEventListener("DOMContentLoaded", function () {
 async function fetchMacroData() {
     try {
         let response = await fetch("http://13.60.235.90:5002/market_data");
-        let data = await response.json();
+        if (!response.ok) throw new Error("Fout bij ophalen macro-data");
         
+        let data = await response.json();
         let fearGreed = parseInt(data.fear_greed_index);
-        let btcDominance = parseFloat(data.crypto.bitcoin.volume / 1000000000).toFixed(2); // Omzetten naar percentage
+        let btcDominance = parseFloat(data.crypto.bitcoin.dominance).toFixed(2);
         
         console.log("📊 API Macro Data:", { fearGreed, btcDominance });
         
@@ -21,7 +22,6 @@ async function fetchMacroData() {
         
         document.getElementById("usdtDominance").innerText = btcDominance + "%";
         updateScore("usdtDominance", btcDominance);
-        
     } catch (error) {
         console.error("❌ Fout bij ophalen macro-data:", error);
     }
@@ -32,17 +32,11 @@ function updateScore(indicator, value) {
     let score = 0;
 
     if (indicator === "googleTrends") {
-        if (value > 70) score = 2;
-        else if (value > 50) score = 1;
-        else if (value > 30) score = -1;
-        else score = -2;
+        score = value > 70 ? 2 : value > 50 ? 1 : value > 30 ? -1 : -2;
     }
-
+    
     if (indicator === "usdtDominance") {
-        if (value < 3) score = 2;
-        else if (value < 5) score = 1;
-        else if (value < 7) score = -1;
-        else score = -2;
+        score = value < 3 ? 2 : value < 5 ? 1 : value < 7 ? -1 : -2;
     }
 
     let scoreCell = document.getElementById(indicator).parentNode.querySelector(".macro-score");
@@ -72,10 +66,7 @@ function updateMacroScore() {
 
 // ✅ **Advies genereren op basis van macro-score**
 function updateMacroAdvice(score) {
-    let advice = "Neutraal";
-    if (score >= 1.5) advice = "Bullish 🟢";
-    else if (score <= -1.5) advice = "Bearish 🔴";
-    
+    let advice = score >= 1.5 ? "Bullish 🟢" : score <= -1.5 ? "Bearish 🔴" : "Neutraal";
     document.getElementById("macroAdvice").innerText = advice;
 }
 
