@@ -1,3 +1,4 @@
+/* ✅ Algemene styling */
 body {
     font-family: Arial, sans-serif;
     text-align: center;
@@ -16,43 +17,51 @@ h2 {
 .macro-container {
     text-align: center;
     padding: 20px;
+    max-width: 90%;
+    margin: auto;
 }
 
+/* ✅ Dynamische kleuren voor scores */
 .macro-score {
     font-weight: bold;
     transition: color 0.3s ease-in-out;
 }
 
-/* ✅ Dynamische kleuren voor scores */
 .macro-score.positive {
-    color: green;
+    color: #2e7d32; /* Donkergroen */
 }
 
 .macro-score.negative {
-    color: red;
+    color: #d32f2f; /* Donkerrood */
 }
 
 #macroAdvice {
     font-size: 1.5rem;
     font-weight: bold;
     margin-top: 10px;
+    padding: 10px;
+    background: #e8f5e9;
+    color: #2e7d32;
+    border-radius: 8px;
+    display: inline-block;
 }
 
 /* ✅ Tabel styling */
 table {
-    width: 90%;
+    width: 100%;
+    max-width: 900px;
     margin: 20px auto;
     border-collapse: collapse;
     background: white;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
     border-radius: 8px;
     overflow: hidden;
+    text-align: center;
 }
 
 th, td {
     padding: 12px;
     border: 1px solid #ddd;
-    text-align: center;
     font-size: 16px;
 }
 
@@ -60,6 +69,7 @@ th {
     background: #388e3c;
     color: white;
     font-weight: bold;
+    text-transform: uppercase;
 }
 
 tr:nth-child(even) {
@@ -68,23 +78,33 @@ tr:nth-child(even) {
 
 tr:hover {
     background-color: #f1f1f1;
+    transition: background 0.3s ease-in-out;
 }
 
 /* ✅ Knoppen styling */
-.btn-add {
+.btn-add, .btn-remove {
     background-color: #4caf50;
     color: white;
     border: none;
-    padding: 12px 15px;
+    padding: 10px 15px;
     margin: 10px;
     cursor: pointer;
     border-radius: 5px;
-    font-size: 16px;
+    font-size: 14px;
     transition: background 0.3s ease-in-out;
 }
 
 .btn-add:hover {
     background-color: #388e3c;
+}
+
+.btn-remove {
+    background-color: #d32f2f;
+    padding: 6px 10px;
+}
+
+.btn-remove:hover {
+    background-color: #b71c1c;
 }
 
 /* ✅ Responsieve optimalisatie */
@@ -99,6 +119,6 @@ tr:hover {
 
     .btn-add {
         font-size: 14px;
-        padding: 10px;
+        padding: 8px;
     }
 }
