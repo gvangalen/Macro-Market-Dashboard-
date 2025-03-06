@@ -11,9 +11,28 @@ document.addEventListener("DOMContentLoaded", function () {
     setInterval(() => fetchMarketData(macroGauge, technicalGauge, setupGauge), 300000); // Elke 5 min verversen
 });
 
+// ✅ **Helperfunctie voor veilige API-aanvragen met retry**
+async function safeFetch(url) {
+    let retries = 3;
+    while (retries > 0) {
+        try {
+            let response = await fetch(url);
+            if (!response.ok) throw new Error(`Fout bij ophalen data van ${url}`);
+            return await response.json();
+        } catch (error) {
+            console.error(`❌ API-fout bij ${url}:`, error);
+            retries--;
+            if (retries === 0) return null;
+            await new Promise(resolve => setTimeout(resolve, 2000)); // 2 sec wachten
+        }
+    }
+}
+
 // ✅ **Functie om Chart.js gauges te maken**
 function createGauge(elementId, label) {
-    const ctx = document.getElementById(elementId).getContext("2d");
+    const ctx = document.getElementById(elementId)?.getContext("2d");
+    if (!ctx) return null;
+
     return new Chart(ctx, {
         type: "doughnut",
         data: {
@@ -38,53 +57,43 @@ function createGauge(elementId, label) {
 
 // ✅ **Data ophalen en meters updaten**
 async function fetchMarketData(macroGauge, technicalGauge, setupGauge) {
-    try {
-        let response = await fetch("http://13.60.235.90:5002/market_data"); // ✅ AWS-server 
-        if (!response.ok) throw new Error("API-fout bij ophalen market data");
-        
-        let data = await response.json();
-        console.log("📊 Ontvangen API-data:", data);
-        
-        if (!data.crypto || !data.fear_greed_index) {
-            throw new Error("Ongeldige API-response");
-        }
+    let data = await safeFetch("http://13.60.235.90:5002/api/market_data"); // ✅ Correcte API-route
+    if (!data || !data.length) return console.error("❌ Ongeldige of lege API-response!");
 
-        // ✅ Update gauges
-        updateGauge(macroGauge, calculateMacroScore(data.fear_greed_index));
-        updateGauge(technicalGauge, calculateTechnicalScore(data.crypto));
-        checkActiveSetups(setupGauge, data);
-    } catch (error) {
-        console.error("❌ API-fout:", error);
-    }
+    let btc = data.find(asset => asset.symbol === "BTC");
+    if (!btc) return console.error("❌ Geen Bitcoin-data gevonden!");
+
+    console.log("📊 Ontvangen API-data:", data);
+
+    // ✅ Update gauges
+    updateGauge(macroGauge, calculateMacroScore(btc));
+    updateGauge(technicalGauge, calculateTechnicalScore(btc));
+    checkActiveSetups(setupGauge, data);
 }
 
 // ✅ **Bereken Macro Score**
-function calculateMacroScore(fearGreed) {
-    if (fearGreed > 75) return 2; // Zeer bullish
-    if (fearGreed > 50) return 1; // Bullish
-    if (fearGreed > 25) return -1; // Bearish
-    return -2; // Zeer bearish
+function calculateMacroScore(btc) {
+    if (!btc.fear_greed) return 0;
+    let score = btc.fear_greed > 75 ? 2 : btc.fear_greed > 50 ? 1 : btc.fear_greed > 25 ? -1 : -2;
+    return score;
 }
 
 // ✅ **Bereken Technische Score**
-function calculateTechnicalScore(cryptoData) {
-    let btc = cryptoData.bitcoin;
-    let sol = cryptoData.solana;
-
+function calculateTechnicalScore(btc) {
     let score = 0;
-    if (btc.change_24h > 3 || sol.change_24h > 3) score += 2;
-    else if (btc.change_24h > 1.5 || sol.change_24h > 1.5) score += 1;
-    else if (btc.change_24h < -3 || sol.change_24h < -3) score -= 2;
+    if (btc.change_24h > 3) score += 2;
+    else if (btc.change_24h > 1.5) score += 1;
+    else if (btc.change_24h < -3) score -= 2;
     else score -= 1;
 
     if (btc.volume > 50000000000) score += 1; // Hoge volume bullish
-    if (sol.volume > 5000000000) score += 1;
 
     return Math.max(-2, Math.min(2, score)); // Limiteer score tussen -2 en 2
 }
 
 // ✅ **Update gauge met nieuwe waarde**
 function updateGauge(gauge, score) {
+    if (!gauge) return;
     let index = Math.max(0, Math.min(4, Math.round((score + 2) / 4 * 4)));
     gauge.data.datasets[0].data = gauge.data.datasets[0].data.map((v, i) => (i === index ? 100 : 20));
     gauge.update();
