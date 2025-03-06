@@ -1,6 +1,7 @@
 console.log("✅ gauges.js correct geladen!");
 
 let macroGauge, technicalGauge, setupGauge;
+const API_BASE_URL = "http://13.60.235.90:5002"; // ✅ AWS API-endpoint
 
 // ✅ **Gauges aanmaken met Chart.js**
 document.addEventListener("DOMContentLoaded", function () {
@@ -29,6 +30,7 @@ document.addEventListener("DOMContentLoaded", function () {
         }
     });
 
+    // ✅ Meters aanmaken
     macroGauge = createGauge(document.getElementById("macroGauge"), "Macro");
     technicalGauge = createGauge(document.getElementById("technicalGauge"), "Technisch");
     setupGauge = createGauge(document.getElementById("setupGauge"), "Setup");
@@ -49,16 +51,21 @@ function updateGauge(gauge, score) {
 // ✅ **API ophalen en gauges bijwerken**
 async function fetchMarketData() {
     try {
-        let response = await fetch("http://13.60.235.90:5002/market_data");
+        let response = await fetch(`${API_BASE_URL}/market_data`);
         if (!response.ok) throw new Error("API-fout bij ophalen market data");
-        
+
         let data = await response.json();
         console.log("📊 Ontvangen API-data:", data);
-        
+
+        if (!data.crypto || !data.fear_greed_index) {
+            throw new Error("Ongeldige API-response");
+        }
+
         // ✅ Update gauges met ontvangen scores
         updateGauge(macroGauge, calculateMacroScore(data.fear_greed_index));
         updateGauge(technicalGauge, calculateTechnicalScore(data.crypto));
-        checkActiveSetups(setupGauge, data);
+        updateSetupGauge(setupGauge, data);
+
     } catch (error) {
         console.error("❌ API-fout:", error);
     }
@@ -66,21 +73,25 @@ async function fetchMarketData() {
 
 // ✅ **Bereken Macro Score**
 function calculateMacroScore(fearGreed) {
-    if (fearGreed > 75) return 2; // Zeer bullish
-    if (fearGreed > 50) return 1; // Bullish
-    if (fearGreed > 25) return -1; // Bearish
+    if (fearGreed >= 75) return 2; // Zeer bullish
+    if (fearGreed >= 50) return 1; // Bullish
+    if (fearGreed >= 25) return -1; // Bearish
     return -2; // Zeer bearish
 }
 
 // ✅ **Bereken Technische Score**
 function calculateTechnicalScore(cryptoData) {
+    if (!cryptoData.bitcoin || !cryptoData.solana) return 0; // Fallback als data ontbreekt
+
     let btc = cryptoData.bitcoin;
     let sol = cryptoData.solana;
-    
+
     let score = 0;
-    if (btc.change_24h > 3 || sol.change_24h > 3) score += 2;
-    else if (btc.change_24h > 1.5 || sol.change_24h > 1.5) score += 1;
-    else if (btc.change_24h < -3 || sol.change_24h < -3) score -= 2;
+    let priceChange = Math.max(btc.change_24h, sol.change_24h); // Neemt de grootste prijsverandering
+
+    if (priceChange > 3) score += 2;
+    else if (priceChange > 1.5) score += 1;
+    else if (priceChange < -3) score -= 2;
     else score -= 1;
 
     if (btc.volume > 50000000000) score += 1; // Hoge volume bullish
@@ -90,12 +101,15 @@ function calculateTechnicalScore(cryptoData) {
 }
 
 // ✅ **Check actieve setups en update SetupGauge**
-function checkActiveSetups(setupGauge, marketData) {
+function updateSetupGauge(setupGauge, marketData) {
+    if (!marketData.crypto || !marketData.fear_greed_index) return;
+
     let activeSetups = 0;
-    
+
     if (marketData.fear_greed_index > 50) activeSetups++;
     if (marketData.crypto.bitcoin.change_24h > 2) activeSetups++;
-    
+    if (marketData.crypto.solana.change_24h > 2) activeSetups++;
+
     console.log(`🔎 Actieve setups gevonden: ${activeSetups}`);
     updateGauge(setupGauge, activeSetups > 0 ? 2 : -2);
 }
