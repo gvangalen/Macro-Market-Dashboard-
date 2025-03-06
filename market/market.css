@@ -1,4 +1,4 @@
-/* ✅ Market Data Stijl */
+/* ✅ Algemene Tabelstijl */
 .table-container {
     background: white;
     padding: 20px;
@@ -6,9 +6,10 @@
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
     margin-bottom: 20px;
     width: 90%;
+    max-width: 1000px; /* ✅ Voorkomt extreem brede tabellen */
     margin-left: auto;
     margin-right: auto;
-    overflow-x: auto; /* Zorgt ervoor dat de tabel niet breekt op kleine schermen */
+    overflow-x: auto; /* ✅ Zorgt ervoor dat de tabel niet breekt op kleine schermen */
 }
 
 /* ✅ Standaard tabel styling */
@@ -19,6 +20,7 @@ table {
     background: white;
     border-radius: 8px;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    overflow: hidden; /* ✅ Voorkomt dat border-radius niet werkt op tabelranden */
 }
 
 th, td {
@@ -26,6 +28,7 @@ th, td {
     padding: 12px;
     text-align: center;
     font-size: 16px;
+    transition: background 0.3s ease-in-out; /* ✅ Zachte hover-animatie */
 }
 
 th {
@@ -39,7 +42,7 @@ tr:nth-child(even) {
 }
 
 tr:hover {
-    background-color: #f1f1f1;
+    background-color: #e8f5e9; /* ✅ Lichte groene tint bij hover */
 }
 
 /* ✅ Dynamische laadtoestand */
@@ -51,21 +54,31 @@ tr:hover {
     margin-top: 10px;
 }
 
-/* ✅ Koers stijging/daling animatie */
+/* ✅ Stijging/Daling Animatie */
 .green {
     color: green;
     font-weight: bold;
-    transition: color 0.5s ease-in-out;
+    animation: fadeIn 0.5s ease-in-out;
 }
 
 .red {
     color: red;
     font-weight: bold;
-    transition: color 0.5s ease-in-out;
+    animation: fadeIn 0.5s ease-in-out;
 }
 
-/* ✅ Responsieve optimalisatie */
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+/* ✅ Extra responsieve optimalisatie */
 @media (max-width: 768px) {
+    .table-container {
+        width: 100%;
+        padding: 15px;
+    }
+
     th, td {
         padding: 8px;
         font-size: 14px;
