@@ -1,9 +1,10 @@
 <!-- ✅ Market Data Tabel -->
 <div class="table-container">
-    <h2>📊 Bitcoin Market Data</h2>
+    <h2>📊 Market Data</h2>
     <table id="marketTable">
         <thead>
             <tr>
+                <th>Crypto</th>
                 <th>Open</th>
                 <th>High</th>
                 <th>Low</th>
@@ -11,13 +12,9 @@
                 <th>24h % Change</th>
             </tr>
         </thead>
-        <tbody>
+        <tbody id="marketBody">
             <tr>
-                <td id="btcOpen">Laden...</td>
-                <td id="btcHigh">Laden...</td>
-                <td id="btcLow">Laden...</td>
-                <td id="btcClose">Laden...</td>
-                <td id="btcChange">Laden...</td>
+                <td colspan="6">📡 Data laden...</td>
             </tr>
         </tbody>
     </table>
@@ -25,34 +22,53 @@
 </div>
 
 <script>
-    const marketApiUrl = "http://13.60.235.90:5002/market_data"; // AWS API endpoint
+    const marketApiUrl = "http://13.60.235.90:5002/market_data"; // ✅ AWS API endpoint
 
     async function fetchMarketData() {
         try {
             let response = await fetch(marketApiUrl);
-            if (!response.ok) throw new Error("Fout bij ophalen marktdata");
-            
+            if (!response.ok) throw new Error("❌ API-fout bij ophalen marktdata!");
+
             let data = await response.json();
-            
-            document.getElementById("btcOpen").textContent = `$${data.crypto.bitcoin.open.toFixed(2)}`;
-            document.getElementById("btcHigh").textContent = `$${data.crypto.bitcoin.high.toFixed(2)}`;
-            document.getElementById("btcLow").textContent = `$${data.crypto.bitcoin.low.toFixed(2)}`;
-            document.getElementById("btcClose").textContent = `$${data.crypto.bitcoin.close.toFixed(2)}`;
-            
-            let change = data.crypto.bitcoin.change_24h.toFixed(2);
-            let changeElement = document.getElementById("btcChange");
-            changeElement.textContent = `${change}%`;
-            changeElement.style.color = change >= 0 ? "green" : "red";
-            
-            document.getElementById("marketStatus").textContent = "✅ Marktdata up-to-date";
+            if (!data.crypto) throw new Error("❌ Geen crypto-data beschikbaar!");
+
+            let marketBody = document.getElementById("marketBody");
+            marketBody.innerHTML = ""; // 🔄 Oude data wissen
+
+            Object.keys(data.crypto).forEach(coin => {
+                let coinData = data.crypto[coin];
+                
+                let row = document.createElement("tr");
+                row.innerHTML = `
+                    <td>${coin.toUpperCase()}</td>
+                    <td>$${formatNumber(coinData.open)}</td>
+                    <td>$${formatNumber(coinData.high)}</td>
+                    <td>$${formatNumber(coinData.low)}</td>
+                    <td>$${formatNumber(coinData.close)}</td>
+                    <td style="color: ${coinData.change_24h >= 0 ? "green" : "red"};">
+                        ${coinData.change_24h.toFixed(2)}%
+                    </td>
+                `;
+                marketBody.appendChild(row);
+            });
+
+            document.getElementById("marketStatus").textContent = "✅ Marktdata up-to-date!";
         } catch (error) {
-            console.error("❌ Marktdata ophalen mislukt:", error);
-            document.getElementById("marketStatus").textContent = "❌ Fout bij ophalen marktdata.";
+            console.error(error);
+            document.getElementById("marketStatus").textContent = "❌ Fout bij ophalen marktdata!";
         }
+    }
+
+    function formatNumber(num) {
+        return num >= 1e9
+            ? `${(num / 1e9).toFixed(2)}B`
+            : num >= 1e6
+            ? `${(num / 1e6).toFixed(2)}M`
+            : num.toFixed(2);
     }
 
     document.addEventListener("DOMContentLoaded", function () {
         fetchMarketData();
-        setInterval(fetchMarketData, 60000); // Elke minuut updaten
+        setInterval(fetchMarketData, 60000); // 🔄 Elke minuut updaten
     });
 </script>
