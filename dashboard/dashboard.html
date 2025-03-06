@@ -12,6 +12,7 @@
 <div class="table-container">
     <h2>📊 Dashboard</h2>
     <p id="dashboardStatus" class="loading">📡 Data laden...</p>
+
     <div class="dashboard-container">
         <div class="gauge-wrapper">
             <canvas id="macroGauge"></canvas>
@@ -31,31 +32,6 @@
 </div>
 
 <!-- ✅ JavaScript-bestanden laden -->
-<script>
-    const dashboardApiUrl = "http://13.60.235.90:5002/dashboard_data"; // AWS API endpoint
-
-    async function fetchDashboardData() {
-        try {
-            let response = await fetch(dashboardApiUrl);
-            if (!response.ok) throw new Error("Fout bij ophalen dashboard-data");
-            
-            let data = await response.json();
-            updateGauge(macroGauge, data.macro_score);
-            updateGauge(technicalGauge, data.technical_score);
-            updateGauge(setupGauge, data.setup_score);
-            
-            document.getElementById("dashboardStatus").textContent = "✅ Dashboard up-to-date";
-        } catch (error) {
-            console.error("❌ Dashboard ophalen mislukt:", error);
-            document.getElementById("dashboardStatus").textContent = "❌ Fout bij ophalen dashboard-data.";
-        }
-    }
-
-    document.addEventListener("DOMContentLoaded", function () {
-        fetchDashboardData();
-        setInterval(fetchDashboardData, 60000); // Elke minuut updaten
-    });
-</script>
 <script src="dashboard.js"></script>
 
 </body>
