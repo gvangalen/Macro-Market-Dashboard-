@@ -11,15 +11,16 @@
 .gauge-wrapper {
     text-align: center;
     width: 180px;
-    background: white;
+    background: var(--bg-color, white);
     padding: 20px;
-    border-radius: 10px;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-    transition: transform 0.2s ease-in-out;
+    border-radius: 12px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    transition: transform 0.3s ease-in-out, box-shadow 0.3s ease-in-out;
 }
 
 .gauge-wrapper:hover {
-    transform: scale(1.05);
+    transform: scale(1.07);
+    box-shadow: 0 6px 15px rgba(0, 0, 0, 0.15);
 }
 
 .gauge-wrapper span {
@@ -27,6 +28,20 @@
     font-weight: bold;
     margin-top: 10px;
     font-size: 16px;
+    color: var(--text-color, #333);
+}
+
+/* ✅ Donkere modus ondersteuning */
+@media (prefers-color-scheme: dark) {
+    :root {
+        --bg-color: #222;
+        --text-color: #f5f5f5;
+    }
+    .gauge-wrapper {
+        background: var(--bg-color);
+        color: var(--text-color);
+        box-shadow: 0 4px 10px rgba(255, 255, 255, 0.1);
+    }
 }
 
 /* ✅ Responsieve aanpassingen */
@@ -39,5 +54,6 @@
     .gauge-wrapper {
         width: 90%;
         height: auto;
+        padding: 15px;
     }
 }
