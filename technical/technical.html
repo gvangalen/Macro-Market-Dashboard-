@@ -3,18 +3,19 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Technische Analyse</title>
+    <title>📉 Technische Analyse</title>
     <link rel="stylesheet" href="css/styles.css">
 </head>
 <body>
+
     <h2>📉 Technische Analyse</h2>
 
     <div class="controls">
-        <button class="btn-add" onclick="window.addTechRow()">➕ Asset toevoegen</button>
-        <button class="btn-add" onclick="window.addTechIndicator()">➕ Indicator toevoegen</button>
+        <button class="btn-add" onclick="addTechRow()">➕ Asset toevoegen</button>
+        <button class="btn-add" onclick="addTechIndicator()">➕ Indicator toevoegen</button>
 
         <!-- ✅ Timeframe dropdown -->
-        <select id="globalTimeframe">
+        <select id="globalTimeframe" onchange="loadTechAnalysis()">
             <option value="1hr">1H</option>
             <option value="4hr" selected>4H</option>
             <option value="1day">1D</option>
@@ -26,45 +27,120 @@
         <thead>
             <tr>
                 <th>Asset</th>
-                <th>Actie</th> 
+                <th>Actie</th>
             </tr>
         </thead>
         <tbody>
-            <!-- Dynamische rijen worden hier automatisch geladen vanuit AWS -->
+            <tr><td colspan="2" class="loading">📡 Data laden...</td></tr>
         </tbody>
     </table>
 
+    <p id="techStatus" class="loading">📡 Data laden...</p>
+
     <script>
-        // ✅ Laad technische analyse data vanaf AWS
+        const apiUrl = "http://13.60.235.90:5002/technical_analysis"; // ✅ AWS API endpoint
+
+        // ✅ **Technische Analyse laden vanaf AWS**
         async function loadTechAnalysis() {
+            let timeframe = document.getElementById("globalTimeframe").value; // 🕒 Pak geselecteerde timeframe
+
             try {
-                let response = await fetch("http://13.60.235.90:5002/technical_analysis");
+                document.getElementById("techStatus").textContent = "📡 Data laden...";
+                let response = await fetch(`${apiUrl}?timeframe=${timeframe}`);
                 if (!response.ok) throw new Error("Fout bij ophalen technische analyse");
+
                 let data = await response.json();
                 renderTechTable(data);
             } catch (error) {
                 console.error("❌ Fout bij laden technische analyse:", error);
+                document.getElementById("techStatus").textContent = "❌ Fout bij laden technische analyse.";
             }
         }
 
-        // ✅ Tabel vullen met data van de server
+        // ✅ **Tabel vullen met data van de server**
         function renderTechTable(data) {
-            let tableBody = document.getElementById("analysisTable").getElementsByTagName("tbody")[0];
-            tableBody.innerHTML = "";
+            let tableBody = document.querySelector("#analysisTable tbody");
+            tableBody.innerHTML = ""; // ❌ Oude rijen verwijderen
+
+            if (data.assets.length === 0) {
+                tableBody.innerHTML = `<tr><td colspan="2">🚫 Geen data beschikbaar</td></tr>`;
+                return;
+            }
 
             data.assets.forEach(asset => {
-                let newRow = tableBody.insertRow();
-                newRow.insertCell(0).innerText = asset.name;
-                
-                let deleteCell = newRow.insertCell(-1);
-                deleteCell.innerHTML = `<button class="btn-remove" onclick="removeTechRow('${asset.id}')">❌</button>`;
+                let newRow = document.createElement("tr");
+
+                let nameCell = document.createElement("td");
+                nameCell.innerText = asset.name;
+                newRow.appendChild(nameCell);
+
+                let deleteCell = document.createElement("td");
+                deleteCell.innerHTML = `<button class="btn-remove" onclick="removeTechRow('${asset.id}', this)">❌</button>`;
+                newRow.appendChild(deleteCell);
+
+                tableBody.appendChild(newRow);
             });
+
+            document.getElementById("techStatus").textContent = "✅ Data up-to-date";
         }
 
-        // ✅ Laad de technische analyse data zodra de pagina opent
-        document.addEventListener("DOMContentLoaded", loadTechAnalysis);
+        // ✅ **Asset toevoegen met bestaande indicatoren**
+        async function addTechRow() {
+            let assetName = prompt("Voer de naam van de asset in:");
+            if (!assetName || assetName.trim() === "") return alert("⚠️ Ongeldige naam!");
+
+            try {
+                let response = await fetch(apiUrl, {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ name: assetName.trim(), indicators: [] })
+                });
+
+                if (!response.ok) throw new Error("Fout bij toevoegen asset");
+                loadTechAnalysis();
+            } catch (error) {
+                console.error("❌ Asset toevoegen mislukt:", error);
+            }
+        }
+
+        // ✅ **Indicator toevoegen aan alle assets**
+        async function addTechIndicator() {
+            let indicatorName = prompt("Voer de naam van de indicator in:");
+            if (!indicatorName || indicatorName.trim() === "") return alert("⚠️ Ongeldige naam!");
+
+            try {
+                let response = await fetch(`${apiUrl}/indicators`, {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ name: indicatorName.trim() })
+                });
+
+                if (!response.ok) throw new Error("Fout bij toevoegen indicator");
+                loadTechAnalysis();
+            } catch (error) {
+                console.error("❌ Indicator toevoegen mislukt:", error);
+            }
+        }
+
+        // ✅ **Asset verwijderen**
+        async function removeTechRow(assetId, button) {
+            if (!confirm("Weet je zeker dat je deze asset wilt verwijderen?")) return;
+
+            button.textContent = "⏳";
+            try {
+                let response = await fetch(`${apiUrl}/${assetId}`, { method: "DELETE" });
+                if (!response.ok) throw new Error("Fout bij verwijderen asset");
+                loadTechAnalysis();
+            } catch (error) {
+                console.error("❌ Asset verwijderen mislukt:", error);
+            }
+        }
+
+        // ✅ **Laad data bij opstarten**
+        document.addEventListener("DOMContentLoaded", () => {
+            loadTechAnalysis();
+        });
     </script>
 
-    <script src="js/technical.js"></script>
 </body>
 </html>
