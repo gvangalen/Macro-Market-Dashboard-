@@ -1,27 +1,30 @@
 /* ✅ Algemene instellingen */
 body {
     font-family: Arial, sans-serif;
-    margin: 20px;
+    margin: 0;
+    padding: 20px;
     background-color: #f4f4f4;
     text-align: center;
 }
 
-/* ✅ Hoofdtitel */
+/* ✅ Hoofdtitels */
 h1 {
     font-size: 28px;
     font-weight: bold;
+    color: #222;
     margin-bottom: 10px;
 }
 
 h2 {
     font-size: 22px;
     margin-bottom: 15px;
+    color: #333;
 }
 
 /* ✅ Navigatieblok */
 .nav-container {
     background: white;
-    padding: 20px;
+    padding: 15px;
     border-radius: 10px;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
     margin-bottom: 20px;
@@ -34,13 +37,14 @@ h2 {
     color: #007bff;
     text-decoration: none;
     margin: 8px 0;
+    transition: color 0.2s ease-in-out;
 }
 
 .nav-container a:hover {
-    text-decoration: underline;
+    color: #0056b3;
 }
 
-/* ✅ Dashboard container */
+/* ✅ Dashboard layout */
 .dashboard-container {
     display: flex;
     justify-content: center;
@@ -60,11 +64,12 @@ h2 {
     display: flex;
     align-items: center;
     justify-content: center;
-    transition: transform 0.2s ease-in-out;
+    transition: transform 0.3s ease-in-out, box-shadow 0.3s ease-in-out;
 }
 
 .gauge-container:hover {
     transform: scale(1.05);
+    box-shadow: 0px 6px 15px rgba(0, 0, 0, 0.15);
 }
 
 /* ✅ Tabel container */
@@ -88,15 +93,20 @@ table {
     background: white;
     border-radius: 8px;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    transition: box-shadow 0.2s ease-in-out;
+}
+
+table:hover {
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
 }
 
 th, td {
     border: 1px solid #ddd;
     padding: 12px;
     text-align: center;
+    font-size: 16px;
 }
 
-/* ✅ Tabellen koppen */
 th {
     background-color: #388e3c;
     color: white;
@@ -110,7 +120,7 @@ th {
     cursor: pointer;
     border-radius: 5px;
     font-size: 14px;
-    transition: background 0.3s ease;
+    transition: background 0.3s ease-in-out, transform 0.2s ease-in-out;
 }
 
 .btn-add {
@@ -120,6 +130,7 @@ th {
 
 .btn-add:hover {
     background-color: #45a049;
+    transform: scale(1.05);
 }
 
 .btn-remove {
@@ -129,6 +140,7 @@ th {
 
 .btn-remove:hover {
     background-color: #e53935;
+    transform: scale(1.05);
 }
 
 /* ✅ Laadtoestand voor tabellen */
