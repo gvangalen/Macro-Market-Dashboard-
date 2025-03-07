@@ -1,19 +1,31 @@
-/* Algemene styling */
+/* ✅ Algemene styling */
 body {
     font-family: Arial, sans-serif;
     text-align: center;
     background-color: #f4f4f4;
     margin: 0;
     padding: 0;
+    transition: background 0.3s ease-in-out;
 }
 
-/* Titel */
+/* ✅ Donkere modus ondersteuning */
+@media (prefers-color-scheme: dark) {
+    body {
+        background-color: #1e1e1e;
+        color: #f1f1f1;
+    }
+}
+
+/* ✅ Titel */
 h2 {
     margin-top: 20px;
     color: #333;
+    font-size: 24px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
 }
 
-/* Container voor knoppen */
+/* ✅ Container voor knoppen */
 .controls {
     display: flex;
     justify-content: center;
@@ -22,7 +34,21 @@ h2 {
     margin-bottom: 15px;
 }
 
-/* Tabellen styling */
+/* ✅ Timeframe dropdown */
+#globalTimeframe {
+    padding: 10px;
+    font-size: 16px;
+    border: 1px solid #388e3c;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: all 0.3s ease-in-out;
+}
+
+#globalTimeframe:hover {
+    background-color: #e8f5e9;
+}
+
+/* ✅ Tabellen styling */
 table {
     width: 90%;
     margin: 20px auto;
@@ -31,9 +57,14 @@ table {
     box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
     border-radius: 8px;
     overflow: hidden;
+    transition: box-shadow 0.3s ease-in-out;
 }
 
-/* Responsieve tabel voor kleine schermen */
+table:hover {
+    box-shadow: 0px 0px 20px rgba(0, 0, 0, 0.15);
+}
+
+/* ✅ Responsieve tabel voor kleine schermen */
 @media (max-width: 768px) {
     table {
         display: block;
@@ -42,56 +73,87 @@ table {
     }
 }
 
-/* Tabellen cellen */
+/* ✅ Tabellen cellen */
 th, td {
     padding: 12px;
     border: 1px solid #ddd;
     text-align: center;
+    font-size: 16px;
+    transition: background 0.3s ease-in-out;
 }
 
-/* Tabellen hoofding */
+/* ✅ Tabellen hoofding */
 th {
     background: #388e3c;
     color: white;
     font-weight: bold;
+    text-transform: uppercase;
 }
 
-/* Toevoegknoppen */
+/* ✅ Dynamische hover voor rijen */
+tr:hover {
+    background-color: #f1f8e9;
+    cursor: pointer;
+}
+
+/* ✅ Toevoegknoppen */
 .btn-add {
     background-color: #4caf50;
     color: white;
     border: none;
-    padding: 10px 15px;
+    padding: 12px 18px;
     cursor: pointer;
     border-radius: 5px;
-    font-size: 14px;
-    transition: background 0.3s ease;
+    font-size: 16px;
+    transition: all 0.3s ease-in-out;
+    font-weight: bold;
 }
 
 .btn-add:hover {
     background-color: #388e3c;
+    transform: scale(1.05);
 }
 
-/* Verwijderknoppen */
+/* ✅ Verwijderknoppen */
 .btn-remove {
     background-color: #d9534f;
     color: white;
     border: none;
-    padding: 5px;
+    padding: 8px 12px;
     cursor: pointer;
     border-radius: 5px;
-    font-size: 14px;
-    transition: background 0.3s ease;
+    font-size: 16px;
+    transition: all 0.3s ease-in-out;
 }
 
 .btn-remove:hover {
     background-color: #c9302c;
+    transform: scale(1.05);
 }
 
 /* ✅ Laadtoestand */
 .loading {
     text-align: center;
-    font-size: 16px;
+    font-size: 18px;
+    font-style: italic;
     color: #777;
     margin-top: 20px;
+    transition: opacity 0.3s ease-in-out;
+}
+
+/* ✅ Responsief design voor kleinere schermen */
+@media (max-width: 768px) {
+    .controls {
+        flex-direction: column;
+        align-items: center;
+    }
+
+    .btn-add {
+        font-size: 14px;
+        padding: 10px 14px;
+    }
+
+    table {
+        font-size: 14px;
+    }
 }
