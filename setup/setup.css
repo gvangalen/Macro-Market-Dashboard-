@@ -6,17 +6,20 @@
     background: white;
     border-radius: 8px;
     box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
-    transition: transform 0.3s ease-in-out;
+    transition: transform 0.3s ease-in-out, box-shadow 0.3s ease-in-out;
 }
 
 .setup-container:hover {
     transform: scale(1.02);
+    box-shadow: 0px 6px 15px rgba(0, 0, 0, 0.15);
 }
 
+/* ✅ Koppen styling */
 h2, h3 {
     text-align: center;
     font-weight: bold;
     color: #333;
+    margin-bottom: 15px;
 }
 
 /* ✅ Formulier styling */
@@ -30,11 +33,11 @@ input, select, button {
     transition: all 0.3s ease-in-out;
 }
 
-/* ✅ Input velden focus effect */
+/* ✅ Input focus effect */
 input:focus, select:focus {
     border-color: #4caf50;
     outline: none;
-    box-shadow: 0px 0px 8px rgba(76, 175, 80, 0.3);
+    box-shadow: 0px 0px 8px rgba(76, 175, 80, 0.4);
 }
 
 /* ✅ Knop styling */
@@ -45,11 +48,17 @@ button {
     cursor: pointer;
     font-weight: bold;
     text-transform: uppercase;
-    transition: background 0.3s ease-in-out;
+    transition: background 0.3s ease-in-out, transform 0.2s ease-in-out;
 }
 
 button:hover {
     background: #388e3c;
+    transform: translateY(-2px);
+}
+
+button:disabled {
+    background: #ccc;
+    cursor: not-allowed;
 }
 
 /* ✅ Lijst van setups */
@@ -68,14 +77,21 @@ button:hover {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    transition: background 0.3s ease-in-out;
+    transition: background 0.3s ease-in-out, box-shadow 0.3s ease-in-out;
 }
 
 #setupList li:hover {
     background: #e0f2f1;
+    box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
 }
 
-/* ✅ Verwijderen knop in lijst */
+/* ✅ Actieve setups krijgen visuele prioriteit */
+#setupList li.active {
+    background: #c8e6c9;
+    font-weight: bold;
+}
+
+/* ✅ Verwijderen knop */
 .delete-btn {
     background: #d9534f;
     color: white;
@@ -83,14 +99,15 @@ button:hover {
     padding: 8px 12px;
     border-radius: 6px;
     cursor: pointer;
-    transition: background 0.3s ease-in-out;
+    transition: background 0.3s ease-in-out, transform 0.2s ease-in-out;
 }
 
 .delete-btn:hover {
     background: #c9302c;
+    transform: scale(1.1);
 }
 
-/* ✅ Laadtoestand voor setup-lijst */
+/* ✅ Laadindicator styling */
 .loading {
     text-align: center;
     font-size: 16px;
