@@ -1,9 +1,13 @@
+import { API_BASE_URL } from "../config.js"; // ✅ API-config ophalen
+
+console.log("✅ setup.js geladen!");
+
 document.addEventListener("DOMContentLoaded", function () {
-    console.log("✅ setup.js geladen!");
-    loadSetups(); // ✅ Laad bestaande setups bij het starten
+    console.log("📌 Setup Manager geladen!");
+    loadSetups();
 });
 
-const apiUrl = "http://13.60.235.90:5002/setups"; // ✅ AWS API-endpoint
+const apiUrl = `${API_BASE_URL}/setups`; // ✅ Gebruik centrale API-config
 
 // ✅ **Setup toevoegen**
 document.getElementById("setupForm")?.addEventListener("submit", async function (e) {
@@ -14,63 +18,47 @@ document.getElementById("setupForm")?.addEventListener("submit", async function 
     let trend = document.getElementById("setupTrend")?.value;
 
     if (!name || !indicators || !trend) {
-        alert("⚠️ Vul alle velden in!");
+        showError("⚠️ Vul alle velden in!");
         return;
     }
 
     let setup = { name, indicators, trend };
+    setText("setupStatus", "📡 Opslaan...");
 
     try {
-        await saveSetup(setup);
+        await safeFetch(apiUrl, "POST", setup);
         document.getElementById("setupForm").reset();
         loadSetups();
     } catch (error) {
-        console.error("❌ Setup opslaan mislukt:", error);
+        showError("❌ Setup opslaan mislukt.");
     }
 });
 
-// ✅ **Setup opslaan op AWS-server**
-async function saveSetup(setup) {
-    try {
-        let response = await fetch(apiUrl, {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify(setup)
-        });
-
-        if (!response.ok) throw new Error(`Serverfout (${response.status}): Setup niet opgeslagen.`);
-        
-        console.log("✅ Setup succesvol opgeslagen:", setup);
-    } catch (error) {
-        console.error("❌ Fout bij opslaan setup:", error);
-        alert("❌ Setup opslaan mislukt. Controleer je verbinding.");
-    }
-}
-
-// ✅ **Setups laden van AWS-server**
+// ✅ **Setup laden vanaf AWS-server**
 async function loadSetups() {
-    try {
-        let response = await fetch(apiUrl);
-        if (!response.ok) throw new Error(`Serverfout (${response.status}): Setups niet geladen.`);
-        
-        let setups = await response.json();
-        let list = document.getElementById("setupList");
+    setText("setupStatus", "📡 Laden...");
 
+    try {
+        let setups = await safeFetch(apiUrl);
+        if (!setups || setups.length === 0) {
+            setText("setupList", "<li>🚫 Geen setups opgeslagen</li>", true);
+            return;
+        }
+
+        let list = document.getElementById("setupList");
         if (!list) return;
 
-        list.innerHTML = setups.length === 0 
-            ? "<li>🚫 Geen setups opgeslagen</li>"
-            : setups.map(setup => `
-                <li>
-                    <span><strong>${setup.name}</strong> (${setup.trend}) - ${setup.indicators}</span>
-                    <button class="delete-btn" onclick="deleteSetup('${setup.id}')">❌</button>
-                </li>
-            `).join("");
+        list.innerHTML = setups.map(setup => `
+            <li data-id="${setup.id}">
+                <span><strong>${setup.name}</strong> (${setup.trend}) - ${setup.indicators}</span>
+                <button class="delete-btn">❌</button>
+            </li>
+        `).join("");
 
-        console.log("✅ Setups succesvol geladen:", setups);
+        attachDeleteEventListeners();
+        setText("setupStatus", "✅ Setups geladen.");
     } catch (error) {
-        console.error("❌ Fout bij laden setups:", error);
-        alert("❌ Setup laden mislukt. Controleer je verbinding.");
+        showError("❌ Fout bij laden setups.");
     }
 }
 
@@ -79,13 +67,55 @@ async function deleteSetup(id) {
     if (!confirm("Weet je zeker dat je deze setup wilt verwijderen?")) return;
 
     try {
-        let response = await fetch(`${apiUrl}/${id}`, { method: "DELETE" });
-        if (!response.ok) throw new Error(`Serverfout (${response.status}): Setup niet verwijderd.`);
-
-        console.log(`✅ Setup ${id} succesvol verwijderd.`);
+        await safeFetch(`${apiUrl}/${id}`, "DELETE");
         loadSetups(); // ✅ Automatisch lijst verversen
     } catch (error) {
-        console.error("❌ Fout bij verwijderen setup:", error);
-        alert("❌ Setup verwijderen mislukt. Controleer je verbinding.");
+        showError("❌ Setup verwijderen mislukt.");
     }
+}
+
+// ✅ **Helperfunctie voor veilige API-aanvragen met retry**
+async function safeFetch(url, method = "GET", body = null) {
+    let retries = 3;
+    while (retries > 0) {
+        try {
+            let options = {
+                method,
+                headers: { "Content-Type": "application/json" },
+            };
+            if (body) options.body = JSON.stringify(body);
+
+            let response = await fetch(url, options);
+            if (!response.ok) throw new Error(`Serverfout (${response.status})`);
+
+            return method === "GET" ? await response.json() : true;
+        } catch (error) {
+            console.error(`❌ API-fout bij ${url}:`, error);
+            retries--;
+            if (retries === 0) throw error;
+            await new Promise(resolve => setTimeout(resolve, 2000)); // ✅ 2 sec wachten
+        }
+    }
+}
+
+// ✅ **Helperfunctie om tekst in een element te zetten**
+function setText(elementId, text, isHTML = false) {
+    let el = document.getElementById(elementId);
+    if (el) isHTML ? (el.innerHTML = text) : (el.textContent = text);
+}
+
+// ✅ **Foutmelding in UI tonen**
+function showError(message) {
+    setText("setupStatus", message);
+    document.getElementById("setupStatus").style.color = "red";
+}
+
+// ✅ **Event Listeners voor verwijderen**
+function attachDeleteEventListeners() {
+    document.querySelectorAll(".delete-btn").forEach(button => {
+        button.addEventListener("click", function () {
+            let setupId = this.closest("li").dataset.id;
+            deleteSetup(setupId);
+        });
+    });
 }
