@@ -1,3 +1,5 @@
+import { API_BASE_URL } from "../config.js"; // ✅ Config.js importeren
+
 document.addEventListener("DOMContentLoaded", function () {
     console.log("📌 Dashboard geladen!");
 
@@ -16,9 +18,15 @@ async function safeFetch(url) {
     let retries = 3;
     while (retries > 0) {
         try {
-            let response = await fetch(url);
+            let response = await fetch(`${API_BASE_URL}${url}`);
             if (!response.ok) throw new Error(`Fout bij ophalen data van ${url}`);
-            return await response.json();
+
+            let data = await response.json();
+            if (!data || (typeof data === "object" && Object.keys(data).length === 0)) {
+                throw new Error(`Lege of ongeldige data ontvangen van ${url}`);
+            }
+
+            return data;
         } catch (error) {
             console.error(`❌ API-fout bij ${url}:`, error);
             retries--;
@@ -57,8 +65,8 @@ function createGauge(elementId, label) {
 
 // ✅ **Data ophalen en meters updaten**
 async function fetchMarketData(macroGauge, technicalGauge, setupGauge) {
-    let data = await safeFetch("http://13.60.235.90:5002/api/market_data"); // ✅ Correcte API-route
-    if (!data || !data.length) return console.error("❌ Ongeldige of lege API-response!");
+    let data = await safeFetch("/api/market_data"); // ✅ Correcte API-route
+    if (!data || !Array.isArray(data)) return console.error("❌ Ongeldige of lege API-response!");
 
     let btc = data.find(asset => asset.symbol === "BTC");
     if (!btc) return console.error("❌ Geen Bitcoin-data gevonden!");
@@ -66,16 +74,15 @@ async function fetchMarketData(macroGauge, technicalGauge, setupGauge) {
     console.log("📊 Ontvangen API-data:", data);
 
     // ✅ Update gauges
-    updateGauge(macroGauge, calculateMacroScore(btc));
-    updateGauge(technicalGauge, calculateTechnicalScore(btc));
-    checkActiveSetups(setupGauge, data);
+    if (macroGauge) updateGauge(macroGauge, calculateMacroScore(btc));
+    if (technicalGauge) updateGauge(technicalGauge, calculateTechnicalScore(btc));
+    if (setupGauge) checkActiveSetups(setupGauge, data);
 }
 
 // ✅ **Bereken Macro Score**
 function calculateMacroScore(btc) {
     if (!btc.fear_greed) return 0;
-    let score = btc.fear_greed > 75 ? 2 : btc.fear_greed > 50 ? 1 : btc.fear_greed > 25 ? -1 : -2;
-    return score;
+    return btc.fear_greed > 75 ? 2 : btc.fear_greed > 50 ? 1 : btc.fear_greed > 25 ? -1 : -2;
 }
 
 // ✅ **Bereken Technische Score**
