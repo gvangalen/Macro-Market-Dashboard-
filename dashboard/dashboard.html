@@ -32,7 +32,69 @@
 </div>
 
 <!-- ✅ JavaScript-bestanden laden -->
-<script src="dashboard.js"></script>
+<script>
+    console.log("✅ Dashboard.js geladen!");
+
+    const API_BASE_URL = "http://13.60.235.90:5002"; // ✅ AWS API-endpoint
+    let macroGauge, technicalGauge, setupGauge;
+
+    document.addEventListener("DOMContentLoaded", function () {
+        console.log("📌 Dashboard wordt geladen...");
+        macroGauge = createGauge("macroGauge");
+        technicalGauge = createGauge("technicalGauge");
+        setupGauge = createGauge("setupGauge");
+
+        fetchDashboardData();
+        setInterval(fetchDashboardData, 60000); // 🔄 Elke minuut updaten
+    });
+
+    async function fetchDashboardData() {
+        try {
+            let response = await fetch(`${API_BASE_URL}/dashboard_data`);
+            if (!response.ok) throw new Error("Fout bij ophalen dashboard-data");
+
+            let data = await response.json();
+            console.log("📊 Dashboard API data:", data);
+
+            updateGauge(macroGauge, data.macroScore);
+            updateGauge(technicalGauge, data.technicalScore);
+            updateGauge(setupGauge, data.activeSetups);
+
+            document.getElementById("dashboardStatus").textContent = "✅ Dashboard up-to-date!";
+        } catch (error) {
+            console.error("❌ Dashboard API-fout:", error);
+            document.getElementById("dashboardStatus").textContent = "❌ Fout bij laden dashboard-data.";
+        }
+    }
+
+    function createGauge(elementId) {
+        const ctx = document.getElementById(elementId).getContext("2d");
+        return new Chart(ctx, {
+            type: "doughnut",
+            data: {
+                labels: ["Bearish", "Neutraal", "Bullish"],
+                datasets: [{
+                    data: [33, 34, 33], // Gelijke verdeling in begin
+                    backgroundColor: ["#ff3b30", "#f0ad4e", "#34c759"],
+                    borderWidth: 0
+                }]
+            },
+            options: {
+                rotation: -90,
+                circumference: 180,
+                cutout: "80%",
+                plugins: { legend: { display: false }, tooltip: { enabled: false } }
+            }
+        });
+    }
+
+    function updateGauge(gauge, score) {
+        if (!gauge) return;
+        let index = score >= 1 ? 2 : score <= -1 ? 0 : 1;
+        gauge.data.datasets[0].data = [index === 0 ? 100 : 33, index === 1 ? 100 : 33, index === 2 ? 100 : 33];
+        gauge.update();
+    }
+</script>
 
 </body>
 </html>
