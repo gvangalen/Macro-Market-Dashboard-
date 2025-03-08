@@ -10,11 +10,13 @@
                 <th>Low</th>
                 <th>Close</th>
                 <th>24h % Change</th>
+                <th>Market Cap</th>
+                <th>24h Volume</th>
             </tr>
         </thead>
         <tbody id="marketBody">
             <tr>
-                <td colspan="6">📡 Data laden...</td>
+                <td colspan="8">📡 Data laden...</td>
             </tr>
         </tbody>
     </table>
@@ -23,6 +25,7 @@
 
 <script>
     const marketApiUrl = "http://13.60.235.90:5002/market_data"; // ✅ AWS API endpoint
+    const allowedAssets = ["bitcoin", "solana"]; // 🔹 Pas aan als je meer munten wilt tonen
 
     async function fetchMarketData() {
         try {
@@ -35,12 +38,20 @@
             let marketBody = document.getElementById("marketBody");
             marketBody.innerHTML = ""; // 🔄 Oude data wissen
 
-            Object.keys(data.crypto).forEach(coin => {
-                let coinData = data.crypto[coin];
-                
+            // ✅ Filter alleen toegestane munten
+            let filteredData = Object.keys(data.crypto)
+                .filter(coin => allowedAssets.includes(coin))
+                .map(coin => ({
+                    name: coin.toUpperCase(),
+                    ...data.crypto[coin]
+                }))
+                .sort((a, b) => Math.abs(b.change_24h) - Math.abs(a.change_24h)); // 🔄 Sorteren op grootste beweging
+
+            // ✅ Genereer rijen in de tabel
+            filteredData.forEach(coinData => {
                 let row = document.createElement("tr");
                 row.innerHTML = `
-                    <td>${coin.toUpperCase()}</td>
+                    <td>${coinData.name}</td>
                     <td>$${formatNumber(coinData.open)}</td>
                     <td>$${formatNumber(coinData.high)}</td>
                     <td>$${formatNumber(coinData.low)}</td>
@@ -48,6 +59,8 @@
                     <td style="color: ${coinData.change_24h >= 0 ? "green" : "red"};">
                         ${coinData.change_24h.toFixed(2)}%
                     </td>
+                    <td>$${formatNumber(coinData.market_cap)}</td>
+                    <td>$${formatNumber(coinData.volume)}</td>
                 `;
                 marketBody.appendChild(row);
             });
@@ -64,7 +77,7 @@
             ? `${(num / 1e9).toFixed(2)}B`
             : num >= 1e6
             ? `${(num / 1e6).toFixed(2)}M`
-            : num.toFixed(2);
+            : num ? num.toFixed(2) : "N/A"; // Fallback naar "N/A"
     }
 
     document.addEventListener("DOMContentLoaded", function () {
