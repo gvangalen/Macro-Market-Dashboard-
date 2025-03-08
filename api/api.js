@@ -1,15 +1,19 @@
-// api/api.js
-const apiBaseUrl = "http://13.60.235.90:5002"; // ✅ AWS API-endpoint
+import { API_BASE_URL } from "../config.js"; // ✅ API-config laden
 
 // ✅ **Helperfunctie voor veilige API-aanvragen met retry**
 async function fetchData(url) {
     let retries = 3;
     while (retries > 0) {
         try {
-            let response = await fetch(`${apiBaseUrl}${url}`);
+            let response = await fetch(`${API_BASE_URL}${url}`);
             if (!response.ok) throw new Error(`Fout bij ophalen data van ${url}`);
 
-            return await response.json();
+            let data = await response.json();
+            if (!data || (typeof data === "object" && Object.keys(data).length === 0)) {
+                throw new Error(`Lege of ongeldige data ontvangen van ${url}`);
+            }
+
+            return data;
         } catch (error) {
             console.error(`❌ Fout bij ophalen data van ${url}:`, error);
             retries--;
@@ -23,7 +27,7 @@ async function fetchData(url) {
 
 // ✅ **Macrodata ophalen**
 async function fetchMacroData() {
-    let data = await fetchData("/api/macro_data"); // ✅ Correcte API-route
+    let data = await fetchData("/api/macro_data");
     if (!data) return;
 
     setText("googleTrends", data.fear_greed);
@@ -34,8 +38,8 @@ async function fetchMacroData() {
 
 // ✅ **Marktdata ophalen**
 async function fetchMarketData() {
-    let data = await fetchData("/api/market_data"); // ✅ Correcte API-route
-    if (!data || !data.length) return;
+    let data = await fetchData("/api/market_data");
+    if (!data || !Array.isArray(data)) return;
 
     let btc = data.find(asset => asset.symbol === "BTC");
     if (!btc) return console.error("❌ Geen Bitcoin-data gevonden!");
