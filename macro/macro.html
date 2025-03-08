@@ -14,10 +14,10 @@
                 <th>Verwijderen</th>
             </tr>
         </thead>
-        <tbody>
+        <tbody id="macroBody">
             <tr>
                 <td>Bitcoin Dominantie</td>
-                <td id="usdtDominance">Laden...</td>
+                <td id="usdtDominance">📡 Laden...</td>
                 <td id="usdtTrend">N/A</td>
                 <td id="usdtInterpretation">N/A</td>
                 <td id="usdtAction">N/A</td>
@@ -26,7 +26,7 @@
             </tr>
             <tr>
                 <td>Google Trends (Fear & Greed)</td>
-                <td id="googleTrends">Laden...</td>
+                <td id="googleTrends">📡 Laden...</td>
                 <td id="googleTrend">N/A</td>
                 <td id="googleInterpretation">N/A</td>
                 <td id="googleAction">N/A</td>
@@ -43,17 +43,26 @@
 
 <script>
     const API_BASE_URL = "http://13.60.235.90:5002"; // ✅ AWS API-endpoint
+    const indicators = {
+        "usdtDominance": { thresholds: [3, 5, 7], positive: false },
+        "googleTrends": { thresholds: [30, 50, 70], positive: true }
+    };
 
     async function fetchMacroData() {
         try {
             let response = await fetch(`${API_BASE_URL}/macro_data`);
             if (!response.ok) throw new Error("Fout bij ophalen macro-data");
-            
+
             let data = await response.json();
             console.log("📊 Ontvangen Macro Data:", data);
-            
-            updateMacroIndicator("usdtDominance", "usdtTrend", "usdtInterpretation", "usdtAction", "usdtScore", data.usdt_dominance, [3, 5, 7], false);
-            updateMacroIndicator("googleTrends", "googleTrend", "googleInterpretation", "googleAction", "googleScore", data.fear_greed, [30, 50, 70], true);
+
+            // ✅ **Update indicatoren**
+            Object.keys(indicators).forEach(id => {
+                let value = data[id] ?? "N/A"; // Fallback bij ontbrekende waarde
+                let { thresholds, positive } = indicators[id];
+
+                updateMacroIndicator(id, value, thresholds, positive);
+            });
 
             updateMacroScore();
             document.getElementById("macroStatus").textContent = "✅ Macrodata up-to-date";
@@ -63,23 +72,26 @@
         }
     }
 
-    function updateMacroIndicator(valueId, trendId, interpId, actionId, scoreId, value, thresholds, positive) {
-        document.getElementById(valueId).textContent = value + (valueId.includes("Dominance") ? "%" : "");
-        
+    function updateMacroIndicator(id, value, thresholds, positive) {
+        document.getElementById(id).textContent = `${value}${id.includes("Dominance") ? "%" : ""}`;
+
         let score = calculateScore(value, thresholds, positive);
-        document.getElementById(scoreId).textContent = score;
+        document.getElementById(`${id}Score`).textContent = score;
 
         let trend = score >= 1 ? "Bullish 📈" : score <= -1 ? "Bearish 📉" : "Neutraal ⚖️";
-        document.getElementById(trendId).textContent = trend;
+        document.getElementById(`${id}Trend`).textContent = trend;
 
         let interpretation = score >= 1 ? "Positief signaal" : score <= -1 ? "Negatief signaal" : "Geen duidelijke richting";
-        document.getElementById(interpId).textContent = interpretation;
+        document.getElementById(`${id}Interpretation`).textContent = interpretation;
 
         let action = score >= 1 ? "Overwegen om te kopen 🟢" : score <= -1 ? "Voorzichtigheid geboden 🔴" : "Geen actie nodig";
-        document.getElementById(actionId).textContent = action;
+        document.getElementById(`${id}Action`).textContent = action;
     }
 
     function calculateScore(value, thresholds, positive) {
+        if (isNaN(value)) return "N/A";
+        value = parseFloat(value);
+
         if (positive) {
             return value > thresholds[2] ? 2 : value > thresholds[1] ? 1 : value > thresholds[0] ? -1 : -2;
         } else {
@@ -90,7 +102,7 @@
     function updateMacroScore() {
         let scores = document.querySelectorAll(".macro-score");
         let totalScore = 0, count = 0;
-        
+
         scores.forEach(cell => {
             let score = parseInt(cell.textContent);
             if (!isNaN(score)) {
@@ -98,7 +110,7 @@
                 count++;
             }
         });
-        
+
         let avgScore = count > 0 ? (totalScore / count).toFixed(1) : "N/A";
         document.getElementById("macroTotalScore").textContent = avgScore;
         updateMacroAdvice(avgScore);
@@ -132,6 +144,6 @@
 
     document.addEventListener("DOMContentLoaded", function () {
         fetchMacroData();
-        setInterval(fetchMacroData, 60000); // Elke minuut updaten
+        setInterval(fetchMacroData, 60000); // 🔄 Elke minuut updaten
     });
 </script>
