@@ -81,6 +81,7 @@
             
             console.log("✅ Setup succesvol opgeslagen:", setup);
             document.getElementById("statusMessage").innerText = "✅ Setup opgeslagen!";
+            setTimeout(() => { document.getElementById("statusMessage").innerText = ""; }, 3000); // ✅ Laat bericht verdwijnen
         } catch (error) {
             console.error("❌ Fout bij opslaan setup:", error);
             document.getElementById("statusMessage").innerText = "❌ Setup opslaan mislukt!";
@@ -104,8 +105,8 @@
             setups.forEach((setup) => {
                 let li = document.createElement("li");
                 li.innerHTML = `
-                    <span><strong>${setup.name}</strong> (${setup.trend}) - ${setup.indicators}</span>
-                    <button class="delete-btn" onclick="deleteSetup('${setup.id}')">❌</button>
+                    <span class="setup-item"><strong>${setup.name}</strong> (${setup.trend}) - ${setup.indicators}</span>
+                    ${setup.id ? `<button class="delete-btn" onclick="deleteSetup('${setup.id}')">❌</button>` : ""}
                 `;
                 list.appendChild(li);
             });
@@ -132,5 +133,93 @@
         }
     }
 </script>
+
+<style>
+/* ✅ Algemene container styling */
+.setup-container {
+    max-width: 450px;
+    margin: auto;
+    padding: 20px;
+    background: white;
+    border-radius: 8px;
+    box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
+    transition: transform 0.3s ease-in-out;
+}
+
+.setup-container:hover {
+    transform: scale(1.02);
+}
+
+h2, h3 {
+    text-align: center;
+    font-weight: bold;
+    color: #333;
+}
+
+/* ✅ Formulier styling */
+input, select, button {
+    width: 100%;
+    margin: 10px 0;
+    padding: 12px;
+    border-radius: 6px;
+    border: 1px solid #ccc;
+    font-size: 16px;
+    transition: all 0.3s ease-in-out;
+}
+
+/* ✅ Input velden focus effect */
+input:focus, select:focus {
+    border-color: #4caf50;
+    outline: none;
+    box-shadow: 0px 0px 8px rgba(76, 175, 80, 0.3);
+}
+
+/* ✅ Knop styling */
+button {
+    background: #4caf50;
+    color: white;
+    border: none;
+    cursor: pointer;
+    font-weight: bold;
+    text-transform: uppercase;
+    transition: background 0.3s ease-in-out;
+}
+
+button:hover {
+    background: #388e3c;
+}
+
+/* ✅ Setup lijst */
+#setupList {
+    list-style: none;
+    padding: 0;
+    margin-top: 15px;
+}
+
+/* ✅ Setup item */
+.setup-item {
+    display: inline-block;
+    max-width: 80%;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+/* ✅ Verwijderen knop in lijst */
+.delete-btn {
+    background: #d9534f;
+    color: white;
+    border: none;
+    padding: 8px 12px;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: background 0.3s ease-in-out;
+}
+
+.delete-btn:hover {
+    background: #c9302c;
+}
+</style>
+
 </body>
 </html>
