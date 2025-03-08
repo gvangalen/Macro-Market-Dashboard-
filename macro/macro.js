@@ -1,6 +1,6 @@
-console.log("✅ macro.js geladen!");
+import { API_BASE_URL } from "../config.js"; // ✅ Gebruik centrale API-config
 
-const API_BASE_URL = "http://13.60.235.90:5002"; // ✅ AWS API-endpoint
+console.log("✅ macro.js correct geladen!");
 
 document.addEventListener("DOMContentLoaded", function () {
     console.log("📌 Macro Indicatoren geladen!");
@@ -8,29 +8,43 @@ document.addEventListener("DOMContentLoaded", function () {
     setInterval(updateMacroData, 60000); // Elke minuut verversen
 });
 
-// ✅ **Macro Data ophalen van AWS-server**
-async function fetchMacroData() {
-    try {
-        let response = await fetch(`${API_BASE_URL}/market_data`);
-        if (!response.ok) throw new Error("Fout bij ophalen macro-data");
+// ✅ **Helperfunctie voor veilige API-aanvragen met retry**
+async function safeFetch(url) {
+    let retries = 3;
+    while (retries > 0) {
+        try {
+            let response = await fetch(`${API_BASE_URL}${url}`);
+            if (!response.ok) throw new Error(`Fout bij ophalen data van ${url}`);
 
-        let data = await response.json();
-        if (!data || !data.fear_greed_index || !data.crypto?.bitcoin) {
-            throw new Error("Ontbrekende data in API-response");
+            let data = await response.json();
+            if (!data || Object.keys(data).length === 0) {
+                throw new Error(`Lege of ongeldige data ontvangen van ${url}`);
+            }
+
+            return data;
+        } catch (error) {
+            console.error(`❌ API-fout bij ${url}:`, error);
+            retries--;
+            if (retries === 0) return null;
+            await new Promise(resolve => setTimeout(resolve, 2000)); // 2 sec wachten
         }
-
-        let fearGreed = parseInt(data.fear_greed_index);
-        let btcDominance = parseFloat(data.crypto.bitcoin.dominance).toFixed(2);
-
-        console.log("📊 API Macro Data:", { fearGreed, btcDominance });
-
-        // ✅ Update DOM & scores
-        updateMacroIndicator("googleTrends", fearGreed);
-        updateMacroIndicator("usdtDominance", btcDominance);
-
-    } catch (error) {
-        console.error("❌ Fout bij ophalen macro-data:", error);
     }
+}
+
+// ✅ **Macro Data ophalen en updaten**
+async function updateMacroData() {
+    let data = await safeFetch("/market_data");
+    if (!data || !data.fear_greed_index || !data.crypto?.bitcoin) {
+        return console.error("❌ Ongeldige of ontbrekende macro-data ontvangen!");
+    }
+
+    let fearGreed = parseInt(data.fear_greed_index) || 0;
+    let btcDominance = parseFloat(data.crypto.bitcoin.dominance).toFixed(2) || "N/A";
+
+    console.log("📊 API Macro Data:", { fearGreed, btcDominance });
+
+    updateMacroIndicator("googleTrends", fearGreed);
+    updateMacroIndicator("usdtDominance", btcDominance);
 }
 
 // ✅ **Update een macro-indicator in de DOM en bereken score**
@@ -79,10 +93,9 @@ function updateMacroScore() {
 
 // ✅ **Advies genereren op basis van macro-score**
 function updateMacroAdvice(score) {
-    let advice;
+    let advice = "Neutraal ⚖️";
     if (score >= 1.5) advice = "Bullish 🟢";
     else if (score <= -1.5) advice = "Bearish 🔴";
-    else advice = "Neutraal ⚖️";
 
     document.getElementById("macroAdvice").innerText = advice;
 }
