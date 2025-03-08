@@ -1,74 +1,60 @@
+import { API_BASE_URL } from "../config.js"; // ✅ API-config ophalen
+
+console.log("✅ technical.js geladen!");
+
 document.addEventListener("DOMContentLoaded", function () {
     console.log("📌 Technische Analyse geladen!");
-    loadTechAnalysis(); // Laad bestaande analyses van AWS
+    loadTechAnalysis();
 });
 
-const apiUrl = "http://13.60.235.90:5003/technical_analysis"; // ✅ AWS API endpoint
+const apiUrl = `${API_BASE_URL}/technical_analysis`;
 
 // ✅ **Technische Analyse laden vanaf AWS**
 async function loadTechAnalysis() {
+    setText("techStatus", "📡 Laden...");
+
     try {
-        let response = await fetch(apiUrl);
-        if (!response.ok) throw new Error("Fout bij ophalen technische analyse");
-        let data = await response.json();
+        let data = await safeFetch(apiUrl);
+        if (!data || !data.assets) throw new Error("Ongeldige API-response");
+
         console.log("📊 Ontvangen technische analyse data:", data);
-        renderTechTable(data);
+        renderTechTable(data.assets);
+        setText("techStatus", "✅ Data up-to-date");
     } catch (error) {
-        console.error("❌ Fout bij laden technische analyse:", error);
-        document.getElementById("techStatus").textContent = "❌ Fout bij laden.";
+        showError("techStatus", "❌ Fout bij laden.");
     }
 }
 
 // ✅ **Tabel vullen met data**
-function renderTechTable(data) {
+function renderTechTable(assets) {
     let tableBody = document.querySelector("#analysisTable tbody");
-    tableBody.innerHTML = ""; // ❌ Oude rijen verwijderen
+    tableBody.innerHTML = "";
 
-    data.assets.forEach(asset => {
+    assets.forEach(asset => {
         let newRow = document.createElement("tr");
+        newRow.dataset.id = asset.id; // ✅ dataset ID voor verwijderen
 
-        let nameCell = document.createElement("td");
-        nameCell.innerText = asset.name;
-        newRow.appendChild(nameCell);
-
-        asset.indicators.forEach(indicator => {
-            let indicatorCell = document.createElement("td");
-            indicatorCell.innerText = indicator.value;
-            newRow.appendChild(indicatorCell);
-        });
-
-        let deleteCell = document.createElement("td");
-        deleteCell.innerHTML = `<button class="btn-remove" onclick="removeTechRow('${asset.id}', this)">❌</button>`;
-        newRow.appendChild(deleteCell);
+        newRow.innerHTML = `
+            <td>${asset.name}</td>
+            ${asset.indicators.map(indicator => `<td>${indicator.value}</td>`).join("")}
+            <td><button class="btn-remove">❌</button></td>
+        `;
 
         tableBody.appendChild(newRow);
     });
 
-    document.getElementById("techStatus").textContent = "✅ Data up-to-date";
+    attachDeleteEventListeners();
 }
 
-// ✅ **Asset toevoegen met bestaande indicatoren**
+// ✅ **Asset toevoegen met indicatoren**
 async function addTechRow() {
     let assetName = prompt("Voer de naam van de asset in:");
     if (!assetName || assetName.trim() === "") return alert("⚠️ Ongeldige naam!");
 
-    let button = document.getElementById("addTechAssetBtn");
-    button.textContent = "⏳ Toevoegen...";
-
-    try {
-        let response = await fetch(apiUrl, {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ name: assetName.trim(), indicators: [] })
-        });
-
-        if (!response.ok) throw new Error("Fout bij toevoegen asset");
+    await updateButton("addTechAssetBtn", "⏳ Toevoegen...", async () => {
+        await safeFetch(apiUrl, "POST", { name: assetName.trim(), indicators: [] });
         loadTechAnalysis();
-    } catch (error) {
-        console.error("❌ Asset toevoegen mislukt:", error);
-    } finally {
-        button.textContent = "➕ Asset Toevoegen";
-    }
+    });
 }
 
 // ✅ **Indicator toevoegen aan alle assets**
@@ -76,55 +62,84 @@ async function addTechIndicator() {
     let indicatorName = prompt("Voer de naam van de indicator in:");
     if (!indicatorName || indicatorName.trim() === "") return alert("⚠️ Ongeldige naam!");
 
-    let button = document.getElementById("addTechnicalIndicatorBtn");
-    button.textContent = "⏳ Toevoegen...";
-
-    try {
-        let response = await fetch(`${apiUrl}/indicators`, {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ name: indicatorName.trim() })
-        });
-
-        if (!response.ok) throw new Error("Fout bij toevoegen indicator");
+    await updateButton("addTechnicalIndicatorBtn", "⏳ Toevoegen...", async () => {
+        await safeFetch(`${apiUrl}/indicators`, "POST", { name: indicatorName.trim() });
         loadTechAnalysis();
-    } catch (error) {
-        console.error("❌ Indicator toevoegen mislukt:", error);
-    } finally {
-        button.textContent = "➕ Indicator Toevoegen";
-    }
-}
-
-// ✅ **Indicator verwijderen**
-async function removeTechIndicator(button) {
-    let indicatorName = button.parentNode.textContent.trim();
-    if (!confirm(`Weet je zeker dat je '${indicatorName}' wilt verwijderen?`)) return;
-
-    button.textContent = "⏳ Verwijderen...";
-
-    try {
-        let response = await fetch(`${apiUrl}/indicators/${indicatorName}`, { method: "DELETE" });
-        if (!response.ok) throw new Error("Fout bij verwijderen indicator");
-        loadTechAnalysis();
-    } catch (error) {
-        console.error("❌ Indicator verwijderen mislukt:", error);
-    } finally {
-        button.textContent = "❌";
-    }
+    });
 }
 
 // ✅ **Asset verwijderen**
-async function removeTechRow(assetId, button) {
+async function removeTechRow(assetId) {
     if (!confirm("Weet je zeker dat je deze asset wilt verwijderen?")) return;
 
-    button.textContent = "⏳ Verwijderen...";
-    try {
-        let response = await fetch(`${apiUrl}/${assetId}`, { method: "DELETE" });
-        if (!response.ok) throw new Error("Fout bij verwijderen asset");
+    await updateButton(`remove-${assetId}`, "⏳ Verwijderen...", async () => {
+        await safeFetch(`${apiUrl}/${assetId}`, "DELETE");
         loadTechAnalysis();
-    } catch (error) {
-        console.error("❌ Asset verwijderen mislukt:", error);
-    } finally {
-        button.textContent = "❌";
+    });
+}
+
+// ✅ **Veilige API-aanroepen met retry**
+async function safeFetch(url, method = "GET", body = null) {
+    let retries = 3;
+    while (retries > 0) {
+        try {
+            let options = { method, headers: { "Content-Type": "application/json" } };
+            if (body) options.body = JSON.stringify(body);
+
+            let response = await fetch(url, options);
+            if (!response.ok) throw new Error(`Serverfout (${response.status})`);
+
+            return method === "GET" ? await response.json() : true;
+        } catch (error) {
+            console.error(`❌ API-fout bij ${url}:`, error);
+            retries--;
+            if (retries === 0) throw error;
+            await new Promise(resolve => setTimeout(resolve, 2000));
+        }
     }
+}
+
+// ✅ **Tekst aanpassen in UI**
+function setText(elementId, text) {
+    let el = document.getElementById(elementId);
+    if (el) el.textContent = text;
+}
+
+// ✅ **Foutmelding tonen in UI**
+function showError(elementId, message) {
+    setText(elementId, message);
+    document.getElementById(elementId).style.color = "red";
+}
+
+// ✅ **Knop tijdelijk aanpassen bij async bewerking**
+async function updateButton(buttonId, tempText, action) {
+    let button = document.getElementById(buttonId);
+    if (!button) return;
+
+    let originalText = button.textContent;
+    button.textContent = tempText;
+    button.disabled = true;
+
+    try {
+        await action();
+    } catch (error) {
+        console.error(error);
+    } finally {
+        button.textContent = originalText;
+        button.disabled = false;
+    }
+}
+
+// ✅ **Event Listeners koppelen voor verwijderen**
+function attachDeleteEventListeners() {
+    document.querySelectorAll(".btn-remove").forEach(button => {
+        button.removeEventListener("click", handleDeleteClick);
+        button.addEventListener("click", handleDeleteClick);
+    });
+}
+
+// ✅ **Afhandelen van verwijderen**
+function handleDeleteClick(event) {
+    let assetId = event.target.closest("tr").dataset.id;
+    if (assetId) removeTechRow(assetId);
 }
