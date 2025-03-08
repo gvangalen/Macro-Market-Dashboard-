@@ -1,61 +1,83 @@
+import { API_BASE_URL } from "../config.js"; // ✅ Gebruik centrale API-config
+
+console.log("✅ dashboard.js correct geladen!");
+
 document.addEventListener("DOMContentLoaded", function () {
     console.log("📌 Dashboard geladen!");
-
     updateAllData();
     setInterval(updateAllData, 60000); // ✅ Elke minuut verversen
 
-    // ✅ Event Listeners koppelen voor knoppen (met null-check)
+    // ✅ Event Listeners koppelen met null-checks
     document.getElementById("addMacroIndicatorBtn")?.addEventListener("click", addMacroRow);
     document.getElementById("addTechnicalIndicatorBtn")?.addEventListener("click", addTechIndicator);
     document.getElementById("addTechAssetBtn")?.addEventListener("click", addTechRow);
 });
 
+// ✅ **Helperfunctie voor veilige API-aanvragen met retry**
+async function safeFetch(url) {
+    let retries = 3;
+    while (retries > 0) {
+        try {
+            let response = await fetch(`${API_BASE_URL}${url}`);
+            if (!response.ok) throw new Error(`Fout bij ophalen data van ${url}`);
+
+            let data = await response.json();
+            if (!data || Object.keys(data).length === 0) {
+                throw new Error(`Lege of ongeldige data ontvangen van ${url}`);
+            }
+
+            return data;
+        } catch (error) {
+            console.error(`❌ API-fout bij ${url}:`, error);
+            retries--;
+            if (retries === 0) return null;
+            await new Promise(resolve => setTimeout(resolve, 2000)); // 2 sec wachten
+        }
+    }
+}
+
 // ✅ **Haalt ALLE data op vanaf AWS-server**
 async function updateAllData() {
-    try {
-        const response = await fetch("http://13.60.235.90:5002/market_data");
-        if (!response.ok) throw new Error(`Fout bij ophalen marktdata: ${response.status}`);
-        
-        const data = await response.json();
-        console.log("📊 Ontvangen API-data:", data);
-
-        // ✅ Update macro-indicatoren
-        updateMacroData(data);
-
-        // ✅ Update Bitcoin en Solana gegevens
-        updateCryptoData("btc", data.crypto?.bitcoin);
-        updateCryptoData("sol", data.crypto?.solana);
-    } catch (error) {
-        console.error("❌ Fout bij ophalen marktdata:", error);
-        showError("macroStatus", "Fout bij ophalen data.");
+    let data = await safeFetch("/market_data");
+    if (!data || !data.crypto) {
+        return showError("macroStatus", "Fout bij ophalen data.");
     }
+
+    console.log("📊 Ontvangen API-data:", data);
+
+    updateMacroData(data);
+    updateCryptoUI(data.crypto);
 }
 
 // ✅ **Macro Indicatoren Updaten**
 function updateMacroData(data) {
-    document.getElementById("googleTrends").innerText = data.fear_greed_index ?? "N/A";
-    document.getElementById("usdtDominance").innerText = data.crypto?.bitcoin?.dominance
+    setText("googleTrends", data.fear_greed_index ?? "N/A");
+    setText("usdtDominance", data.crypto?.bitcoin?.dominance
         ? `${data.crypto.bitcoin.dominance.toFixed(2)}%`
-        : "N/A";
+        : "N/A"
+    );
 }
 
-// ✅ **Crypto Data bijwerken (Bitcoin & Solana)**
-function updateCryptoData(prefix, cryptoData) {
-    if (!cryptoData) {
-        showError(`${prefix}Close`, "N/A");
-        showError(`${prefix}Change`, "N/A");
-        showError(`${prefix}MarketCap`, "N/A");
-        showError(`${prefix}Volume`, "N/A");
-        return;
-    }
+// ✅ **Crypto Data bijwerken voor ALLE assets**
+function updateCryptoUI(cryptoData) {
+    Object.keys(cryptoData).forEach(coin => {
+        let elements = document.querySelectorAll(`[data-coin="${coin}"]`);
+        if (elements.length === 0) {
+            console.warn(`⚠️ Geen HTML-elementen voor ${coin} gevonden.`);
+            return;
+        }
 
-    document.getElementById(`${prefix}Close`).innerText = `$${cryptoData.price.toFixed(2)}`;
-    document.getElementById(`${prefix}Change`).innerText = `${cryptoData.change_24h.toFixed(2)}%`;
-    document.getElementById(`${prefix}MarketCap`).innerText = `$${(cryptoData.market_cap / 1e9).toFixed(2)}B`;
-    document.getElementById(`${prefix}Volume`).innerText = `$${(cryptoData.volume / 1e9).toFixed(2)}B`;
-
-    // ✅ Kleur aanpassen op basis van stijging/daling
-    document.getElementById(`${prefix}Change`).style.color = cryptoData.change_24h >= 0 ? "green" : "red";
+        let data = cryptoData[coin];
+        elements.forEach(el => {
+            let type = el.dataset.type;
+            if (type === "price") setText(el.id, `$${data.price.toFixed(2)}`);
+            if (type === "volume") setText(el.id, `📈 Volume: ${formatNumber(data.volume)}`);
+            if (type === "change") {
+                setText(el.id, `${data.change_24h.toFixed(2)}%`);
+                el.style.color = data.change_24h >= 0 ? "green" : "red";
+            }
+        });
+    });
 }
 
 // ✅ **Macro Indicator Toevoegen**
@@ -95,4 +117,19 @@ function showError(elementId, message) {
         element.innerText = message;
         element.style.color = "red";
     }
+}
+
+// ✅ **Helperfunctie voor tekst in een element**
+function setText(elementId, text) {
+    let el = typeof elementId === "string" ? document.getElementById(elementId) : elementId;
+    if (el) el.innerText = text;
+}
+
+// ✅ **Hulpfunctie voor grote getallen (M = miljoen, B = miljard)**
+function formatNumber(num) {
+    return num >= 1e9
+        ? `${(num / 1e9).toFixed(2)}B`
+        : num >= 1e6
+        ? `${(num / 1e6).toFixed(2)}M`
+        : num.toLocaleString();
 }
