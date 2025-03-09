@@ -65,24 +65,45 @@ function createGauge(elementId, label) {
 
 // ✅ **Data ophalen en meters updaten**
 async function fetchMarketData(macroGauge, technicalGauge, setupGauge) {
-    let data = await safeFetch("/api/market_data"); // ✅ Correcte API-route
-    if (!data || !Array.isArray(data)) return console.error("❌ Ongeldige of lege API-response!");
+    let macroData = await safeFetch("/macro_data"); // ✅ API voor macro
+    let marketData = await safeFetch("/market_data"); // ✅ API voor marktdata
 
-    let btc = data.find(asset => asset.symbol === "BTC");
+    if (!macroData) return console.error("❌ Ongeldige of ontbrekende macro-data ontvangen!");
+    if (!marketData || !Array.isArray(marketData)) return console.error("❌ Ongeldige of lege marktdata ontvangen!");
+
+    let btc = marketData.find(asset => asset.symbol === "BTC");
     if (!btc) return console.error("❌ Geen Bitcoin-data gevonden!");
 
-    console.log("📊 Ontvangen API-data:", data);
+    console.log("📊 Ontvangen API Macro Data:", macroData);
+    console.log("📊 Ontvangen API Market Data:", marketData);
 
     // ✅ Update gauges
-    if (macroGauge) updateGauge(macroGauge, calculateMacroScore(btc));
+    if (macroGauge) updateGauge(macroGauge, calculateMacroScore(macroData));
     if (technicalGauge) updateGauge(technicalGauge, calculateTechnicalScore(btc));
-    if (setupGauge) checkActiveSetups(setupGauge, data);
+    if (setupGauge) checkActiveSetups(setupGauge, marketData);
 }
 
-// ✅ **Bereken Macro Score**
-function calculateMacroScore(btc) {
-    if (!btc.fear_greed) return 0;
-    return btc.fear_greed > 75 ? 2 : btc.fear_greed > 50 ? 1 : btc.fear_greed > 25 ? -1 : -2;
+// ✅ **Bereken Macro Score op basis van alleen 3 factoren**
+function calculateMacroScore(macroData) {
+    let score = 0;
+
+    // ✅ Fear & Greed Index
+    if (macroData.fear_greed_index > 75) score += 2;
+    else if (macroData.fear_greed_index > 50) score += 1;
+    else if (macroData.fear_greed_index > 30) score -= 1;
+    else score -= 2;
+
+    // ✅ BTC Dominantie
+    if (macroData.btc_dominance > 55) score += 1;
+    else if (macroData.btc_dominance < 50) score -= 1;
+
+    // ✅ DXY (Dollar Index)
+    if (macroData.dxy < 100) score += 2;
+    else if (macroData.dxy < 103) score += 1;
+    else if (macroData.dxy < 106) score -= 1;
+    else score -= 2;
+
+    return Math.max(-2, Math.min(2, score)); // Limiteer tussen -2 en 2
 }
 
 // ✅ **Bereken Technische Score**
