@@ -34,7 +34,7 @@ document.getElementById("setupForm")?.addEventListener("submit", async function 
     }
 });
 
-// ✅ **Setup laden vanaf AWS-server**
+// ✅ **Setup laden vanaf server**
 async function loadSetups() {
     setText("setupStatus", "📡 Laden...");
 
@@ -62,7 +62,7 @@ async function loadSetups() {
     }
 }
 
-// ✅ **Setup verwijderen op AWS-server**
+// ✅ **Setup verwijderen**
 async function deleteSetup(id) {
     if (!confirm("Weet je zeker dat je deze setup wilt verwijderen?")) return;
 
@@ -74,7 +74,7 @@ async function deleteSetup(id) {
     }
 }
 
-// ✅ **Helperfunctie voor veilige API-aanvragen met retry**
+// ✅ **Veilige API-aanvragen met retry**
 async function safeFetch(url, method = "GET", body = null) {
     let retries = 3;
     while (retries > 0) {
@@ -98,7 +98,7 @@ async function safeFetch(url, method = "GET", body = null) {
     }
 }
 
-// ✅ **Helperfunctie om tekst in een element te zetten**
+// ✅ **Tekst aanpassen in UI**
 function setText(elementId, text, isHTML = false) {
     let el = document.getElementById(elementId);
     if (el) isHTML ? (el.innerHTML = text) : (el.textContent = text);
@@ -107,15 +107,20 @@ function setText(elementId, text, isHTML = false) {
 // ✅ **Foutmelding in UI tonen**
 function showError(message) {
     setText("setupStatus", message);
-    document.getElementById("setupStatus").style.color = "red";
+    let statusEl = document.getElementById("setupStatus");
+    if (statusEl) statusEl.style.color = "red";
 }
 
-// ✅ **Event Listeners voor verwijderen**
+// ✅ **Event Listeners voor verwijderen koppelen**
 function attachDeleteEventListeners() {
     document.querySelectorAll(".delete-btn").forEach(button => {
-        button.addEventListener("click", function () {
-            let setupId = this.closest("li").dataset.id;
-            deleteSetup(setupId);
-        });
+        button.removeEventListener("click", handleDeleteClick); // ✅ Voorkomt dubbele listeners
+        button.addEventListener("click", handleDeleteClick);
     });
+}
+
+// ✅ **Afhandelen van verwijderen**
+function handleDeleteClick(event) {
+    let setupId = event.target.closest("li").dataset.id;
+    if (setupId) deleteSetup(setupId);
 }
