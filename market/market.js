@@ -5,7 +5,7 @@ console.log("✅ market.js correct geladen!");
 document.addEventListener("DOMContentLoaded", function () {
     console.log("📌 Marktdata wordt geladen...");
     fetchMarketData();
-    setInterval(fetchMarketData, 60000); // Elke minuut updaten
+    setInterval(fetchMarketData, 60000); // 🔄 Elke minuut updaten
 });
 
 // ✅ **Helperfunctie voor veilige API-aanvragen met retry**
@@ -26,7 +26,7 @@ async function safeFetch(url) {
             console.error(`❌ API-fout bij ${url}:`, error);
             retries--;
             if (retries === 0) return null;
-            await new Promise(resolve => setTimeout(resolve, 2000)); // 2 sec wachten
+            await new Promise(resolve => setTimeout(resolve, 2000)); // ⏳ 2 sec wachten
         }
     }
 }
@@ -34,42 +34,45 @@ async function safeFetch(url) {
 // ✅ **Marktdata ophalen en UI bijwerken**
 async function fetchMarketData() {
     let data = await safeFetch("/market_data");
-    if (!data || !data.crypto) {
+    if (!data || !Array.isArray(data)) {
         return showErrorState();
     }
 
     console.log("📊 Ontvangen API-marketdata:", data);
 
-    updateMarketUI(data.crypto);
+    updateMarketUI(data);
 }
 
 // ✅ **UI bijwerken met marktdata**
-function updateMarketUI(cryptoData) {
-    Object.keys(cryptoData).forEach(coin => {
-        let elements = document.querySelectorAll(`[data-coin="${coin}"]`);
-        if (elements.length === 0) {
-            console.warn(`⚠️ Geen HTML-elementen voor ${coin} gevonden.`);
-            return;
-        }
+function updateMarketUI(marketData) {
+    let marketContainer = document.getElementById("marketContainer");
+    if (!marketContainer) {
+        console.error("❌ HTML-element voor market data niet gevonden!");
+        return;
+    }
 
-        let data = cryptoData[coin];
-        elements.forEach(el => {
-            let type = el.dataset.type;
-            if (type === "price") el.textContent = `$${data.price.toFixed(2)}`;
-            if (type === "volume") el.textContent = `📈 Volume: ${formatNumber(data.volume)}`;
-            if (type === "change") {
-                el.textContent = `${data.change_24h.toFixed(2)}%`;
-                el.style.color = data.change_24h >= 0 ? "green" : "red";
-            }
-        });
+    marketContainer.innerHTML = ""; // ✅ Eerst leegmaken voor nieuwe data
+
+    marketData.forEach(asset => {
+        let row = document.createElement("tr");
+        row.innerHTML = `
+            <td>${asset.symbol}</td>
+            <td data-coin="${asset.symbol}" data-type="price">$${asset.price.toFixed(2)}</td>
+            <td data-coin="${asset.symbol}" data-type="volume">📈 ${formatNumber(asset.volume)}</td>
+            <td data-coin="${asset.symbol}" data-type="change" style="color: ${asset.change_24h >= 0 ? "green" : "red"}">
+                ${asset.change_24h.toFixed(2)}%
+            </td>
+        `;
+        marketContainer.appendChild(row);
     });
 }
 
 // ✅ **Fallback bij API-fout**
 function showErrorState() {
-    document.querySelectorAll("[data-coin]").forEach(el => {
-        el.textContent = "⚠️ Error";
-    });
+    let marketContainer = document.getElementById("marketContainer");
+    if (!marketContainer) return;
+    
+    marketContainer.innerHTML = `<tr><td colspan="4">⚠️ Fout bij laden van marktdata.</td></tr>`;
 }
 
 // ✅ **Hulpfunctie voor grote getallen (M = miljoen, B = miljard)**
