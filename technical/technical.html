@@ -11,11 +11,11 @@
     <h2>📉 Technische Analyse</h2>
 
     <div class="controls">
-        <button id="addTechAssetBtn" class="btn-add">➕ Asset toevoegen</button>
-        <button id="addTechnicalIndicatorBtn" class="btn-add">➕ Indicator toevoegen</button>
-
+        <button id="addTechAssetBtn" class="btn-add" onclick="addTechRow()">➕ Asset toevoegen</button>
+        <button id="addTechnicalIndicatorBtn" class="btn-add" onclick="addTechIndicator()">➕ Indicator toevoegen</button>
+        
         <!-- ✅ Timeframe dropdown -->
-        <select id="globalTimeframe">
+        <select id="globalTimeframe" onchange="loadTechAnalysis()">
             <option value="1hr">1H</option>
             <option value="4hr" selected>4H</option>
             <option value="1day">1D</option>
@@ -27,14 +27,23 @@
         <thead>
             <tr>
                 <th>Asset</th>
-                <th>Actie</th>
+                <th>RSI</th>
+                <th>Volume</th>
+                <th>200 MA</th>
+                <th>Score</th>
+                <th>Trend</th>
+                <th>Verwijderen</th>
             </tr>
         </thead>
         <tbody>
-            <tr><td colspan="2" class="loading">📡 Data laden...</td></tr>
+            <tr>
+                <td colspan="7" class="loading">📡 Data laden...</td>
+            </tr>
         </tbody>
     </table>
 
+    <h3>📊 Totale Technische Score: <span id="totalTechScore">N/A</span></h3>
+    <h3>📈 Technisch Advies: <span id="technicalAdvice">Neutraal</span></h3>
     <p id="techStatus" class="loading">📡 Data laden...</p>
 
     <!-- ✅ JavaScript bestanden extern laden -->
