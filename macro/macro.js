@@ -33,18 +33,18 @@ async function safeFetch(url) {
 
 // ✅ **Macro Data ophalen en updaten**
 async function updateMacroData() {
-    let data = await safeFetch("/market_data");
-    if (!data || !data.fear_greed_index || !data.crypto?.bitcoin) {
-        return console.error("❌ Ongeldige of ontbrekende macro-data ontvangen!");
-    }
+    let data = await safeFetch("/macro_data"); // ✅ API voor macro-data
+    if (!data) return console.error("❌ Ongeldige of ontbrekende macro-data ontvangen!");
 
     let fearGreed = parseInt(data.fear_greed_index) || 0;
-    let btcDominance = parseFloat(data.crypto.bitcoin.dominance).toFixed(2) || "N/A";
+    let btcDominance = parseFloat(data.btc_dominance).toFixed(2) || "N/A";
+    let dxy = parseFloat(data.dxy).toFixed(2) || "N/A";
 
-    console.log("📊 API Macro Data:", { fearGreed, btcDominance });
+    console.log("📊 API Macro Data:", { fearGreed, btcDominance, dxy });
 
-    updateMacroIndicator("googleTrends", fearGreed);
-    updateMacroIndicator("usdtDominance", btcDominance);
+    updateMacroIndicator("fearGreed", fearGreed);
+    updateMacroIndicator("btcDominance", btcDominance);
+    updateMacroIndicator("dxy", dxy);
 }
 
 // ✅ **Update een macro-indicator in de DOM en bereken score**
@@ -61,12 +61,16 @@ function updateMacroIndicator(indicator, value) {
 
 // ✅ **Bereken de score voor een specifieke indicator**
 function calculateMacroScore(indicator, value) {
-    if (indicator === "googleTrends") {
-        return value > 70 ? 2 : value > 50 ? 1 : value > 30 ? -1 : -2;
+    if (indicator === "fearGreed") {
+        return value > 75 ? 2 : value > 50 ? 1 : value > 30 ? -1 : -2;
     }
 
-    if (indicator === "usdtDominance") {
-        return value < 3 ? 2 : value < 5 ? 1 : value < 7 ? -1 : -2;
+    if (indicator === "btcDominance") {
+        return value > 55 ? 2 : value > 50 ? 1 : value > 45 ? -1 : -2;
+    }
+
+    if (indicator === "dxy") {
+        return value < 100 ? 2 : value < 103 ? 1 : value < 106 ? -1 : -2;
     }
 
     return 0; // Fallback als indicator niet bekend is
@@ -100,7 +104,7 @@ function updateMacroAdvice(score) {
     document.getElementById("macroAdvice").innerText = advice;
 }
 
-// ✅ **Indicator handmatig toevoegen**
+// ✅ **Indicator handmatig toevoegen (voor test/doeleinden)**
 function addMacroRow() {
     let table = document.getElementById("macroTable").getElementsByTagName('tbody')[0];
     let newRow = table.insertRow();
