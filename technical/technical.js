@@ -5,9 +5,10 @@ console.log("✅ technical.js geladen!");
 document.addEventListener("DOMContentLoaded", function () {
     console.log("📌 Technische Analyse geladen!");
     loadTechAnalysis();
+    setInterval(loadTechAnalysis, 60000); // 🔄 Elke minuut updaten
 });
 
-const apiUrl = `${API_BASE_URL}/technical_analysis`;
+const apiUrl = `${API_BASE_URL}/technical_data`;
 
 // ✅ **Technische Analyse laden vanaf AWS**
 async function loadTechAnalysis() {
@@ -15,10 +16,10 @@ async function loadTechAnalysis() {
 
     try {
         let data = await safeFetch(apiUrl);
-        if (!data || !data.assets) throw new Error("Ongeldige API-response");
+        if (!data || !data.symbol) throw new Error("Ongeldige API-response");
 
         console.log("📊 Ontvangen technische analyse data:", data);
-        renderTechTable(data.assets);
+        renderTechTable([data]); // ✅ Alleen de meest recente data tonen
         setText("techStatus", "✅ Data up-to-date");
     } catch (error) {
         showError("techStatus", "❌ Fout bij laden.");
@@ -34,9 +35,16 @@ function renderTechTable(assets) {
         let newRow = document.createElement("tr");
         newRow.dataset.id = asset.id; // ✅ dataset ID voor verwijderen
 
+        let score = calculateTechScore(asset);
+        let trend = score >= 1 ? "Bullish 📈" : score <= -1 ? "Bearish 📉" : "Neutraal ⚖️";
+
         newRow.innerHTML = `
-            <td>${asset.name}</td>
-            ${asset.indicators.map(indicator => `<td>${indicator.value}</td>`).join("")}
+            <td>${asset.symbol}</td>
+            <td>${asset.rsi.toFixed(2)}</td>
+            <td>${formatNumber(asset.volume)}</td>
+            <td>${formatNumber(asset.ma_200)}</td>
+            <td class="tech-score">${score}</td>
+            <td>${trend}</td>
             <td><button class="btn-remove">❌</button></td>
         `;
 
@@ -46,13 +54,29 @@ function renderTechTable(assets) {
     attachDeleteEventListeners();
 }
 
+// ✅ **Score berekenen voor technische indicatoren**
+function calculateTechScore(asset) {
+    let score = 0;
+
+    if (asset.rsi > 70) score -= 2;
+    else if (asset.rsi > 55) score -= 1;
+    else if (asset.rsi < 30) score += 2;
+    else if (asset.rsi < 45) score += 1;
+
+    if (asset.volume > 1_000_000_000) score += 1;
+    if (asset.ma_200 < asset.price) score += 1;
+    else score -= 1;
+
+    return Math.max(-2, Math.min(2, score));
+}
+
 // ✅ **Asset toevoegen met indicatoren**
 async function addTechRow() {
     let assetName = prompt("Voer de naam van de asset in:");
     if (!assetName || assetName.trim() === "") return alert("⚠️ Ongeldige naam!");
 
     await updateButton("addTechAssetBtn", "⏳ Toevoegen...", async () => {
-        await safeFetch(apiUrl, "POST", { name: assetName.trim(), indicators: [] });
+        await safeFetch(apiUrl, "POST", { symbol: assetName.trim() });
         loadTechAnalysis();
     });
 }
@@ -142,4 +166,13 @@ function attachDeleteEventListeners() {
 function handleDeleteClick(event) {
     let assetId = event.target.closest("tr").dataset.id;
     if (assetId) removeTechRow(assetId);
+}
+
+// ✅ **Helper: Getal formatteren**
+function formatNumber(num) {
+    return num >= 1e9
+        ? `${(num / 1e9).toFixed(2)}B`
+        : num >= 1e6
+        ? `${(num / 1e6).toFixed(2)}M`
+        : num.toFixed(2);
 }
