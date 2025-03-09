@@ -81,7 +81,7 @@
             
             console.log("✅ Setup succesvol opgeslagen:", setup);
             document.getElementById("statusMessage").innerText = "✅ Setup opgeslagen!";
-            setTimeout(() => { document.getElementById("statusMessage").innerText = ""; }, 3000); // ✅ Laat bericht verdwijnen
+            setTimeout(() => { document.getElementById("statusMessage").innerText = ""; }, 3000); // ✅ Bericht verdwijnt na 3 sec
         } catch (error) {
             console.error("❌ Fout bij opslaan setup:", error);
             document.getElementById("statusMessage").innerText = "❌ Setup opslaan mislukt!";
