@@ -1,5 +1,17 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>📊 Macro Indicatoren</title>
+    <link rel="stylesheet" href="styles.css"> <!-- ✅ Voeg CSS toe -->
+</head>
+<body>
+
 <div class="macro-container">
     <h2>📊 Macro Indicatoren</h2>
+    
+    <button class="btn-add" onclick="addMacroRow()">➕ Indicator toevoegen</button>
 
     <table id="macroTable">
         <thead>
@@ -10,32 +22,36 @@
                 <th>Interpretatie</th>
                 <th>Actie</th>
                 <th>Score</th>
+                <th>Verwijderen</th>
             </tr>
         </thead>
         <tbody id="macroBody">
             <tr>
                 <td>Fear & Greed Index</td>
                 <td id="fearGreed">📡 Laden...</td>
-                <td id="fearGreedTrend">N/A</td>
+                <td id="fearGreedTrend" class="trend-cell">N/A</td>
                 <td id="fearGreedInterpretation">N/A</td>
                 <td id="fearGreedAction">N/A</td>
                 <td class="macro-score" id="fearGreedScore">-</td>
+                <td><button class="btn-remove" onclick="removeRow(this)">❌</button></td>
             </tr>
             <tr>
                 <td>Bitcoin Dominantie</td>
                 <td id="btcDominance">📡 Laden...</td>
-                <td id="btcDominanceTrend">N/A</td>
+                <td id="btcDominanceTrend" class="trend-cell">N/A</td>
                 <td id="btcDominanceInterpretation">N/A</td>
                 <td id="btcDominanceAction">N/A</td>
                 <td class="macro-score" id="btcDominanceScore">-</td>
+                <td><button class="btn-remove" onclick="removeRow(this)">❌</button></td>
             </tr>
             <tr>
                 <td>Dollar Index (DXY)</td>
                 <td id="dxy">📡 Laden...</td>
-                <td id="dxyTrend">N/A</td>
+                <td id="dxyTrend" class="trend-cell">N/A</td>
                 <td id="dxyInterpretation">N/A</td>
                 <td id="dxyAction">N/A</td>
                 <td class="macro-score" id="dxyScore">-</td>
+                <td><button class="btn-remove" onclick="removeRow(this)">❌</button></td>
             </tr>
         </tbody>
     </table>
@@ -48,7 +64,7 @@
 <script>
     const API_BASE_URL = "http://13.60.235.90:5002"; // ✅ AWS API-endpoint
 
-    // ✅ **Definitie van macro-indicatoren met drempelwaarden**
+    // ✅ **Macro-indicatoren met drempelwaarden**
     const indicators = {
         "fearGreed": { thresholds: [30, 50, 70], positive: true },
         "btcDominance": { thresholds: [45, 50, 55], positive: true },
@@ -64,7 +80,7 @@
             let data = await response.json();
             console.log("📊 Ontvangen Macro Data:", data);
 
-            // ✅ **Update indicatoren met juiste data**
+            // ✅ **Update indicatoren**
             Object.keys(indicators).forEach(id => {
                 let value = data[id] ?? "N/A"; // Fallback als waarde ontbreekt
                 let { thresholds, positive } = indicators[id];
@@ -82,19 +98,31 @@
 
     // ✅ **Update een macro-indicator in de DOM en bereken score**
     function updateMacroIndicator(id, value, thresholds, positive) {
-        document.getElementById(id).textContent = `${value}${id === "btcDominance" ? "%" : ""}`;
+        let valueElement = document.getElementById(id);
+        let trendElement = document.getElementById(`${id}Trend`);
+        let interpretationElement = document.getElementById(`${id}Interpretation`);
+        let actionElement = document.getElementById(`${id}Action`);
+        let scoreElement = document.getElementById(`${id}Score`);
+
+        valueElement.textContent = `${value}${id === "btcDominance" ? "%" : ""}`;
 
         let score = calculateScore(value, thresholds, positive);
-        document.getElementById(`${id}Score`).textContent = score;
+        scoreElement.textContent = score;
 
         let trend = score >= 1 ? "Bullish 📈" : score <= -1 ? "Bearish 📉" : "Neutraal ⚖️";
-        document.getElementById(`${id}Trend`).textContent = trend;
+        trendElement.textContent = trend;
 
         let interpretation = score >= 1 ? "Positief signaal" : score <= -1 ? "Negatief signaal" : "Geen duidelijke richting";
-        document.getElementById(`${id}Interpretation`).textContent = interpretation;
+        interpretationElement.textContent = interpretation;
 
         let action = score >= 1 ? "Overwegen om te kopen 🟢" : score <= -1 ? "Voorzichtigheid geboden 🔴" : "Geen actie nodig";
-        document.getElementById(`${id}Action`).textContent = action;
+        actionElement.textContent = action;
+
+        // ✅ **Voeg kleur toe op basis van trend**
+        trendElement.classList.remove("bullish", "bearish", "neutral");
+        if (score >= 1) trendElement.classList.add("bullish");
+        else if (score <= -1) trendElement.classList.add("bearish");
+        else trendElement.classList.add("neutral");
     }
 
     // ✅ **Score berekenen op basis van thresholds**
@@ -133,11 +161,21 @@
         document.getElementById("macroAdvice").textContent = advice;
     }
 
-    // ✅ **Data automatisch ophalen bij pagina-lading en elke 60 sec**
-    document.addEventListener("DOMContentLoaded", function () {
-        fetchMacroData();
-        setInterval(fetchMacroData, 60000);
-    });
+    // ✅ **Indicator handmatig toevoegen**
+    function addMacroRow() {
+        let table = document.getElementById("macroTable").getElementsByTagName('tbody')[0];
+        let newRow = table.insertRow();
+
+        newRow.innerHTML = `
+            <td><input type="text" placeholder="Naam Indicator"></td>
+            <td>Laden...</td>
+            <td>N/A</td>
+            <td>N/A</td>
+            <td>N/A</td>
+            <td class="macro-score">-</td>
+            <td><button class="btn-remove" onclick="removeRow(this)">❌</button></td>
+        `;
+    }
 
     function removeRow(button) {
         let row = button.parentNode.parentNode;
@@ -147,6 +185,6 @@
 
     document.addEventListener("DOMContentLoaded", function () {
         fetchMacroData();
-        setInterval(fetchMacroData, 60000); // 🔄 Elke minuut updaten
+        setInterval(fetchMacroData, 60000);
     });
 </script>
