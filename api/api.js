@@ -56,6 +56,21 @@ function setText(elementId, text) {
     if (el) el.innerText = text;
 }
 
+// ✅ **Score update functie (bijvoorbeeld voor fear_greed of usdt_dominance)**
+function updateScore(elementId, value, thresholds, isPositive) {
+    let score = calculateScore(value, thresholds, isPositive);
+    setText(elementId, score);
+}
+
+// ✅ **Bereken de score op basis van drempelwaarden**
+function calculateScore(value, thresholds, isPositive) {
+    if (isPositive) {
+        return value > thresholds[2] ? 2 : value > thresholds[1] ? 1 : value > thresholds[0] ? -1 : -2;
+    } else {
+        return value < thresholds[0] ? 2 : value < thresholds[1] ? 1 : value < thresholds[2] ? -1 : -2;
+    }
+}
+
 // ✅ **Alle data ophalen**
 async function fetchAllData() {
     await fetchMacroData();
