@@ -54,16 +54,21 @@ function updateMarketUI(marketData) {
     marketContainer.innerHTML = ""; // ✅ Eerst leegmaken voor nieuwe data
 
     marketData.forEach(asset => {
-        let row = document.createElement("tr");
-        row.innerHTML = `
-            <td>${asset.symbol}</td>
-            <td data-coin="${asset.symbol}" data-type="price">$${asset.price.toFixed(2)}</td>
-            <td data-coin="${asset.symbol}" data-type="volume">📈 ${formatNumber(asset.volume)}</td>
-            <td data-coin="${asset.symbol}" data-type="change" style="color: ${asset.change_24h >= 0 ? "green" : "red"}">
-                ${asset.change_24h.toFixed(2)}%
-            </td>
-        `;
-        marketContainer.appendChild(row);
+        // Checken of de vereiste data aanwezig is
+        if (asset.symbol && asset.price && asset.volume !== undefined && asset.change_24h !== undefined) {
+            let row = document.createElement("tr");
+            row.innerHTML = `
+                <td>${asset.symbol}</td>
+                <td data-coin="${asset.symbol}" data-type="price">$${asset.price.toFixed(2)}</td>
+                <td data-coin="${asset.symbol}" data-type="volume">📈 ${formatNumber(asset.volume)}</td>
+                <td data-coin="${asset.symbol}" data-type="change" style="color: ${asset.change_24h >= 0 ? "green" : "red"}">
+                    ${asset.change_24h.toFixed(2)}%
+                </td>
+            `;
+            marketContainer.appendChild(row);
+        } else {
+            console.error("❌ Ongeldige data voor asset:", asset);
+        }
     });
 }
 
