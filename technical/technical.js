@@ -8,18 +8,18 @@ document.addEventListener("DOMContentLoaded", function () {
     setInterval(loadTechAnalysis, 60000); // 🔄 Elke minuut updaten
 });
 
-const apiUrl = `${API_BASE_URL}/technical_data`;
+const apiUrl = `${API_BASE_URL}/technical_data`;  // ✅ Correcte API URL
 
 // ✅ **Technische Analyse laden vanaf AWS**
 async function loadTechAnalysis() {
     setText("techStatus", "📡 Laden...");
 
     try {
-        let data = await safeFetch(apiUrl);
-        if (!data || !data.symbol) throw new Error("Ongeldige API-response");
+        let data = await safeFetch(apiUrl);  // Haal technische data op
+        if (!data || !Array.isArray(data)) throw new Error("Ongeldige API-response");  // Controleren of het een array is
 
         console.log("📊 Ontvangen technische analyse data:", data);
-        renderTechTable([data]); // ✅ Alleen de meest recente data tonen
+        renderTechTable(data); // ✅ Data is nu een array van assets
         setText("techStatus", "✅ Data up-to-date");
     } catch (error) {
         showError("techStatus", "❌ Fout bij laden.");
@@ -29,7 +29,7 @@ async function loadTechAnalysis() {
 // ✅ **Tabel vullen met data**
 function renderTechTable(assets) {
     let tableBody = document.querySelector("#analysisTable tbody");
-    tableBody.innerHTML = "";
+    tableBody.innerHTML = ""; // Maak de tabel leeg
 
     assets.forEach(asset => {
         let newRow = document.createElement("tr");
