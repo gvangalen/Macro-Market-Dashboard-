@@ -1,90 +1,65 @@
-import { API_BASE_URL } from "../config.js"; // ✅ Gebruik centrale API-config
+const marketApiUrl = "http://13.60.235.90:5002/market_data"; // ✅ AWS API endpoint
 
-console.log("✅ market.js correct geladen!");
+async function fetchMarketData() {
+    try {
+        let response = await fetch(marketApiUrl);
+        if (!response.ok) throw new Error("❌ API-fout bij ophalen marktdata!");
+
+        let data = await response.json();
+        if (!data.crypto || Object.keys(data.crypto).length === 0) throw new Error("❌ Geen crypto-data beschikbaar!");
+
+        let marketBody = document.getElementById("marketBody");
+        marketBody.innerHTML = ""; // 🔄 Oude data wissen
+
+        // ✅ Zet data om naar een array en filter ontbrekende waarden
+        let cryptoData = Object.entries(data.crypto)
+            .map(([name, coinData]) => ({
+                name: name.toUpperCase(),
+                open: coinData.open ?? "N/A",
+                high: coinData.high ?? "N/A",
+                low: coinData.low ?? "N/A",
+                close: coinData.close ?? "N/A",
+                change_24h: coinData.change_24h ?? 0,
+                market_cap: coinData.market_cap ?? 0,
+                volume: coinData.volume ?? 0
+            }))
+            .sort((a, b) => b.market_cap - a.market_cap); // 🔄 Sorteer op marktkapitalisatie (grootste bovenaan)
+
+        // ✅ Genereer rijen in de tabel
+        cryptoData.forEach(coin => {
+            let row = document.createElement("tr");
+            row.innerHTML = `
+                <td>${coin.name}</td>
+                <td>${formatNumber(coin.open, true)}</td>
+                <td>${formatNumber(coin.high, true)}</td>
+                <td>${formatNumber(coin.low, true)}</td>
+                <td>${formatNumber(coin.close, true)}</td>
+                <td style="color: ${coin.change_24h >= 0 ? "green" : "red"};">
+                    ${coin.change_24h.toFixed(2)}%
+                </td>
+                <td>${formatNumber(coin.market_cap)}</td>
+                <td>${formatNumber(coin.volume)}</td>
+            `;
+            marketBody.appendChild(row);
+        });
+
+        document.getElementById("marketStatus").textContent = "✅ Marktdata up-to-date!";
+    } catch (error) {
+        console.error(error);
+        document.getElementById("marketStatus").textContent = "❌ Fout bij ophalen marktdata!";
+    }
+}
+
+// ✅ **Slimme formatter voor grote getallen (miljoenen/miljarden)**
+function formatNumber(num, isPrice = false) {
+    if (num === "N/A") return num; // ❌ Voorkomt NaN fouten
+    let formatted = num >= 1e9 ? `${(num / 1e9).toFixed(2)}B` :
+                    num >= 1e6 ? `${(num / 1e6).toFixed(2)}M` :
+                    isPrice ? `$${parseFloat(num).toFixed(2)}` : parseFloat(num).toLocaleString();
+    return formatted;
+}
 
 document.addEventListener("DOMContentLoaded", function () {
-    console.log("📌 Marktdata wordt geladen...");
     fetchMarketData();
     setInterval(fetchMarketData, 60000); // 🔄 Elke minuut updaten
 });
-
-// ✅ **Helperfunctie voor veilige API-aanvragen met retry**
-async function safeFetch(url) {
-    let retries = 3;
-    while (retries > 0) {
-        try {
-            let response = await fetch(`${API_BASE_URL}${url}`);
-            if (!response.ok) throw new Error(`Fout bij ophalen data van ${url}`);
-
-            let data = await response.json();
-            if (!data || Object.keys(data).length === 0) {
-                throw new Error(`Lege of ongeldige data ontvangen van ${url}`);
-            }
-
-            return data;
-        } catch (error) {
-            console.error(`❌ API-fout bij ${url}:`, error);
-            retries--;
-            if (retries === 0) return null;
-            await new Promise(resolve => setTimeout(resolve, 2000)); // ⏳ 2 sec wachten
-        }
-    }
-}
-
-// ✅ **Marktdata ophalen en UI bijwerken**
-async function fetchMarketData() {
-    let data = await safeFetch("/market_data");
-    if (!data || !Array.isArray(data)) {
-        return showErrorState();
-    }
-
-    console.log("📊 Ontvangen API-marketdata:", data);
-
-    updateMarketUI(data);
-}
-
-// ✅ **UI bijwerken met marktdata**
-function updateMarketUI(marketData) {
-    let marketContainer = document.getElementById("marketContainer");
-    if (!marketContainer) {
-        console.error("❌ HTML-element voor market data niet gevonden!");
-        return;
-    }
-
-    marketContainer.innerHTML = ""; // ✅ Eerst leegmaken voor nieuwe data
-
-    marketData.forEach(asset => {
-        // Checken of de vereiste data aanwezig is
-        if (asset.symbol && asset.price && asset.volume !== undefined && asset.change_24h !== undefined) {
-            let row = document.createElement("tr");
-            row.innerHTML = `
-                <td>${asset.symbol}</td>
-                <td data-coin="${asset.symbol}" data-type="price">$${asset.price.toFixed(2)}</td>
-                <td data-coin="${asset.symbol}" data-type="volume">📈 ${formatNumber(asset.volume)}</td>
-                <td data-coin="${asset.symbol}" data-type="change" style="color: ${asset.change_24h >= 0 ? "green" : "red"}">
-                    ${asset.change_24h.toFixed(2)}%
-                </td>
-            `;
-            marketContainer.appendChild(row);
-        } else {
-            console.error("❌ Ongeldige data voor asset:", asset);
-        }
-    });
-}
-
-// ✅ **Fallback bij API-fout**
-function showErrorState() {
-    let marketContainer = document.getElementById("marketContainer");
-    if (!marketContainer) return;
-    
-    marketContainer.innerHTML = `<tr><td colspan="4">⚠️ Fout bij laden van marktdata.</td></tr>`;
-}
-
-// ✅ **Hulpfunctie voor grote getallen (M = miljoen, B = miljard)**
-function formatNumber(num) {
-    return num >= 1e9
-        ? `${(num / 1e9).toFixed(2)}B`
-        : num >= 1e6
-        ? `${(num / 1e6).toFixed(2)}M`
-        : num.toLocaleString();
-}
