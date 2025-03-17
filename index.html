@@ -1,117 +1,148 @@
-document.addEventListener("DOMContentLoaded", function () {
-    console.log("📌 Technische Analyse geladen!");
-    loadTechAnalysis(); // Laad bestaande analyses bij start
-});
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>📊 Technische Analyse</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script type="module" src="path/to/your/updated/script.js"></script> <!-- Correcte pad naar de JavaScript file -->
+</head>
+<body>
+    <h2>📊 Technische Analyse</h2>
+    <div>
+        <button onclick="addTechRow()">➕ Asset toevoegen</button>
+        <button onclick="addTechIndicator()">➕ Indicator toevoegen</button>
+    </div>
 
-const apiUrl = "http://13.60.235.90:5002/technical_analysis"; // ✅ API endpoint
+    <table id="analysisTable">
+        <thead>
+            <tr>
+                <th>Asset</th>
+                <th>Indicatoren</th>
+                <th>Verwijderen</th>
+            </tr>
+        </thead>
+        <tbody></tbody>
+    </table>
 
-// ✅ **Technische Analyse laden vanaf API**
-async function loadTechAnalysis() {
-    try {
-        let response = await fetch(apiUrl);
-        if (!response.ok) throw new Error("❌ Fout bij ophalen technische analyse");
-
-        let data = await response.json();
-        console.log("📊 Ontvangen technische analyse data:", data);
-        renderTechTable(data);
-    } catch (error) {
-        console.error(error);
-        alert("❌ Er is een fout opgetreden bij het laden van de technische analyse.");
-    }
-}
-
-// ✅ **Tabel genereren op basis van data**
-function renderTechTable(data) {
-    let tableBody = document.getElementById("analysisTable").getElementsByTagName("tbody")[0];
-    tableBody.innerHTML = ""; // Tabel opschonen
-
-    data.assets.forEach(asset => {
-        let newRow = tableBody.insertRow();
-        newRow.insertCell(0).innerText = asset.name;
-
-        asset.indicators.forEach(indicator => {
-            let newCell = newRow.insertCell(-1);
-            newCell.innerText = indicator.value;
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            console.log("📌 Technische Analyse geladen!");
+            loadTechAnalysis(); // Laad bestaande analyses bij start
         });
 
-        let deleteCell = newRow.insertCell(-1);
-        deleteCell.innerHTML = `<button class="btn-remove" onclick="removeTechRow('${asset.id}', this)">❌</button>`;
-    });
-}
+        const apiUrl = "http://13.60.235.90:5002/technical_analysis"; // ✅ API endpoint
 
-// ✅ **Asset toevoegen met bestaande indicatoren**
-window.addTechRow = async function () {
-    let assetName = prompt("🔹 Voer de naam van de asset in:");
-    if (!assetName) return;
+        // ✅ **Technische Analyse laden vanaf API**
+        async function loadTechAnalysis() {
+            try {
+                let response = await fetch(apiUrl);
+                if (!response.ok) throw new Error("❌ Fout bij ophalen technische analyse");
 
-    try {
-        let response = await fetch(apiUrl, {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ name: assetName, indicators: [] })
-        });
+                let data = await response.json();
+                console.log("📊 Ontvangen technische analyse data:", data);
+                renderTechTable(data);
+            } catch (error) {
+                console.error(error);
+                alert("❌ Er is een fout opgetreden bij het laden van de technische analyse.");
+            }
+        }
 
-        if (!response.ok) throw new Error("❌ Fout bij toevoegen asset");
+        // ✅ **Tabel genereren op basis van data**
+        function renderTechTable(data) {
+            let tableBody = document.getElementById("analysisTable").getElementsByTagName("tbody")[0];
+            tableBody.innerHTML = ""; // Tabel opschonen
 
-        loadTechAnalysis(); // **Direct herladen**
-        alert("✅ Asset succesvol toegevoegd!");
-    } catch (error) {
-        console.error(error);
-        alert("❌ Asset toevoegen mislukt.");
-    }
-};
+            data.assets.forEach(asset => {
+                let newRow = tableBody.insertRow();
+                newRow.insertCell(0).innerText = asset.name;
 
-// ✅ **Indicator toevoegen aan alle assets**
-window.addTechIndicator = async function () {
-    let indicatorName = prompt("📊 Voer de naam van de indicator in:");
-    if (!indicatorName) return;
+                asset.indicators.forEach(indicator => {
+                    let newCell = newRow.insertCell(-1);
+                    newCell.innerText = indicator.value;
+                });
 
-    try {
-        let response = await fetch(`${apiUrl}/indicators`, {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ name: indicatorName })
-        });
+                let deleteCell = newRow.insertCell(-1);
+                deleteCell.innerHTML = `<button class="btn-remove" onclick="removeTechRow('${asset.id}', this)">❌</button>`;
+            });
+        }
 
-        if (!response.ok) throw new Error("❌ Fout bij toevoegen indicator");
+        // ✅ **Asset toevoegen met bestaande indicatoren**
+        window.addTechRow = async function () {
+            let assetName = prompt("🔹 Voer de naam van de asset in:");
+            if (!assetName) return;
 
-        loadTechAnalysis();
-        alert("✅ Indicator succesvol toegevoegd!");
-    } catch (error) {
-        console.error(error);
-        alert("❌ Indicator toevoegen mislukt.");
-    }
-};
+            try {
+                let response = await fetch(apiUrl, {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ name: assetName, indicators: [] })
+                });
 
-// ✅ **Asset verwijderen met directe UI-feedback**
-window.removeTechRow = async function (assetId, button) {
-    button.disabled = true; // **Knop uitschakelen om dubbel klikken te voorkomen**
-    try {
-        let response = await fetch(`${apiUrl}/${assetId}`, { method: "DELETE" });
-        if (!response.ok) throw new Error("❌ Fout bij verwijderen asset");
+                if (!response.ok) throw new Error("❌ Fout bij toevoegen asset");
 
-        loadTechAnalysis();
-        alert("✅ Asset succesvol verwijderd!");
-    } catch (error) {
-        console.error(error);
-        alert("❌ Asset verwijderen mislukt.");
-    } finally {
-        button.disabled = false; // **Knop weer inschakelen**
-    }
-};
+                loadTechAnalysis(); // **Direct herladen**
+                alert("✅ Asset succesvol toegevoegd!");
+            } catch (error) {
+                console.error(error);
+                alert("❌ Asset toevoegen mislukt.");
+            }
+        };
 
-// ✅ **Indicator verwijderen**
-window.removeTechIndicator = async function (button) {
-    let indicatorName = button.parentNode.textContent.trim();
+        // ✅ **Indicator toevoegen aan alle assets**
+        window.addTechIndicator = async function () {
+            let indicatorName = prompt("📊 Voer de naam van de indicator in:");
+            if (!indicatorName) return;
 
-    try {
-        let response = await fetch(`${apiUrl}/indicators/${indicatorName}`, { method: "DELETE" });
-        if (!response.ok) throw new Error("❌ Fout bij verwijderen indicator");
+            try {
+                let response = await fetch(`${apiUrl}/indicators`, {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ name: indicatorName })
+                });
 
-        loadTechAnalysis();
-        alert("✅ Indicator succesvol verwijderd!");
-    } catch (error) {
-        console.error(error);
-        alert("❌ Indicator verwijderen mislukt.");
-    }
-};
+                if (!response.ok) throw new Error("❌ Fout bij toevoegen indicator");
+
+                loadTechAnalysis();
+                alert("✅ Indicator succesvol toegevoegd!");
+            } catch (error) {
+                console.error(error);
+                alert("❌ Indicator toevoegen mislukt.");
+            }
+        };
+
+        // ✅ **Asset verwijderen met directe UI-feedback**
+        window.removeTechRow = async function (assetId, button) {
+            button.disabled = true; // **Knop uitschakelen om dubbel klikken te voorkomen**
+            try {
+                let response = await fetch(`${apiUrl}/${assetId}`, { method: "DELETE" });
+                if (!response.ok) throw new Error("❌ Fout bij verwijderen asset");
+
+                loadTechAnalysis();
+                alert("✅ Asset succesvol verwijderd!");
+            } catch (error) {
+                console.error(error);
+                alert("❌ Asset verwijderen mislukt.");
+            } finally {
+                button.disabled = false; // **Knop weer inschakelen**
+            }
+        };
+
+        // ✅ **Indicator verwijderen**
+        window.removeTechIndicator = async function (button) {
+            let indicatorName = button.parentNode.textContent.trim();
+
+            try {
+                let response = await fetch(`${apiUrl}/indicators/${indicatorName}`, { method: "DELETE" });
+                if (!response.ok) throw new Error("❌ Fout bij verwijderen indicator");
+
+                loadTechAnalysis();
+                alert("✅ Indicator succesvol verwijderd!");
+            } catch (error) {
+                console.error(error);
+                alert("❌ Indicator verwijderen mislukt.");
+            }
+        };
+    </script>
+</body>
+</html>
