@@ -56,6 +56,11 @@
             let data = await response.json();
             console.log("📊 Dashboard API data:", data);
 
+            // ✅ Validatie van de ontvangen data
+            if (!data.macroScore || !data.technicalScore || !data.activeSetups) {
+                throw new Error("❌ Ontbrekende gegevens in de API-respons");
+            }
+
             updateGauge(macroGauge, data.macroScore);
             updateGauge(technicalGauge, data.technicalScore);
             updateGauge(setupGauge, data.activeSetups);
