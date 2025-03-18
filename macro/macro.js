@@ -38,7 +38,7 @@ async function updateMacroData() {
 
     let fearGreed = parseInt(data.fear_greed_index) || 0;
     let btcDominance = parseFloat(data.btc_dominance).toFixed(2) || "N/A";
-    let dxy = parseFloat(data.dxy).toFixed(2) || "N/A";
+    let dxy = isNaN(data.dxy) ? "N/A" : parseFloat(data.dxy).toFixed(2); // Controleer op NaN voor DXY
 
     console.log("📊 API Macro Data:", { fearGreed, btcDominance, dxy });
 
@@ -53,6 +53,8 @@ function updateMacroIndicator(indicator, value) {
     if (element) element.innerText = value;
 
     let score = calculateMacroScore(indicator, value);
+    if (isNaN(score)) score = 0;  // Voeg controle toe op NaN waarde
+
     let scoreCell = element?.parentNode?.querySelector(".macro-score");
     if (scoreCell) scoreCell.innerText = score;
 
