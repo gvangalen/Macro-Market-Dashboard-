@@ -14,21 +14,61 @@
     <p id="dashboardStatus" class="loading">📡 Data laden...</p>
 
     <div class="dashboard-container">
+        <!-- Macro Gauge -->
         <div class="gauge-wrapper">
             <canvas id="macroGauge"></canvas>
             <span>📉 Macro</span>
         </div>
 
+        <!-- Technical Gauge -->
         <div class="gauge-wrapper">
             <canvas id="technicalGauge"></canvas>
             <span>📈 Technisch</span>
         </div>
 
+        <!-- Setup Gauge -->
         <div class="gauge-wrapper">
             <canvas id="setupGauge"></canvas>
             <span>📊 Setup</span>
         </div>
     </div>
+
+    <!-- Macro Indicatoren Tabel -->
+    <h3>📊 Macro Indicatoren</h3>
+    <table id="macroTable">
+        <thead>
+            <tr>
+                <th>Indicator</th>
+                <th>Waarde</th>
+            </tr>
+        </thead>
+        <tbody></tbody>
+    </table>
+
+    <!-- Technical Indicatoren Tabel -->
+    <h3>📊 Technische Indicatoren</h3>
+    <table id="technicalTable">
+        <thead>
+            <tr>
+                <th>Indicator</th>
+                <th>Waarde</th>
+            </tr>
+        </thead>
+        <tbody></tbody>
+    </table>
+
+    <!-- Setup Tabel -->
+    <h3>📊 Setups</h3>
+    <table id="setupTable">
+        <thead>
+            <tr>
+                <th>Setup</th>
+                <th>Status</th>
+            </tr>
+        </thead>
+        <tbody></tbody>
+    </table>
+
 </div>
 
 <!-- ✅ JavaScript-bestanden laden -->
@@ -66,6 +106,12 @@
             updateGauge(setupGauge, data.activeSetups);
 
             document.getElementById("dashboardStatus").textContent = "✅ Dashboard up-to-date!";
+
+            // Update de tabellen met macro en technische gegevens
+            renderMacroTable(data.macroIndicators);
+            renderTechnicalTable(data.technicalIndicators);
+            renderSetupTable(data.setups);
+
         } catch (error) {
             console.error("❌ Dashboard API-fout:", error);
             document.getElementById("dashboardStatus").textContent = "❌ Fout bij laden dashboard-data.";
@@ -98,6 +144,39 @@
         let index = score >= 1 ? 2 : score <= -1 ? 0 : 1;
         gauge.data.datasets[0].data = [index === 0 ? 100 : 33, index === 1 ? 100 : 33, index === 2 ? 100 : 33];
         gauge.update();
+    }
+
+    // ✅ Render Macro Indicatoren Tabel
+    function renderMacroTable(data) {
+        let tableBody = document.getElementById("macroTable").getElementsByTagName("tbody")[0];
+        tableBody.innerHTML = "";
+        data.forEach(indicator => {
+            let newRow = tableBody.insertRow();
+            newRow.insertCell(0).innerText = indicator.name;
+            newRow.insertCell(1).innerText = indicator.value;
+        });
+    }
+
+    // ✅ Render Technical Indicatoren Tabel
+    function renderTechnicalTable(data) {
+        let tableBody = document.getElementById("technicalTable").getElementsByTagName("tbody")[0];
+        tableBody.innerHTML = "";
+        data.forEach(indicator => {
+            let newRow = tableBody.insertRow();
+            newRow.insertCell(0).innerText = indicator.name;
+            newRow.insertCell(1).innerText = indicator.value;
+        });
+    }
+
+    // ✅ Render Setup Tabel
+    function renderSetupTable(data) {
+        let tableBody = document.getElementById("setupTable").getElementsByTagName("tbody")[0];
+        tableBody.innerHTML = "";
+        data.forEach(setup => {
+            let newRow = tableBody.insertRow();
+            newRow.insertCell(0).innerText = setup.name;
+            newRow.insertCell(1).innerText = setup.status;
+        });
     }
 </script>
 
