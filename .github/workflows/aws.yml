@@ -3,7 +3,7 @@ name: Deploy to AWS S3
 on:
   push:
     branches:
-      - main
+      - main  # Voer deze workflow alleen uit bij push naar main branch
 
 jobs:
   upload-to-s3:
@@ -29,7 +29,7 @@ jobs:
       - name: Debug - Toon beschikbare S3 buckets
         run: aws s3 ls
 
-      - name: Debug - Print AWS versie en sync commando
+      - name: Debug - Print AWS CLI versie en sync commando
         run: |
           echo "AWS CLI versie:"
           aws --version
