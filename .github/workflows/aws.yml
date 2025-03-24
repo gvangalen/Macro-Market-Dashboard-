@@ -8,6 +8,7 @@ on:
 jobs:
   upload-to-s3:
     runs-on: ubuntu-latest
+
     steps:
       - name: Checkout repository
         uses: actions/checkout@v3
@@ -19,10 +20,19 @@ jobs:
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: ${{ secrets.AWS_REGION }}
 
-      - name: Install AWS CLI  # <== Dit is de extra stap
+      - name: Install AWS CLI
         run: |
           sudo apt-get update
           sudo apt-get install -y awscli
+
+      - name: Debug - Toon huidige bestanden in de repo
+        run: ls -la
+
+      - name: Debug - Toon actieve AWS configuratie
+        run: aws configure list
+
+      - name: Debug - Toon beschikbare S3 buckets
+        run: aws s3 ls
 
       - name: Upload to S3
         run: |
