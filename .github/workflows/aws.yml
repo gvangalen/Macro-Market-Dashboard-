@@ -3,7 +3,7 @@ name: Deploy to AWS S3
 on:
   push:
     branches:
-      - main  # Trigger bij elke push naar de main branch
+      - main
 
 jobs:
   upload-to-s3:
@@ -38,5 +38,5 @@ jobs:
           echo "aws s3 sync . s3://${{ secrets.S3_BUCKET_NAME }} --delete"
 
       - name: Upload to S3
-        shell: bash
-        run: aws s3 sync . s3://${{ secrets.S3_BUCKET_NAME }} --delete
+        run: |
+          aws s3 sync . s3://${{ secrets.S3_BUCKET_NAME }} --delete
