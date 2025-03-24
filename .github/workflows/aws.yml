@@ -3,7 +3,7 @@ name: Deploy to AWS S3
 on:
   push:
     branches:
-      - main  # Deze workflow draait bij een push naar de main branch
+      - main
 
 jobs:
   upload-to-s3:
@@ -20,22 +20,6 @@ jobs:
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: ${{ secrets.AWS_REGION }}
 
-      - name: Debug - Toon huidige bestanden in de repo
-        run: ls -la
-
-      - name: Debug - Toon actieve AWS configuratie
-        run: aws configure list
-
-      - name: Debug - Toon beschikbare S3 buckets
-        run: aws s3 ls
-
-      - name: Debug - Print AWS versie en sync commando
-        run: |
-          echo "AWS CLI versie:"
-          aws --version
-          echo "S3 Bucket: ${{ secrets.S3_BUCKET_NAME }}"
-          echo "Commando dat uitgevoerd wordt:"
-          echo "aws s3 sync . s3://${{ secrets.S3_BUCKET_NAME }} --delete"
-
       - name: Upload to S3
         run: aws s3 sync . s3://${{ secrets.S3_BUCKET_NAME }} --delete
+        
