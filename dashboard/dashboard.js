@@ -9,8 +9,8 @@ document.addEventListener("DOMContentLoaded", function () {
     const setupGauge = createGauge("setupGauge", "Setup");
 
     // ✅ API ophalen en dashboard updaten
-    fetchMarketData(macroGauge, technicalGauge, setupGauge);
-    setInterval(() => fetchMarketData(macroGauge, technicalGauge, setupGauge), 300000); // Elke 5 min verversen
+    fetchDashboardData(macroGauge, technicalGauge, setupGauge);
+    setInterval(() => fetchDashboardData(macroGauge, technicalGauge, setupGauge), 300000); // Elke 5 min verversen
 });
 
 // ✅ **Helperfunctie voor veilige API-aanvragen met retry**
@@ -63,50 +63,59 @@ function createGauge(elementId, label) {
     });
 }
 
-// ✅ **Data ophalen en meters updaten**
-async function fetchMarketData(macroGauge, technicalGauge, setupGauge) {
-    let macroData = await safeFetch("/macro_data"); // ✅ API voor macro
-    let marketData = await safeFetch("/market_data"); // ✅ API voor marktdata
+// ✅ **Dashboard data ophalen**
+async function fetchDashboardData(macroGauge, technicalGauge, setupGauge) {
+    const data = await safeFetch("/dashboard_data");
+    if (!data) return console.error("❌ Dashboard-data niet beschikbaar");
 
-    if (!macroData) return console.error("❌ Ongeldige of ontbrekende macro-data ontvangen!");
-    if (!marketData || !Array.isArray(marketData)) return console.error("❌ Ongeldige of lege marktdata ontvangen!");
+    try {
+        // ✅ Macro score op basis van macro_data
+        const latestMacro = await safeFetch("/macro_data");
+        if (macroGauge && latestMacro) {
+            const macroScore = calculateMacroScore(latestMacro);
+            updateGauge(macroGauge, macroScore);
+        }
 
-    let btc = marketData.find(asset => asset.symbol === "BTC");
-    if (!btc) return console.error("❌ Geen Bitcoin-data gevonden!");
+        // ✅ Technische score op basis van market_data
+        const btc = data.market_data?.find(d => d.symbol === "BTC");
+        if (technicalGauge && btc) {
+            const techScore = calculateTechnicalScore(btc);
+            updateGauge(technicalGauge, techScore);
+        }
 
-    console.log("📊 Ontvangen API Macro Data:", macroData);
-    console.log("📊 Ontvangen API Market Data:", marketData);
+        // ✅ Setup score
+        if (setupGauge) {
+            const setups = await safeFetch("/setups?symbol=BTC");
+            const activeSetups = Array.isArray(setups) ? setups.length : 0;
+            updateGauge(setupGauge, activeSetups > 0 ? 2 : -2);
+        }
 
-    // ✅ Update gauges
-    if (macroGauge) updateGauge(macroGauge, calculateMacroScore(macroData));
-    if (technicalGauge) updateGauge(technicalGauge, calculateTechnicalScore(btc));
-    if (setupGauge) checkActiveSetups(setupGauge, marketData);
+        console.log("✅ Dashboard bijgewerkt!");
+    } catch (e) {
+        console.error("❌ Fout bij verwerken dashboard-data:", e);
+    }
 }
 
-// ✅ **Bereken Macro Score op basis van alleen 3 factoren**
+// ✅ **Macro score berekenen**
 function calculateMacroScore(macroData) {
     let score = 0;
-
-    // ✅ Fear & Greed Index
     if (macroData.fear_greed_index > 75) score += 2;
     else if (macroData.fear_greed_index > 50) score += 1;
     else if (macroData.fear_greed_index > 30) score -= 1;
     else score -= 2;
 
-    // ✅ BTC Dominantie
     if (macroData.btc_dominance > 55) score += 1;
     else if (macroData.btc_dominance < 50) score -= 1;
 
-    // ✅ DXY (Dollar Index)
     if (macroData.dxy < 100) score += 2;
     else if (macroData.dxy < 103) score += 1;
     else if (macroData.dxy < 106) score -= 1;
     else score -= 2;
 
-    return Math.max(-2, Math.min(2, score)); // Limiteer tussen -2 en 2
+    return Math.max(-2, Math.min(2, score));
 }
 
-// ✅ **Bereken Technische Score**
+// ✅ **Technische score berekenen**
 function calculateTechnicalScore(btc) {
     let score = 0;
     if (btc.change_24h > 3) score += 2;
@@ -114,24 +123,15 @@ function calculateTechnicalScore(btc) {
     else if (btc.change_24h < -3) score -= 2;
     else score -= 1;
 
-    if (btc.volume > 50000000000) score += 1; // Hoge volume bullish
+    if (btc.volume > 50000000000) score += 1;
 
-    return Math.max(-2, Math.min(2, score)); // Limiteer score tussen -2 en 2
+    return Math.max(-2, Math.min(2, score));
 }
 
-// ✅ **Update gauge met nieuwe waarde**
+// ✅ **Update gauge visueel**
 function updateGauge(gauge, score) {
     if (!gauge) return;
     let index = Math.max(0, Math.min(4, Math.round((score + 2) / 4 * 4)));
     gauge.data.datasets[0].data = gauge.data.datasets[0].data.map((v, i) => (i === index ? 100 : 20));
     gauge.update();
-}
-
-// ✅ **Check actieve setups en update SetupGauge**
-function checkActiveSetups(setupGauge, marketData) {
-    let setups = JSON.parse(localStorage.getItem("setups")) || [];
-    let activeSetups = setups.filter(setup => setup.trend === marketData.trend).length;
-
-    console.log(`🔎 Actieve setups gevonden: ${activeSetups}`);
-    updateGauge(setupGauge, activeSetups > 0 ? 2 : -2);
 }
