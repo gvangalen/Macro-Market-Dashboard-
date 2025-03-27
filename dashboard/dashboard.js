@@ -1,6 +1,6 @@
 import { API_BASE_URL } from "../config.js";
 
-console.log("✅ Dashboard.js versie 2025-03-27 23:10 geladen");
+console.log("✅ Dashboard.js versie 2025-03-27 23:11 geladen");
 
 document.addEventListener("DOMContentLoaded", function () {
     console.log("📌 Dashboard geladen!");
