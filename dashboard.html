@@ -18,56 +18,57 @@
     <p id="dashboardStatus" class="loading">📡 Data laden...</p>
 
     <div class="dashboard-container">
-        <!-- Macro Gauge -->
         <div class="gauge-wrapper">
             <canvas id="macroGauge"></canvas>
             <span>📉 Macro</span>
         </div>
-
-        <!-- Technical Gauge -->
         <div class="gauge-wrapper">
             <canvas id="technicalGauge"></canvas>
             <span>📈 Technisch</span>
         </div>
-
-        <!-- Setup Gauge -->
         <div class="gauge-wrapper">
             <canvas id="setupGauge"></canvas>
             <span>📊 Setup</span>
         </div>
     </div>
 
-    <!-- Macro Indicatoren Tabel -->
+    <!-- Macro Indicatoren -->
     <h3>📊 Macro Indicatoren</h3>
+    <button onclick="addMacroIndicator()">➕ Toevoegen</button>
     <table id="macroTable">
         <thead>
             <tr>
                 <th>Indicator</th>
                 <th>Waarde</th>
+                <th>🗑️</th>
             </tr>
         </thead>
         <tbody></tbody>
     </table>
 
-    <!-- Technische Indicatoren Tabel -->
+    <!-- Technische Indicatoren -->
     <h3>📊 Technische Indicatoren</h3>
+    <button onclick="addTechnicalIndicator()">➕ Toevoegen</button>
     <table id="technicalTable">
         <thead>
             <tr>
                 <th>Indicator</th>
                 <th>Waarde</th>
+                <th>🗑️</th>
             </tr>
         </thead>
         <tbody></tbody>
     </table>
 
-    <!-- Setup Tabel -->
+    <!-- Setups -->
     <h3>📊 Setups</h3>
+    <button onclick="addSetup()">➕ Toevoegen</button>
     <table id="setupTable">
         <thead>
             <tr>
                 <th>Setup</th>
                 <th>Status</th>
+                <th>🗑️</th>
             </tr>
         </thead>
         <tbody></tbody>
@@ -79,8 +80,38 @@
     Versie: 2025-03-27 22:45
 </p>
 
-<!-- ✅ Extern JavaScript-bestand laden -->
+<!-- ✅ Extern JS-bestand -->
 <script type="module" src="dashboard/dashboard.js"></script>
+
+<!-- ✅ Inline testfuncties -->
+<script>
+    function addMacroIndicator() {
+        const table = document.getElementById("macroTable").getElementsByTagName("tbody")[0];
+        const row = table.insertRow();
+        row.insertCell(0).innerText = "Nieuwe Macro";
+        row.insertCell(1).innerText = "100";
+        const deleteCell = row.insertCell(2);
+        deleteCell.innerHTML = "<button onclick='this.closest(\"tr\").remove()'>🗑️</button>";
+    }
+
+    function addTechnicalIndicator() {
+        const table = document.getElementById("technicalTable").getElementsByTagName("tbody")[0];
+        const row = table.insertRow();
+        row.insertCell(0).innerText = "Nieuwe Technische";
+        row.insertCell(1).innerText = "75";
+        const deleteCell = row.insertCell(2);
+        deleteCell.innerHTML = "<button onclick='this.closest(\"tr\").remove()'>🗑️</button>";
+    }
+
+    function addSetup() {
+        const table = document.getElementById("setupTable").getElementsByTagName("tbody")[0];
+        const row = table.insertRow();
+        row.insertCell(0).innerText = "Setup X";
+        row.insertCell(1).innerText = "Actief";
+        const deleteCell = row.insertCell(2);
+        deleteCell.innerHTML = "<button onclick='this.closest(\"tr\").remove()'>🗑️</button>";
+    }
+</script>
 
 </body>
 </html>
