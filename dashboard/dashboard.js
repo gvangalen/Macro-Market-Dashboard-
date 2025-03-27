@@ -1,6 +1,6 @@
 import { API_BASE_URL } from "../config.js";
 
-console.log("✅ Dashboard.js versie 2025-03-27 22:58 geladen");
+console.log("✅ Dashboard.js versie 2025-03-27 23:10 geladen");
 
 document.addEventListener("DOMContentLoaded", function () {
     console.log("📌 Dashboard geladen!");
@@ -17,42 +17,52 @@ document.addEventListener("DOMContentLoaded", function () {
 });
 
 function initEmptyTables() {
-    const macroTable = document.querySelector("#macroTable tbody");
-    const technicalTable = document.querySelector("#technicalTable tbody");
-    const setupTable = document.querySelector("#setupTable tbody");
-    const marketTable = document.querySelector("#marketTable tbody");
-
-    if (macroTable.rows.length === 0) macroTable.appendChild(createEmptyRow());
-    if (technicalTable.rows.length === 0) technicalTable.appendChild(createEmptyRow());
-    if (setupTable.rows.length === 0) setupTable.appendChild(createEmptyRow());
-    if (marketTable && marketTable.rows.length === 0) marketTable.appendChild(createEmptyRow(5));
-}
-
-function createEmptyRow(cols = 2) {
-    const row = document.createElement("tr");
-    for (let i = 0; i < cols; i++) {
-        const cell = document.createElement("td");
-        cell.innerText = "–";
-        row.appendChild(cell);
-    }
-    return row;
+    ["macroTable", "technicalTable", "setupTable", "marketTable"].forEach((id) => {
+        const tbody = document.querySelector(`#${id} tbody`);
+        if (tbody && tbody.rows.length === 0) {
+            const colCount = tbody.closest("table").rows[0].cells.length;
+            const row = document.createElement("tr");
+            const cell = document.createElement("td");
+            cell.colSpan = colCount;
+            cell.style.textAlign = "center";
+            cell.innerText = "Geen data";
+            row.appendChild(cell);
+            tbody.appendChild(row);
+        }
+    });
 }
 
 function initTableButtons() {
-    document.getElementById("addMacroBtn")?.addEventListener("click", () => addRow("macroTable", ["Nieuwe Macro", "100"]));
-    document.getElementById("addTechnicalBtn")?.addEventListener("click", () => addRow("technicalTable", ["Nieuwe Technische", "75"]));
-    document.getElementById("addSetupBtn")?.addEventListener("click", () => addRow("setupTable", ["Setup X", "Actief"]));
+    document.getElementById("addMacroBtn")?.addEventListener("click", () =>
+        addTableRow("macroTable", ["Macro X", "100"])
+    );
+    document.getElementById("addTechnicalBtn")?.addEventListener("click", () =>
+        addTableRow("technicalTable", ["Technisch X", "80"])
+    );
+    document.getElementById("addSetupBtn")?.addEventListener("click", () =>
+        addTableRow("setupTable", ["Setup X", "Actief"])
+    );
 }
 
-function addRow(tableId, values) {
-    const tableBody = document.getElementById(tableId).getElementsByTagName("tbody")[0];
+function addTableRow(tableId, values) {
+    const tableBody = document.querySelector(`#${tableId} tbody`);
+    if (!tableBody) return;
+
+    if (tableBody.innerText.includes("Geen data") || tableBody.innerText.includes("–")) {
+        tableBody.innerHTML = "";
+    }
+
     const row = tableBody.insertRow();
-    values.forEach(val => row.insertCell().innerText = val);
+    values.forEach((val) => {
+        const cell = row.insertCell();
+        cell.innerText = val;
+    });
+
     const deleteCell = row.insertCell();
-    const trashBtn = document.createElement("button");
-    trashBtn.innerHTML = "🗑️";
-    trashBtn.onclick = () => row.remove();
-    deleteCell.appendChild(trashBtn);
+    const delBtn = document.createElement("button");
+    delBtn.innerText = "🗑️";
+    delBtn.addEventListener("click", () => row.remove());
+    deleteCell.appendChild(delBtn);
 }
 
 async function safeFetch(url) {
@@ -70,12 +80,12 @@ async function safeFetch(url) {
             console.error(`❌ API-fout bij ${url}:`, error);
             retries--;
             if (retries === 0) return null;
-            await new Promise(resolve => setTimeout(resolve, 2000));
+            await new Promise((r) => setTimeout(r, 2000));
         }
     }
 }
 
-function createGauge(elementId, label) {
+function createGauge(elementId) {
     const ctx = document.getElementById(elementId)?.getContext("2d");
     if (!ctx) return null;
     return new Chart(ctx, {
@@ -132,7 +142,7 @@ async function fetchDashboardData(macroGauge, technicalGauge, setupGauge) {
 
 function updateGauge(gauge, score) {
     if (!gauge) return;
-    let index = Math.max(0, Math.min(4, Math.round((score + 2) / 4 * 4)));
+    const index = Math.max(0, Math.min(4, Math.round((score + 2) / 4 * 4)));
     gauge.data.datasets[0].data = gauge.data.datasets[0].data.map((v, i) => (i === index ? 100 : 20));
     gauge.update();
 }
