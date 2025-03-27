@@ -10,6 +10,9 @@ document.addEventListener("DOMContentLoaded", function () {
     const technicalGauge = createGauge("technicalGauge", "Technisch");
     const setupGauge = createGauge("setupGauge", "Setup");
 
+    // ✅ Initialiseer lege tabellen als fallback
+    initEmptyTables();
+
     // ✅ API ophalen en dashboard updaten
     fetchDashboardData(macroGauge, technicalGauge, setupGauge);
     setInterval(() => fetchDashboardData(macroGauge, technicalGauge, setupGauge), 300000); // Elke 5 min verversen
@@ -71,21 +74,18 @@ async function fetchDashboardData(macroGauge, technicalGauge, setupGauge) {
     if (!data) return console.error("❌ Dashboard-data niet beschikbaar");
 
     try {
-        // ✅ Macro score op basis van macro_data
         const latestMacro = await safeFetch("/macro_data");
         if (macroGauge && latestMacro) {
             const macroScore = calculateMacroScore(latestMacro);
             updateGauge(macroGauge, macroScore);
         }
 
-        // ✅ Technische score op basis van market_data
         const btc = data.market_data?.find(d => d.symbol === "BTC");
         if (technicalGauge && btc) {
             const techScore = calculateTechnicalScore(btc);
             updateGauge(technicalGauge, techScore);
         }
 
-        // ✅ Setup score
         if (setupGauge) {
             const setups = await safeFetch("/setups?symbol=BTC");
             const activeSetups = Array.isArray(setups) ? setups.length : 0;
@@ -136,4 +136,29 @@ function updateGauge(gauge, score) {
     let index = Math.max(0, Math.min(4, Math.round((score + 2) / 4 * 4)));
     gauge.data.datasets[0].data = gauge.data.datasets[0].data.map((v, i) => (i === index ? 100 : 20));
     gauge.update();
+}
+
+// ✅ **Tonen van lege rijen als er geen data is**
+function initEmptyTables() {
+    const macroTable = document.querySelector("#macroTable tbody");
+    const technicalTable = document.querySelector("#technicalTable tbody");
+    const setupTable = document.querySelector("#setupTable tbody");
+
+    if (macroTable.rows.length === 0) {
+        const row = macroTable.insertRow();
+        row.insertCell(0).innerText = "–";
+        row.insertCell(1).innerText = "–";
+    }
+
+    if (technicalTable.rows.length === 0) {
+        const row = technicalTable.insertRow();
+        row.insertCell(0).innerText = "–";
+        row.insertCell(1).innerText = "–";
+    }
+
+    if (setupTable.rows.length === 0) {
+        const row = setupTable.insertRow();
+        row.insertCell(0).innerText = "–";
+        row.insertCell(1).innerText = "–";
+    }
 }
