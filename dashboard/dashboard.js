@@ -132,6 +132,7 @@ async function fetchDashboardData(macroGauge, technicalGauge, setupGauge) {
             const setups = await safeFetch("/api/setups?symbol=BTC");
             const activeSetups = Array.isArray(setups) ? setups.length : 0;
             updateGauge(setupGauge, activeSetups > 0 ? 2 : -2);
+            renderSetupTable(setups);
         }
 
         renderMarketTable(data.market_data, data.technical_data);
@@ -235,7 +236,7 @@ function renderTechnicalTable(technicalData) {
     if (technicalData.length === 0) {
         const row = tableBody.insertRow();
         const cell = row.insertCell();
-        cell.colSpan = 6;
+        cell.colSpan = 5;
         cell.style.textAlign = "center";
         cell.innerText = "Geen technische data gevonden";
         return;
@@ -257,4 +258,33 @@ function renderTechnicalTable(technicalData) {
     });
 
     console.log("✅ Technische indicatoren succesvol toegevoegd aan de tabel");
+}
+
+function renderSetupTable(setups) {
+    const tableBody = document.querySelector("#setupTable tbody");
+    if (!tableBody || !Array.isArray(setups)) return;
+
+    tableBody.innerHTML = "";
+    if (setups.length === 0) {
+        const row = tableBody.insertRow();
+        const cell = row.insertCell();
+        cell.colSpan = 2;
+        cell.style.textAlign = "center";
+        cell.innerText = "Geen data";
+        return;
+    }
+
+    setups.forEach(setup => {
+        const row = tableBody.insertRow();
+        row.insertCell().innerText = setup.name || "Setup";
+        row.insertCell().innerText = setup.status || "–";
+
+        const delCell = row.insertCell();
+        const delBtn = document.createElement("button");
+        delBtn.innerText = "🗑️";
+        delBtn.addEventListener("click", () => row.remove());
+        delCell.appendChild(delBtn);
+    });
+
+    console.log("✅ Setups succesvol toegevoegd aan de tabel");
 }
