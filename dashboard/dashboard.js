@@ -111,11 +111,11 @@ function createGauge(elementId) {
 }
 
 async function fetchDashboardData(macroGauge, technicalGauge, setupGauge) {
-    const data = await safeFetch("/dashboard_data");
+    const data = await safeFetch("/api/dashboard_data");
     if (!data) return console.error("❌ Dashboard-data niet beschikbaar");
 
     try {
-        const latestMacro = await safeFetch("/macro_data");
+        const latestMacro = await safeFetch("/api/macro_data");
         if (macroGauge && latestMacro) {
             const macroScore = calculateMacroScore(latestMacro);
             updateGauge(macroGauge, macroScore);
@@ -128,7 +128,7 @@ async function fetchDashboardData(macroGauge, technicalGauge, setupGauge) {
         }
 
         if (setupGauge) {
-            const setups = await safeFetch("/setups?symbol=BTC");
+            const setups = await safeFetch("/api/setups?symbol=BTC");
             const activeSetups = Array.isArray(setups) ? setups.length : 0;
             updateGauge(setupGauge, activeSetups > 0 ? 2 : -2);
         }
