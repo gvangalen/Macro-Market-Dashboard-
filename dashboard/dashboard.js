@@ -119,7 +119,7 @@ async function fetchDashboardData(macroGauge, technicalGauge, setupGauge) {
         if (macroGauge && latestMacro) {
             const macroScore = calculateMacroScore(latestMacro);
             updateGauge(macroGauge, macroScore);
-            renderMacroTable(latestMacro); // ✅ Macrodata tonen in tabel
+            renderMacroTable(latestMacro);
         }
 
         const btc = data.market_data?.find(d => d.symbol === "BTC");
@@ -135,6 +135,7 @@ async function fetchDashboardData(macroGauge, technicalGauge, setupGauge) {
         }
 
         renderMarketTable(data.market_data, data.technical_data);
+        renderTechnicalTable(data.technical_data);
         console.log("✅ Dashboard bijgewerkt!");
     } catch (e) {
         console.error("❌ Fout bij verwerken dashboard-data:", e);
@@ -195,12 +196,11 @@ function renderMarketTable(marketData, technicalData) {
     });
 }
 
-// ✅ Macrodata visueel toevoegen aan de tabel
 function renderMacroTable(macro) {
     const tableBody = document.querySelector("#macroTable tbody");
     if (!tableBody || !macro) return;
 
-    tableBody.innerHTML = ""; // Eerst leegmaken
+    tableBody.innerHTML = "";
 
     const indicators = [
         ["Fear & Greed Index", macro.fear_greed_index],
@@ -221,8 +221,8 @@ function renderMacroTable(macro) {
         delBtn.addEventListener("click", () => row.remove());
         delCell.appendChild(delBtn);
     });
+}
 
-    // ✅ Technische data toevoegen aan de technische indicatoren-tabel
 function renderTechnicalTable(technicalData) {
     const tableBody = document.querySelector("#technicalTable tbody");
     if (!tableBody || !Array.isArray(technicalData)) {
@@ -235,7 +235,7 @@ function renderTechnicalTable(technicalData) {
     if (technicalData.length === 0) {
         const row = tableBody.insertRow();
         const cell = row.insertCell();
-        cell.colSpan = 5;
+        cell.colSpan = 6;
         cell.style.textAlign = "center";
         cell.innerText = "Geen technische data gevonden";
         return;
@@ -257,5 +257,4 @@ function renderTechnicalTable(technicalData) {
     });
 
     console.log("✅ Technische indicatoren succesvol toegevoegd aan de tabel");
-}
 }
