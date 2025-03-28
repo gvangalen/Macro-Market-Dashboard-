@@ -1,6 +1,6 @@
 import { API_BASE_URL } from "../config.js";
 
-console.log("✅ Dashboard.js versie 2025-03-27 23:11 geladen");
+console.log("✅ Dashboard.js versie 2025-03-28 20:20 geladen");
 
 document.addEventListener("DOMContentLoaded", function () {
     console.log("📌 Dashboard geladen!");
@@ -119,6 +119,7 @@ async function fetchDashboardData(macroGauge, technicalGauge, setupGauge) {
         if (macroGauge && latestMacro) {
             const macroScore = calculateMacroScore(latestMacro);
             updateGauge(macroGauge, macroScore);
+            renderMacroTable(latestMacro); // ✅ Macrodata tonen in tabel
         }
 
         const btc = data.market_data?.find(d => d.symbol === "BTC");
@@ -191,5 +192,33 @@ function renderMarketTable(marketData, technicalData) {
         row.insertCell().innerText = Number(asset.volume).toLocaleString();
         row.insertCell().innerText = tech?.rsi ?? "–";
         row.insertCell().innerText = tech?.ma_200 ?? "–";
+    });
+}
+
+// ✅ Macrodata visueel toevoegen aan de tabel
+function renderMacroTable(macro) {
+    const tableBody = document.querySelector("#macroTable tbody");
+    if (!tableBody || !macro) return;
+
+    tableBody.innerHTML = ""; // Eerst leegmaken
+
+    const indicators = [
+        ["Fear & Greed Index", macro.fear_greed_index],
+        ["BTC Dominantie", macro.btc_dominance],
+        ["DXY", macro.dxy]
+    ];
+
+    indicators.forEach(([label, value]) => {
+        const row = tableBody.insertRow();
+        row.insertCell().innerText = label;
+        row.insertCell().innerText = value ?? "–";
+        row.insertCell().innerText = "–";
+        row.insertCell().innerText = "–";
+        row.insertCell().innerText = "–";
+        const delCell = row.insertCell();
+        const delBtn = document.createElement("button");
+        delBtn.innerText = "🗑️";
+        delBtn.addEventListener("click", () => row.remove());
+        delCell.appendChild(delBtn);
     });
 }
