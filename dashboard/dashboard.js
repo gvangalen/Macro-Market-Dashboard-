@@ -221,4 +221,41 @@ function renderMacroTable(macro) {
         delBtn.addEventListener("click", () => row.remove());
         delCell.appendChild(delBtn);
     });
+
+    // ✅ Technische data toevoegen aan de technische indicatoren-tabel
+function renderTechnicalTable(technicalData) {
+    const tableBody = document.querySelector("#technicalTable tbody");
+    if (!tableBody || !Array.isArray(technicalData)) {
+        console.warn("⚠️ Geen technische data beschikbaar om weer te geven");
+        return;
+    }
+
+    tableBody.innerHTML = "";
+
+    if (technicalData.length === 0) {
+        const row = tableBody.insertRow();
+        const cell = row.insertCell();
+        cell.colSpan = 5;
+        cell.style.textAlign = "center";
+        cell.innerText = "Geen technische data gevonden";
+        return;
+    }
+
+    technicalData.forEach(entry => {
+        const row = tableBody.insertRow();
+        row.insertCell().innerText = entry.symbol;
+        row.insertCell().innerText = entry.rsi ?? "–";
+        row.insertCell().innerText = Number(entry.volume).toLocaleString();
+        row.insertCell().innerText = entry.ma_200 ?? "–";
+        row.insertCell().innerText = (entry.rsi && entry.ma_200 && entry.rsi > entry.ma_200) ? "Boven 200MA" : "Onder 200MA";
+
+        const delCell = row.insertCell();
+        const delBtn = document.createElement("button");
+        delBtn.innerText = "🗑️";
+        delBtn.addEventListener("click", () => row.remove());
+        delCell.appendChild(delBtn);
+    });
+
+    console.log("✅ Technische indicatoren succesvol toegevoegd aan de tabel");
+}
 }
