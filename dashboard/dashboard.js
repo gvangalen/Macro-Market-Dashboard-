@@ -4,30 +4,6 @@ console.log("✅ Dashboard.js versie 2025-03-28 geladen");
 
 let macroGauge, technicalGauge, setupGauge;
 
-function createGauge(elementId, label) {
-    const ctx = document.getElementById(elementId)?.getContext("2d");
-    if (!ctx) return null;
-    return new Chart(ctx, {
-        type: "doughnut",
-        data: {
-            labels: ["Sterke Sell", "Sell", "Neutraal", "Buy", "Sterke Buy"],
-            datasets: [{
-                data: [20, 20, 20, 20, 20],
-                backgroundColor: ["#ff3b30", "#ff9500", "#f0ad4e", "#4cd964", "#34c759"],
-                borderWidth: 0
-            }]
-        },
-        options: {
-            rotation: -90,
-            circumference: 180,
-            cutout: "80%",
-            plugins: {
-                legend: { display: false },
-                tooltip: { enabled: false },
-            }
-        }
-    });
-}
 
 document.addEventListener("DOMContentLoaded", function () {
     console.log("📌 Dashboard geladen!");
