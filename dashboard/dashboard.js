@@ -2,12 +2,14 @@ import { API_BASE_URL } from "../config.js";
 
 console.log("✅ Dashboard.js versie 2025-03-28 geladen");
 
+let macroGauge, technicalGauge, setupGauge;
+
 document.addEventListener("DOMContentLoaded", function () {
     console.log("📌 Dashboard geladen!");
 
-    const macroGauge = createGauge("macroGauge", "Macro");
-    const technicalGauge = createGauge("technicalGauge", "Technisch");
-    const setupGauge = createGauge("setupGauge", "Setup");
+    macroGauge = createGauge("macroGauge", "Macro");
+    technicalGauge = createGauge("technicalGauge", "Technisch");
+    setupGauge = createGauge("setupGauge", "Setup");
 
     initEmptyTables();
     initTableButtons();
@@ -58,7 +60,7 @@ function showMacroForm() {
             body: JSON.stringify({ name })
         });
         form.remove();
-        fetchDashboardData();
+        fetchDashboardData(macroGauge, technicalGauge, setupGauge);
     });
 
     document.getElementById("cancelMacro").addEventListener("click", () => form.remove());
@@ -83,10 +85,63 @@ function showTechnicalForm() {
             body: JSON.stringify({ name })
         });
         form.remove();
-        fetchDashboardData();
+        fetchDashboardData(macroGauge, technicalGauge, setupGauge);
     });
 
     document.getElementById("cancelTech").addEventListener("click", () => form.remove());
+}
+
+function showSetupForm() {
+    const form = document.createElement("div");
+    form.className = "popup-form";
+    form.innerHTML = `
+        <h3>➕ Nieuwe Setup</h3>
+        <label>Naam: <input id="setupName" /></label><br/>
+        <label>Timeframe:
+            <select id="setupTimeframe">
+                <option value="1H">1H</option>
+                <option value="4H">4H</option>
+                <option value="1D">1D</option>
+                <option value="1W">1W</option>
+            </select>
+        </label><br/>
+        <label>Asset:
+            <select id="setupAsset">
+                <option value="BTC">BTC</option>
+                <option value="SOL">SOL</option>
+                <option value="ETH">ETH</option>
+            </select>
+        </label><br/>
+        <label>Trade Type:
+            <select id="setupTradeType">
+                <option value="Swing Trade">Swing Trade</option>
+                <option value="Long Term Trade">Long Term Trade</option>
+            </select>
+        </label><br/>
+        <label>Setup Type:
+            <select id="setupType">
+                <option value="A-Plus">A-Plus</option>
+                <option value="B-Plus">B-Plus</option>
+                <option value="C-Plus">C-Plus</option>
+            </select>
+        </label><br/>
+        <label>Beschrijving: <input id="setupDescription" /></label><br/>
+        <label>Criteria: <input id="setupCriteria" /></label><br/>
+        <button id="submitSetupForm">Toevoegen</button>
+        <button id="cancelSetupForm">Annuleer</button>
+    `;
+    document.body.appendChild(form);
+
+    document.getElementById("submitSetupForm").addEventListener("click", () => {
+        const values = [
+            document.getElementById("setupName").value,
+            "Actief"
+        ];
+        addTableRow("setupTable", values);
+        form.remove();
+    });
+
+    document.getElementById("cancelSetupForm").addEventListener("click", () => form.remove());
 }
 
 function initTechnicalFilter() {
@@ -113,8 +168,8 @@ function initTechnicalFilter() {
     `;
     container.insertBefore(filter, container.querySelector("table"));
 
-    document.getElementById("filterAsset").addEventListener("change", fetchDashboardData);
-    document.getElementById("filterTimeframe").addEventListener("change", fetchDashboardData);
+    document.getElementById("filterAsset").addEventListener("change", () => fetchDashboardData(macroGauge, technicalGauge, setupGauge));
+    document.getElementById("filterTimeframe").addEventListener("change", () => fetchDashboardData(macroGauge, technicalGauge, setupGauge));
 }
 
 async function fetchDashboardData(macroGauge, technicalGauge, setupGauge) {
