@@ -269,38 +269,7 @@ function createGauge(elementId) {
     });
 }
 
-async function fetchDashboardData(macroGauge, technicalGauge, setupGauge) {
-    const data = await safeFetch("/api/dashboard_data");
-    if (!data) return console.error("❌ Dashboard-data niet beschikbaar");
 
-    try {
-        const latestMacro = await safeFetch("/api/macro_data");
-        if (macroGauge && latestMacro) {
-            const macroScore = calculateMacroScore(latestMacro);
-            updateGauge(macroGauge, macroScore);
-            renderMacroTable(latestMacro);
-        }
-
-        const btc = data.market_data?.find(d => d.symbol === "BTC");
-        if (technicalGauge && btc) {
-            const techScore = calculateTechnicalScore(btc);
-            updateGauge(technicalGauge, techScore);
-        }
-
-        if (setupGauge) {
-            const setups = await safeFetch("/api/setups?symbol=BTC");
-            const activeSetups = Array.isArray(setups) ? setups.length : 0;
-            updateGauge(setupGauge, activeSetups > 0 ? 2 : -2);
-            renderSetupTable(setups);
-        }
-
-        renderMarketTable(data.market_data, data.technical_data);
-        renderTechnicalTable(data.technical_data);
-        console.log("✅ Dashboard bijgewerkt!");
-    } catch (e) {
-        console.error("❌ Fout bij verwerken dashboard-data:", e);
-    }
-}
 
 function updateGauge(gauge, score) {
     if (!gauge) return;
