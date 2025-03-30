@@ -246,168 +246,28 @@ async function safeFetch(url) {
     }
 }
 
-function createGauge(elementId) {
-    const ctx = document.getElementById(elementId)?.getContext("2d");
-    if (!ctx) return null;
-    return new Chart(ctx, {
-        type: "doughnut",
-        data: {
-            labels: ["Sterke Sell", "Sell", "Neutraal", "Buy", "Sterke Buy"],
-            datasets: [{
-                data: [20, 20, 20, 20, 20],
-                backgroundColor: ["#ff3b30", "#ff9500", "#f0ad4e", "#4cd964", "#34c759"],
-                borderWidth: 0
-            }]
-        },
-        options: {
-            rotation: -90,
-            circumference: 180,
-            cutout: "80%",
-            plugins: {
-                legend: { display: false },
-                tooltip: { enabled: false },
-            }
-        }
-    });
-}
-
-
-
-function updateGauge(gauge, score) {
-    if (!gauge) return;
-    const index = Math.max(0, Math.min(4, Math.round((score + 2) / 4 * 4)));
-    gauge.data.datasets[0].data = gauge.data.datasets[0].data.map((v, i) => (i === index ? 100 : 20));
-    gauge.update();
-}
-
-function calculateMacroScore(macroData) {
-    let score = 0;
-    if (macroData.fear_greed_index > 75) score += 2;
-    else if (macroData.fear_greed_index > 50) score += 1;
-    else if (macroData.fear_greed_index > 30) score -= 1;
-    else score -= 2;
-
-    if (macroData.btc_dominance > 55) score += 1;
-    else if (macroData.btc_dominance < 50) score -= 1;
-
-    if (macroData.dxy < 100) score += 2;
-    else if (macroData.dxy < 103) score += 1;
-    else if (macroData.dxy < 106) score -= 1;
-    else score -= 2;
-
-    return Math.max(-2, Math.min(2, score));
-}
-
-function calculateTechnicalScore(btc) {
-    let score = 0;
-    if (btc.change_24h > 3) score += 2;
-    else if (btc.change_24h > 1.5) score += 1;
-    else if (btc.change_24h < -3) score -= 2;
-    else score -= 1;
-
-    if (btc.volume > 50000000000) score += 1;
-    return Math.max(-2, Math.min(2, score));
-}
-
-function renderMarketTable(marketData, technicalData) {
-    const tableBody = document.querySelector("#marketTable tbody");
-    if (!tableBody || !Array.isArray(marketData)) return;
-
-    tableBody.innerHTML = "";
-    marketData.forEach(asset => {
-        const row = tableBody.insertRow();
-        const tech = Array.isArray(technicalData) ? technicalData.find(d => d.symbol === asset.symbol) : {};
-
-        row.insertCell().innerText = asset.symbol;
-        row.insertCell().innerText = Number(asset.price).toFixed(2);
-        row.insertCell().innerText = `${Number(asset.change_24h).toFixed(2)}%`;
-        row.insertCell().innerText = Number(asset.volume).toLocaleString();
-        row.insertCell().innerText = tech?.rsi ?? "–";
-        row.insertCell().innerText = tech?.ma_200 ?? "–";
-    });
-}
-
-function renderMacroTable(macro) {
+function renderMacroTable(macroIndicators) {
     const tableBody = document.querySelector("#macroTable tbody");
-    if (!tableBody || !macro) return;
+    if (!tableBody || !Array.isArray(macroIndicators)) return;
 
     tableBody.innerHTML = "";
 
-    const indicators = [
-        ["Fear & Greed Index", macro.fear_greed_index],
-        ["BTC Dominantie", macro.btc_dominance],
-        ["DXY", macro.dxy]
-    ];
-
-    indicators.forEach(([label, value]) => {
-        const row = tableBody.insertRow();
-        row.insertCell().innerText = label;
-        row.insertCell().innerText = value ?? "–";
-        row.insertCell().innerText = "–";
-        row.insertCell().innerText = "–";
-        row.insertCell().innerText = "–";
-        const delCell = row.insertCell();
-        const delBtn = document.createElement("button");
-        delBtn.innerText = "🗑️";
-        delBtn.addEventListener("click", () => row.remove());
-        delCell.appendChild(delBtn);
-    });
-}
-
-function renderTechnicalTable(technicalData) {
-    const tableBody = document.querySelector("#technicalTable tbody");
-    if (!tableBody || !Array.isArray(technicalData)) {
-        console.warn("⚠️ Geen technische data beschikbaar om weer te geven");
-        return;
-    }
-
-    tableBody.innerHTML = "";
-
-    if (technicalData.length === 0) {
+    if (macroIndicators.length === 0) {
         const row = tableBody.insertRow();
         const cell = row.insertCell();
         cell.colSpan = 5;
-        cell.style.textAlign = "center";
-        cell.innerText = "Geen technische data gevonden";
-        return;
-    }
-
-    technicalData.forEach(entry => {
-        const row = tableBody.insertRow();
-        row.insertCell().innerText = entry.symbol;
-        row.insertCell().innerText = entry.rsi ?? "–";
-        row.insertCell().innerText = Number(entry.volume).toLocaleString();
-        row.insertCell().innerText = entry.ma_200 ?? "–";
-        row.insertCell().innerText = (entry.rsi && entry.ma_200 && entry.rsi > entry.ma_200) ? "Boven 200MA" : "Onder 200MA";
-
-        const delCell = row.insertCell();
-        const delBtn = document.createElement("button");
-        delBtn.innerText = "🗑️";
-        delBtn.addEventListener("click", () => row.remove());
-        delCell.appendChild(delBtn);
-    });
-
-    console.log("✅ Technische indicatoren succesvol toegevoegd aan de tabel");
-}
-
-function renderSetupTable(setups) {
-    const tableBody = document.querySelector("#setupTable tbody");
-    if (!tableBody || !Array.isArray(setups)) return;
-
-    tableBody.innerHTML = "";
-    if (setups.length === 0) {
-        const row = tableBody.insertRow();
-        const cell = row.insertCell();
-        cell.colSpan = 2;
         cell.style.textAlign = "center";
         cell.innerText = "Geen data";
         return;
     }
 
-    setups.forEach(setup => {
+    macroIndicators.forEach(indicator => {
         const row = tableBody.insertRow();
-        row.insertCell().innerText = setup.name || "Setup";
-        row.insertCell().innerText = setup.status || "–";
+        row.insertCell().innerText = indicator.name || "–";
+        row.insertCell().innerText = indicator.value ?? "–";
+        row.insertCell().innerText = indicator.trend ?? "–";
+        row.insertCell().innerText = indicator.interpretation ?? "–";
+        row.insertCell().innerText = indicator.action ?? "–";
 
         const delCell = row.insertCell();
         const delBtn = document.createElement("button");
@@ -415,6 +275,37 @@ function renderSetupTable(setups) {
         delBtn.addEventListener("click", () => row.remove());
         delCell.appendChild(delBtn);
     });
+}
 
-    console.log("✅ Setups succesvol toegevoegd aan de tabel");
+function calculateMacroScore(macroIndicators) {
+    let score = 0;
+
+    const getValue = (name) => {
+        const found = macroIndicators.find(m => m.name === name);
+        return found?.value ?? null;
+    };
+
+    const fg = getValue("fear_greed_index");
+    if (fg !== null) {
+        if (fg > 75) score += 2;
+        else if (fg > 50) score += 1;
+        else if (fg > 30) score -= 1;
+        else score -= 2;
+    }
+
+    const dom = getValue("btc_dominance");
+    if (dom !== null) {
+        if (dom > 55) score += 1;
+        else if (dom < 50) score -= 1;
+    }
+
+    const dxy = getValue("dxy");
+    if (dxy !== null) {
+        if (dxy < 100) score += 2;
+        else if (dxy < 103) score += 1;
+        else if (dxy < 106) score -= 1;
+        else score -= 2;
+    }
+
+    return Math.max(-2, Math.min(2, score));
 }
