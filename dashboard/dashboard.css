@@ -59,6 +59,7 @@ table tbody tr:hover {
     background-color: #f9f9f9;
 }
 
+/* ✅ Algemene Buttons */
 button {
     background-color: #007bff;
     color: white;
@@ -75,6 +76,23 @@ button:hover {
     background-color: #0056b3;
 }
 
+/* ✅ Popup Overlay (optioneel als je dimming wil bij popups) */
+.popup-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.35);
+    z-index: 9998;
+}
+
+/* ✅ Popup Animatie */
+@keyframes fadeIn {
+    from { opacity: 0; transform: translate(-50%, -60%); }
+    to { opacity: 1; transform: translate(-50%, -50%); }
+}
+
 /* ✅ Popup Formulieren */
 .popup-form {
     position: fixed;
@@ -89,6 +107,7 @@ button:hover {
     z-index: 9999;
     width: 320px;
     max-width: 90%;
+    animation: fadeIn 0.2s ease-out;
 }
 
 .popup-form label {
@@ -110,7 +129,27 @@ button:hover {
 }
 
 .popup-form button {
+    background-color: #007bff;
+    color: white;
+    border: none;
+    padding: 8px 12px;
+    border-radius: 5px;
+    font-size: 14px;
+    cursor: pointer;
     margin-right: 8px;
+    transition: background-color 0.2s ease;
+}
+
+.popup-form button:hover {
+    background-color: #0056b3;
+}
+
+.popup-form button:last-of-type {
+    background-color: #777;
+}
+
+.popup-form button:last-of-type:hover {
+    background-color: #555;
 }
 
 /* ✅ Donkere modus */
@@ -163,6 +202,10 @@ button:hover {
         background-color: #333;
         color: #fff;
         border: 1px solid #555;
+    }
+
+    .popup-overlay {
+        background: rgba(255, 255, 255, 0.1);
     }
 }
 
