@@ -334,3 +334,34 @@ function calculateMacroScore(macroIndicators) {
 
     return Math.max(-2, Math.min(2, score));
 }
+function createGauge(elementId, label) {
+    const ctx = document.getElementById(elementId)?.getContext("2d");
+    if (!ctx) return null;
+    return new Chart(ctx, {
+        type: "doughnut",
+        data: {
+            labels: ["Sterke Sell", "Sell", "Neutraal", "Buy", "Sterke Buy"],
+            datasets: [{
+                data: [20, 20, 20, 20, 20],
+                backgroundColor: ["#ff3b30", "#ff9500", "#f0ad4e", "#4cd964", "#34c759"],
+                borderWidth: 0
+            }]
+        },
+        options: {
+            rotation: -90,
+            circumference: 180,
+            cutout: "80%",
+            plugins: {
+                legend: { display: false },
+                tooltip: { enabled: false },
+            }
+        }
+    });
+}
+
+function updateGauge(gauge, score) {
+    if (!gauge) return;
+    const index = Math.max(0, Math.min(4, Math.round((score + 2) / 4 * 4)));
+    gauge.data.datasets[0].data = gauge.data.datasets[0].data.map((v, i) => (i === index ? 100 : 20));
+    gauge.update();
+}
