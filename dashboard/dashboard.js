@@ -33,12 +33,8 @@ function initEmptyTables() {
 }
 
 function initTableButtons() {
-    document.getElementById("addMacroBtn")?.addEventListener("click", () =>
-        addTableRow("macroTable", ["Macro X", "100"])
-    );
-    document.getElementById("addTechnicalBtn")?.addEventListener("click", () =>
-        addTableRow("technicalTable", ["Technisch X", "80"])
-    );
+    document.getElementById("addMacroBtn")?.addEventListener("click", showMacroForm);
+    document.getElementById("addTechnicalBtn")?.addEventListener("click", showTechnicalForm);
     document.getElementById("addSetupBtn")?.addEventListener("click", () =>
         addTableRow("setupTable", ["Setup X", "Actief"])
     );
