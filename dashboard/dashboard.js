@@ -35,12 +35,9 @@ function initEmptyTables() {
 function initTableButtons() {
     document.getElementById("addMacroBtn")?.addEventListener("click", showMacroForm);
     document.getElementById("addTechnicalBtn")?.addEventListener("click", showTechnicalForm);
-    document.getElementById("addSetupBtn")?.addEventListener("click", () =>
-        addTableRow("setupTable", ["Setup X", "Actief"])
-    );
+    document.getElementById("addSetupBtn")?.addEventListener("click", showSetupForm);
 }
 
-// ✅ Macro formulier
 function showMacroForm() {
     const form = document.createElement("div");
     form.className = "popup-form";
@@ -71,7 +68,6 @@ function showMacroForm() {
     document.getElementById("cancelMacroForm").addEventListener("click", () => form.remove());
 }
 
-// ✅ Technisch formulier
 function showTechnicalForm() {
     const form = document.createElement("div");
     form.className = "popup-form";
@@ -108,6 +104,58 @@ function showTechnicalForm() {
     document.getElementById("cancelTechForm").addEventListener("click", () => form.remove());
 }
 
+function showSetupForm() {
+    const form = document.createElement("div");
+    form.className = "popup-form";
+    form.innerHTML = `
+        <h3>➕ Nieuwe Setup</h3>
+        <label>Naam: <input id="setupName" /></label><br/>
+        <label>Timeframe:
+            <select id="setupTimeframe">
+                <option value="1H">1H</option>
+                <option value="4H">4H</option>
+                <option value="1D">1D</option>
+                <option value="1W">1W</option>
+            </select>
+        </label><br/>
+        <label>Asset:
+            <select id="setupAsset">
+                <option value="BTC">BTC</option>
+                <option value="SOL">SOL</option>
+                <option value="ETH">ETH</option>
+            </select>
+        </label><br/>
+        <label>Trade Type:
+            <select id="setupTradeType">
+                <option value="Swing Trade">Swing Trade</option>
+                <option value="Long Term Trade">Long Term Trade</option>
+            </select>
+        </label><br/>
+        <label>Setup Type:
+            <select id="setupType">
+                <option value="A-Plus">A-Plus</option>
+                <option value="B-Plus">B-Plus</option>
+                <option value="C-Plus">C-Plus</option>
+            </select>
+        </label><br/>
+        <label>Beschrijving: <input id="setupDescription" /></label><br/>
+        <label>Criteria: <input id="setupCriteria" /></label><br/>
+        <button id="submitSetupForm">Toevoegen</button>
+        <button id="cancelSetupForm">Annuleer</button>
+    `;
+    document.body.appendChild(form);
+
+    document.getElementById("submitSetupForm").addEventListener("click", () => {
+        const values = [
+            document.getElementById("setupName").value,
+            "Actief"
+        ];
+        addTableRow("setupTable", values);
+        form.remove();
+    });
+
+    document.getElementById("cancelSetupForm").addEventListener("click", () => form.remove());
+}
 
 function addTableRow(tableId, values) {
     const tableBody = document.querySelector(`#${tableId} tbody`);
