@@ -1,6 +1,6 @@
 import { API_BASE_URL } from "../config.js";
 
-console.log("✅ Dashboard.js versie 2025-03-28 20:20 geladen");
+console.log("✅ Dashboard.js versie 2025-03-28 geladen");
 
 document.addEventListener("DOMContentLoaded", function () {
     console.log("📌 Dashboard geladen!");
@@ -11,6 +11,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
     initEmptyTables();
     initTableButtons();
+    initTechnicalFilter();
 
     fetchDashboardData(macroGauge, technicalGauge, setupGauge);
     setInterval(() => fetchDashboardData(macroGauge, technicalGauge, setupGauge), 300000);
@@ -42,66 +43,111 @@ function showMacroForm() {
     const form = document.createElement("div");
     form.className = "popup-form";
     form.innerHTML = `
-        <h3>➕ Nieuwe Macro Indicator</h3>
-        <label>Indicator: <input id="macroIndicator" /></label><br/>
-        <label>Waarde: <input id="macroValue" /></label><br/>
-        <label>Trend: <input id="macroTrend" /></label><br/>
-        <label>Interpretatie: <input id="macroInterpretatie" /></label><br/>
-        <label>Actiepunt: <input id="macroActie" /></label><br/>
-        <button id="submitMacroForm">Toevoegen</button>
-        <button id="cancelMacroForm">Annuleer</button>
+        <h3>➕ Macro Indicator toevoegen</h3>
+        <label>Naam: <input id="macroName" /></label><br/>
+        <button id="submitMacro">Toevoegen</button>
+        <button id="cancelMacro">Annuleren</button>
     `;
     document.body.appendChild(form);
 
-    document.getElementById("submitMacroForm").addEventListener("click", () => {
-        const values = [
-            document.getElementById("macroIndicator").value,
-            document.getElementById("macroValue").value,
-            document.getElementById("macroTrend").value,
-            document.getElementById("macroInterpretatie").value,
-            document.getElementById("macroActie").value
-        ];
-        addTableRow("macroTable", values);
+    document.getElementById("submitMacro").addEventListener("click", async () => {
+        const name = document.getElementById("macroName").value;
+        await fetch(`${API_BASE_URL}/api/macro_data`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ name })
+        });
         form.remove();
+        fetchDashboardData();
     });
 
-    document.getElementById("cancelMacroForm").addEventListener("click", () => form.remove());
+    document.getElementById("cancelMacro").addEventListener("click", () => form.remove());
 }
 
 function showTechnicalForm() {
     const form = document.createElement("div");
     form.className = "popup-form";
     form.innerHTML = `
-        <h3>➕ Nieuwe Technische Indicator</h3>
-        <label>Asset: <input id="techAsset" /></label><br/>
-        <label>RSI: <input id="techRSI" /></label><br/>
-        <label>Volume: <input id="techVolume" /></label><br/>
-        <label>200MA: <input id="techMA" /></label><br/>
-        <label>t.o.v. 200MA:
-            <select id="techAboveMA">
-                <option value="–">–</option>
-                <option value="Boven 200MA">Boven 200MA</option>
-                <option value="Onder 200MA">Onder 200MA</option>
-            </select>
-        </label><br/>
-        <button id="submitTechForm">Toevoegen</button>
-        <button id="cancelTechForm">Annuleer</button>
+        <h3>➕ Technische Indicator toevoegen</h3>
+        <label>Naam: <input id="techName" /></label><br/>
+        <button id="submitTech">Toevoegen</button>
+        <button id="cancelTech">Annuleren</button>
     `;
     document.body.appendChild(form);
 
-    document.getElementById("submitTechForm").addEventListener("click", () => {
-        const values = [
-            document.getElementById("techAsset").value,
-            document.getElementById("techRSI").value,
-            document.getElementById("techVolume").value,
-            document.getElementById("techMA").value,
-            document.getElementById("techAboveMA").value
-        ];
-        addTableRow("technicalTable", values);
+    document.getElementById("submitTech").addEventListener("click", async () => {
+        const name = document.getElementById("techName").value;
+        await fetch(`${API_BASE_URL}/api/technical_data`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ name })
+        });
         form.remove();
+        fetchDashboardData();
     });
 
-    document.getElementById("cancelTechForm").addEventListener("click", () => form.remove());
+    document.getElementById("cancelTech").addEventListener("click", () => form.remove());
+}
+
+function initTechnicalFilter() {
+    const container = document.querySelector("#technicalTable").parentElement;
+    const filter = document.createElement("div");
+    filter.innerHTML = `
+        <label>Asset: 
+            <select id="filterAsset">
+                <option value="ALL">Alle</option>
+                <option value="BTC">BTC</option>
+                <option value="SOL">SOL</option>
+                <option value="ETH">ETH</option>
+            </select>
+        </label>
+        <label>Timeframe: 
+            <select id="filterTimeframe">
+                <option value="ALL">Alle</option>
+                <option value="1H">1H</option>
+                <option value="4H">4H</option>
+                <option value="1D">1D</option>
+                <option value="1W">1W</option>
+            </select>
+        </label>
+    `;
+    container.insertBefore(filter, container.querySelector("table"));
+
+    document.getElementById("filterAsset").addEventListener("change", fetchDashboardData);
+    document.getElementById("filterTimeframe").addEventListener("change", fetchDashboardData);
+}
+
+async function fetchDashboardData(macroGauge, technicalGauge, setupGauge) {
+    const data = await safeFetch("/api/dashboard_data");
+    if (!data) return;
+
+    const macro = await safeFetch("/api/macro_data");
+    if (macroGauge && macro) {
+        updateGauge(macroGauge, calculateMacroScore(macro));
+        renderMacroTable(macro);
+    }
+
+    const btc = data.market_data?.find(d => d.symbol === "BTC");
+    if (technicalGauge && btc) {
+        updateGauge(technicalGauge, calculateTechnicalScore(btc));
+    }
+
+    const setups = await safeFetch("/api/setups?symbol=BTC");
+    if (setupGauge && Array.isArray(setups)) {
+        updateGauge(setupGauge, setups.length > 0 ? 2 : -2);
+        renderSetupTable(setups);
+    }
+
+    renderMarketTable(data.market_data, data.technical_data);
+
+    const asset = document.getElementById("filterAsset")?.value || "ALL";
+    const tf = document.getElementById("filterTimeframe")?.value || "ALL";
+    const filtered = data.technical_data.filter(d => 
+        (asset === "ALL" || d.symbol === asset) &&
+        (tf === "ALL" || d.timeframe === tf)
+    );
+    renderTechnicalTable(filtered);
+    console.log("✅ Dashboard bijgewerkt");
 }
 
 function showSetupForm() {
