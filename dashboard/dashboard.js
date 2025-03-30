@@ -44,6 +44,75 @@ function initTableButtons() {
     );
 }
 
+// ✅ Macro formulier
+function showMacroForm() {
+    const form = document.createElement("div");
+    form.className = "popup-form";
+    form.innerHTML = `
+        <h3>➕ Nieuwe Macro Indicator</h3>
+        <label>Indicator: <input id="macroIndicator" /></label><br/>
+        <label>Waarde: <input id="macroValue" /></label><br/>
+        <label>Trend: <input id="macroTrend" /></label><br/>
+        <label>Interpretatie: <input id="macroInterpretatie" /></label><br/>
+        <label>Actiepunt: <input id="macroActie" /></label><br/>
+        <button id="submitMacroForm">Toevoegen</button>
+        <button id="cancelMacroForm">Annuleer</button>
+    `;
+    document.body.appendChild(form);
+
+    document.getElementById("submitMacroForm").addEventListener("click", () => {
+        const values = [
+            document.getElementById("macroIndicator").value,
+            document.getElementById("macroValue").value,
+            document.getElementById("macroTrend").value,
+            document.getElementById("macroInterpretatie").value,
+            document.getElementById("macroActie").value
+        ];
+        addTableRow("macroTable", values);
+        form.remove();
+    });
+
+    document.getElementById("cancelMacroForm").addEventListener("click", () => form.remove());
+}
+
+// ✅ Technisch formulier
+function showTechnicalForm() {
+    const form = document.createElement("div");
+    form.className = "popup-form";
+    form.innerHTML = `
+        <h3>➕ Nieuwe Technische Indicator</h3>
+        <label>Asset: <input id="techAsset" /></label><br/>
+        <label>RSI: <input id="techRSI" /></label><br/>
+        <label>Volume: <input id="techVolume" /></label><br/>
+        <label>200MA: <input id="techMA" /></label><br/>
+        <label>t.o.v. 200MA:
+            <select id="techAboveMA">
+                <option value="–">–</option>
+                <option value="Boven 200MA">Boven 200MA</option>
+                <option value="Onder 200MA">Onder 200MA</option>
+            </select>
+        </label><br/>
+        <button id="submitTechForm">Toevoegen</button>
+        <button id="cancelTechForm">Annuleer</button>
+    `;
+    document.body.appendChild(form);
+
+    document.getElementById("submitTechForm").addEventListener("click", () => {
+        const values = [
+            document.getElementById("techAsset").value,
+            document.getElementById("techRSI").value,
+            document.getElementById("techVolume").value,
+            document.getElementById("techMA").value,
+            document.getElementById("techAboveMA").value
+        ];
+        addTableRow("technicalTable", values);
+        form.remove();
+    });
+
+    document.getElementById("cancelTechForm").addEventListener("click", () => form.remove());
+}
+
+
 function addTableRow(tableId, values) {
     const tableBody = document.querySelector(`#${tableId} tbody`);
     if (!tableBody) return;
