@@ -238,3 +238,36 @@ function renderSetupTable(setups) {
         del.appendChild(btn);
     });
 }
+
+// ✅ Macro-indicator toevoegen via POST
+document.getElementById("addMacroBtn").addEventListener("click", async () => {
+    const input = document.getElementById("macroNameInput");
+    const name = input.value.trim();
+
+    if (!name) {
+        alert("❗ Voer een geldige indicatornaam in.");
+        return;
+    }
+
+    try {
+        const res = await fetch(`${API_BASE_URL}/api/macro_data`, {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify({ name }),
+        });
+
+        if (!res.ok) {
+            const text = await res.text();
+            throw new Error(`Fout: ${text}`);
+        }
+
+        alert(`✅ Indicator '${name}' toegevoegd`);
+        input.value = "";
+        fetchDashboardData(); // Refresh de data
+    } catch (err) {
+        alert(`❌ Fout bij toevoegen macro-indicator: \n\n${err.message}`);
+        console.error("❌ Macro POST fout:", err);
+    }
+});
