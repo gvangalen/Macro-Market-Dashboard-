@@ -1,7 +1,7 @@
 // dashboard.js
 import { API_BASE_URL } from "../config.js";
 
-console.log("✅ Dashboard.js versie 2025-03-30 geladen");
+console.log("✅ Dashboard.js versie 2025-03-31 geladen");
 
 let macroGauge, technicalGauge, setupGauge;
 
@@ -38,6 +38,36 @@ document.addEventListener("DOMContentLoaded", function () {
     initEmptyTables();
     fetchDashboardData();
     setInterval(fetchDashboardData, 300000);
+
+    const btn = document.getElementById("addMacroBtn");
+    if (btn) {
+        btn.addEventListener("click", async () => {
+            const nameInput = document.getElementById("macroNameInput");
+            const name = nameInput?.value?.trim();
+            if (!name) return alert("⚠️ Vul een indicatornaam in!");
+
+            try {
+                const res = await fetch(`${API_BASE_URL}/api/macro_data`, {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ name }),
+                });
+
+                if (!res.ok) {
+                    const msg = await res.text();
+                    throw new Error(msg);
+                }
+
+                const result = await res.json();
+                alert(result.message || "Succesvol toegevoegd!");
+                nameInput.value = "";
+                fetchDashboardData();
+            } catch (err) {
+                console.error("❌ Fout bij toevoegen macro-indicator:", err);
+                alert("Fout: " + err.message);
+            }
+        });
+    }
 });
 
 function initEmptyTables() {
@@ -128,6 +158,7 @@ function calculateMacroScore(indicators) {
         else if (dxy < 106) score -= 1;
         else score -= 2;
     }
+
     return Math.max(-2, Math.min(2, score));
 }
 
