@@ -1,7 +1,7 @@
 // dashboard.js
 import { API_BASE_URL } from "../config.js";
 
-console.log("✅ Dashboard.js versie 2025-03-31 geladen");
+console.log("✅ Dashboard.js versie 2025-04-01 geladen");
 
 let macroGauge, technicalGauge, setupGauge;
 
@@ -39,7 +39,6 @@ document.addEventListener("DOMContentLoaded", function () {
     fetchDashboardData();
     setInterval(fetchDashboardData, 300000); // elke 5 min
 
-    // ✅ Macro-indicator toevoegen via input + knop
     const btn = document.getElementById("addMacroBtn");
     if (btn) {
         btn.addEventListener("click", async () => {
@@ -48,7 +47,7 @@ document.addEventListener("DOMContentLoaded", function () {
             if (!name) return alert("⚠️ Vul een indicatornaam in!");
 
             try {
-                const res = await fetch(`${API_BASE_URL}/api/macro_data`, {
+                const res = await fetch(`${API_BASE_URL}/macro_data/add`, {
                     method: "POST",
                     headers: { "Content-Type": "application/json" },
                     body: JSON.stringify({ name }),
@@ -89,10 +88,10 @@ function initEmptyTables() {
 
 async function fetchDashboardData() {
     try {
-        const data = await safeFetch("/api/dashboard_data");
+        const data = await safeFetch("/dashboard_data");
         if (!data) return;
 
-        const macro = await safeFetch("/api/macro_data");
+        const macro = await safeFetch("/macro_data/list");
         if (macroGauge && macro) {
             updateGauge(macroGauge, calculateMacroScore(macro));
             renderMacroTable(macro);
@@ -103,7 +102,7 @@ async function fetchDashboardData() {
             updateGauge(technicalGauge, calculateTechnicalScore(btc));
         }
 
-        const setups = await safeFetch("/api/setups?symbol=BTC");
+        const setups = await safeFetch("/setups?symbol=BTC");
         if (setupGauge && Array.isArray(setups)) {
             updateGauge(setupGauge, setups.length > 0 ? 2 : -2);
             renderSetupTable(setups);
