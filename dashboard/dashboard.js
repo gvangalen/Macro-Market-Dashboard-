@@ -37,8 +37,9 @@ document.addEventListener("DOMContentLoaded", function () {
 
     initEmptyTables();
     fetchDashboardData();
-    setInterval(fetchDashboardData, 300000);
+    setInterval(fetchDashboardData, 300000); // elke 5 min
 
+    // ✅ Macro-indicator toevoegen via input + knop
     const btn = document.getElementById("addMacroBtn");
     if (btn) {
         btn.addEventListener("click", async () => {
@@ -129,7 +130,7 @@ function safeFetch(url) {
 function updateGauge(gauge, score) {
     if (!gauge) return;
     const index = Math.max(0, Math.min(4, Math.round((score + 2) / 4 * 4)));
-    gauge.data.datasets[0].data = gauge.data.datasets[0].data.map((v, i) => (i === index ? 100 : 20));
+    gauge.data.datasets[0].data = gauge.data.datasets[0].data.map((_, i) => (i === index ? 100 : 20));
     gauge.update();
 }
 
@@ -194,7 +195,7 @@ function renderMacroTable(indicators) {
         const del = row.insertCell();
         const btn = document.createElement("button");
         btn.innerText = "🗑️";
-        btn.addEventListener("click", () => row.remove());
+        btn.addEventListener("click", () => row.remove()); // Placeholder
         del.appendChild(btn);
     });
 }
@@ -234,40 +235,7 @@ function renderSetupTable(setups) {
         const del = row.insertCell();
         const btn = document.createElement("button");
         btn.innerText = "🗑️";
-        btn.addEventListener("click", () => row.remove());
+        btn.addEventListener("click", () => row.remove()); // Placeholder
         del.appendChild(btn);
     });
 }
-
-// ✅ Macro-indicator toevoegen via POST
-document.getElementById("addMacroBtn").addEventListener("click", async () => {
-    const input = document.getElementById("macroNameInput");
-    const name = input.value.trim();
-
-    if (!name) {
-        alert("❗ Voer een geldige indicatornaam in.");
-        return;
-    }
-
-    try {
-        const res = await fetch(`${API_BASE_URL}/api/macro_data`, {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json",
-            },
-            body: JSON.stringify({ name }),
-        });
-
-        if (!res.ok) {
-            const text = await res.text();
-            throw new Error(`Fout: ${text}`);
-        }
-
-        alert(`✅ Indicator '${name}' toegevoegd`);
-        input.value = "";
-        fetchDashboardData(); // Refresh de data
-    } catch (err) {
-        alert(`❌ Fout bij toevoegen macro-indicator: \n\n${err.message}`);
-        console.error("❌ Macro POST fout:", err);
-    }
-});
