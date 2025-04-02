@@ -1,6 +1,6 @@
-import { API_BASE_URL } from "../config.js"; // ✅ API-config laden
+import { API_BASE_URL } from "../config.js";
 
-// ✅ **Helperfunctie voor veilige API-aanvragen met retry**
+// ✅ API-call met retries
 async function fetchData(url) {
     let retries = 3;
     while (retries > 0) {
@@ -15,54 +15,67 @@ async function fetchData(url) {
 
             return data;
         } catch (error) {
-            console.error(`❌ Fout bij ophalen data van ${url}:`, error);
+            console.error(`❌ Fout bij ophalen van ${url}:`, error);
             retries--;
-            if (retries === 0) {
-                return null; // Geef null terug bij een definitieve fout
-            }
-            await new Promise(resolve => setTimeout(resolve, 2000)); // 2 sec wachten
+            if (retries === 0) return null;
+            await new Promise(resolve => setTimeout(resolve, 2000));
         }
     }
 }
 
-// ✅ **Macrodata ophalen**
-async function fetchMacroData() {
-    let data = await fetchData("/api/macro_data");
+// ✅ Dashboarddata ophalen
+async function fetchDashboardData() {
+    const data = await fetchData("/api/dashboard_data");
     if (!data) return;
 
-    setText("googleTrends", data.fear_greed);
-    setText("usdtDominance", `${data.usdt_dominance}%`);
-    updateScore("googleScore", data.fear_greed, [30, 50, 70], true);
-    updateScore("usdtScore", data.usdt_dominance, [3, 5, 7], false);
+    renderMacro(data.macro_data);
+    renderMarket(data.market_data);
+    renderTechnical(data.technical_data);
 }
 
-// ✅ **Marktdata ophalen**
-async function fetchMarketData() {
-    let data = await fetchData("/api/market_data");
-    if (!data || !Array.isArray(data)) return;
+// ✅ Macro
+function renderMacro(indicators) {
+    const fg = indicators.find(i => i.name === "fear_greed_index")?.value;
+    const usdt = indicators.find(i => i.name === "usdt_dominance")?.value;
 
-    let btc = data.find(asset => asset.symbol === "BTC");
-    if (!btc) return console.error("❌ Geen Bitcoin-data gevonden!");
+    if (fg !== undefined) {
+        setText("googleTrends", fg);
+        updateScore("googleScore", fg, [30, 50, 70], true);
+    }
+
+    if (usdt !== undefined) {
+        setText("usdtDominance", `${usdt}%`);
+        updateScore("usdtScore", usdt, [3, 5, 7], false);
+    }
+}
+
+// ✅ Marktdata
+function renderMarket(data) {
+    const btc = data.find(a => a.symbol === "BTC");
+    if (!btc) return;
 
     setText("btcClose", `$${btc.price.toLocaleString()}`);
     setText("btcChange", `${btc.change_24h.toFixed(2)}%`);
-    setText("btcMarketCap", `$${(btc.market_cap / 1e9).toFixed(2)}B`);
+    setText("btcMarketCap", btc.market_cap ? `$${(btc.market_cap / 1e9).toFixed(2)}B` : "–");
     setText("btcVolume", `$${(btc.volume / 1e9).toFixed(2)}B`);
 }
 
-// ✅ **Helperfunctie om tekst in een element te zetten**
-function setText(elementId, text) {
-    let el = document.getElementById(elementId);
-    if (el) el.innerText = text;
+// ✅ Technische data (optioneel)
+function renderTechnical(data) {
+    // Vul in als je technische tabellen live wil vullen
 }
 
-// ✅ **Score update functie (bijvoorbeeld voor fear_greed of usdt_dominance)**
-function updateScore(elementId, value, thresholds, isPositive) {
-    let score = calculateScore(value, thresholds, isPositive);
-    setText(elementId, score);
+// ✅ Helpers
+function setText(id, value) {
+    const el = document.getElementById(id);
+    if (el) el.innerText = value;
 }
 
-// ✅ **Bereken de score op basis van drempelwaarden**
+function updateScore(id, value, thresholds, isPositive) {
+    const score = calculateScore(value, thresholds, isPositive);
+    setText(id, score);
+}
+
 function calculateScore(value, thresholds, isPositive) {
     if (isPositive) {
         return value > thresholds[2] ? 2 : value > thresholds[1] ? 1 : value > thresholds[0] ? -1 : -2;
@@ -71,14 +84,8 @@ function calculateScore(value, thresholds, isPositive) {
     }
 }
 
-// ✅ **Alle data ophalen**
-async function fetchAllData() {
-    await fetchMacroData();
-    await fetchMarketData();
-}
-
-// ✅ **Pagina laden en elke minuut verversen**
-document.addEventListener("DOMContentLoaded", function () {
-    fetchAllData();
-    setInterval(fetchAllData, 60000); // Elke minuut updaten
+// ✅ Init
+document.addEventListener("DOMContentLoaded", () => {
+    fetchDashboardData();
+    setInterval(fetchDashboardData, 60000);
 });
