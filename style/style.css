@@ -54,6 +54,22 @@ h2 {
 }
 
 /* ✅ Stijl voor de meters */
+.gauge-wrapper {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 250px;
+}
+.gauge-wrapper canvas {
+    max-width: 100%;
+}
+.gauge-wrapper span {
+    margin-top: 8px;
+    font-weight: bold;
+    font-size: 16px;
+    color: #333;
+}
+
 .gauge-container {
     width: 250px;
     height: 250px;
@@ -83,6 +99,7 @@ h2 {
     margin-left: auto;
     margin-right: auto;
     overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
 }
 
 /* ✅ Tabellen styling */
@@ -111,6 +128,12 @@ th {
     background-color: #388e3c;
     color: white;
     font-weight: bold;
+}
+
+/* ✅ Stijl voor lege tabellen */
+td[colspan] {
+    font-style: italic;
+    color: #999;
 }
 
 /* ✅ Knoppen styling */
