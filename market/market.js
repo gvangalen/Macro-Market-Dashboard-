@@ -1,65 +1,51 @@
-const marketApiUrl = "http://13.60.235.90:5002/market_data"; // ✅ AWS API endpoint
+import { API_BASE_URL } from "../config.js"; // Gebruik altijd centrale config
+
+console.log("✅ market.js geladen");
 
 async function fetchMarketData() {
     try {
-        let response = await fetch(marketApiUrl);
-        if (!response.ok) throw new Error("❌ API-fout bij ophalen marktdata!");
+        const response = await fetch(`${API_BASE_URL}/api/dashboard_data`);
+        if (!response.ok) throw new Error("❌ Fout bij ophalen dashboard_data");
 
-        let data = await response.json();
-        if (!data.crypto || Object.keys(data.crypto).length === 0) throw new Error("❌ Geen crypto-data beschikbaar!");
+        const data = await response.json();
+        const marketData = data.market_data;
 
-        let marketBody = document.getElementById("marketBody");
-        marketBody.innerHTML = ""; // 🔄 Oude data wissen
+        if (!Array.isArray(marketData)) throw new Error("❌ Marktdata ongeldig of ontbreekt!");
 
-        // ✅ Zet data om naar een array en filter ontbrekende waarden
-        let cryptoData = Object.entries(data.crypto)
-            .map(([name, coinData]) => ({
-                name: name.toUpperCase(),
-                open: coinData.open ?? "N/A",
-                high: coinData.high ?? "N/A",
-                low: coinData.low ?? "N/A",
-                close: coinData.close ?? "N/A",
-                change_24h: coinData.change_24h ?? 0,
-                market_cap: coinData.market_cap ?? 0,
-                volume: coinData.volume ?? 0
-            }))
-            .sort((a, b) => b.market_cap - a.market_cap); // 🔄 Sorteer op marktkapitalisatie (grootste bovenaan)
+        const marketBody = document.getElementById("marketBody");
+        marketBody.innerHTML = "";
 
-        // ✅ Genereer rijen in de tabel
-        cryptoData.forEach(coin => {
-            let row = document.createElement("tr");
+        marketData.forEach(asset => {
+            const row = document.createElement("tr");
             row.innerHTML = `
-                <td>${coin.name}</td>
-                <td>${formatNumber(coin.open, true)}</td>
-                <td>${formatNumber(coin.high, true)}</td>
-                <td>${formatNumber(coin.low, true)}</td>
-                <td>${formatNumber(coin.close, true)}</td>
-                <td style="color: ${coin.change_24h >= 0 ? "green" : "red"};">
-                    ${coin.change_24h.toFixed(2)}%
-                </td>
-                <td>${formatNumber(coin.market_cap)}</td>
-                <td>${formatNumber(coin.volume)}</td>
+                <td>${asset.symbol}</td>
+                <td>${formatNumber(asset.price, true)}</td>
+                <td>${formatChange(asset.change_24h)}</td>
+                <td>${formatNumber(asset.volume)}</td>
+                <td>${asset.timestamp ? new Date(asset.timestamp).toLocaleString() : "–"}</td>
             `;
             marketBody.appendChild(row);
         });
 
         document.getElementById("marketStatus").textContent = "✅ Marktdata up-to-date!";
     } catch (error) {
-        console.error(error);
-        document.getElementById("marketStatus").textContent = "❌ Fout bij ophalen marktdata!";
+        console.error("❌ Fout bij laden marktdata:", error);
+        document.getElementById("marketStatus").textContent = "❌ Marktdata ophalen mislukt!";
     }
 }
 
-// ✅ **Slimme formatter voor grote getallen (miljoenen/miljarden)**
 function formatNumber(num, isPrice = false) {
-    if (num === "N/A") return num; // ❌ Voorkomt NaN fouten
-    let formatted = num >= 1e9 ? `${(num / 1e9).toFixed(2)}B` :
-                    num >= 1e6 ? `${(num / 1e6).toFixed(2)}M` :
-                    isPrice ? `$${parseFloat(num).toFixed(2)}` : parseFloat(num).toLocaleString();
-    return formatted;
+    if (num === null || num === "N/A") return "–";
+    return isPrice ? `$${Number(num).toFixed(2)}` : Number(num).toLocaleString();
+}
+
+function formatChange(change) {
+    if (change === null || change === undefined) return "–";
+    const color = change >= 0 ? "green" : "red";
+    return `<span style="color:${color};">${Number(change).toFixed(2)}%</span>`;
 }
 
 document.addEventListener("DOMContentLoaded", function () {
     fetchMarketData();
-    setInterval(fetchMarketData, 60000); // 🔄 Elke minuut updaten
+    setInterval(fetchMarketData, 60000);
 });
