@@ -1,54 +1,62 @@
 <!DOCTYPE html>
 <html lang="nl">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>📉 Technische Analyse</title>
-    <link rel="stylesheet" href="css/styles.css">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>📉 Technische Analyse</title>
+
+  <!-- ✅ CSS-bestand -->
+  <link rel="stylesheet" href="css/styles.css" />
+
+  <!-- ✅ Eventueel extra meta -->
+  <meta name="description" content="Live technische analyse van crypto assets met RSI, volume en 200MA.">
 </head>
 <body>
 
-    <h2>📉 Technische Analyse</h2>
+  <h2>📉 Technische Analyse</h2>
 
-    <div class="controls">
-        <button id="addTechAssetBtn" class="btn-add" onclick="addTechRow()">➕ Asset toevoegen</button>
-        <button id="addTechnicalIndicatorBtn" class="btn-add" onclick="addTechIndicator()">➕ Indicator toevoegen</button>
-        
-        <!-- ✅ Timeframe dropdown -->
-        <select id="globalTimeframe" onchange="loadTechAnalysis()">
-            <option value="1hr">1H</option>
-            <option value="4hr" selected>4H</option>
-            <option value="1day">1D</option>
-            <option value="1week">1W</option>
-        </select>
-    </div>
+  <!-- ✅ Bediening -->
+  <div class="controls">
+    <button id="addTechAssetBtn" class="btn-add" onclick="addTechRow()">➕ Asset toevoegen</button>
+    <button id="addTechnicalIndicatorBtn" class="btn-add" onclick="addTechIndicator()">➕ Indicator toevoegen</button>
 
-    <table id="analysisTable">
-        <thead>
-            <tr>
-                <th>Asset</th>
-                <th>RSI</th>
-                <th>Volume</th>
-                <th>200 MA</th>
-                <th>Score</th>
-                <th>Trend</th>
-                <th>Verwijderen</th>
-            </tr>
-        </thead>
-        <tbody>
-            <tr>
-                <td colspan="7" class="loading">📡 Data laden...</td>
-            </tr>
-        </tbody>
-    </table>
+    <!-- ✅ Timeframe dropdown -->
+    <select id="globalTimeframe" onchange="loadTechAnalysis()">
+      <option value="1hr">1H</option>
+      <option value="4hr" selected>4H</option>
+      <option value="1day">1D</option>
+      <option value="1week">1W</option>
+    </select>
+  </div>
 
-    <h3>📊 Totale Technische Score: <span id="totalTechScore">N/A</span></h3>
-    <h3>📈 Technisch Advies: <span id="technicalAdvice">Neutraal</span></h3>
-    <p id="techStatus" class="loading">📡 Data laden...</p>
+  <!-- ✅ Tabel voor technische data -->
+  <table id="analysisTable">
+    <thead>
+      <tr>
+        <th>Asset</th>
+        <th>RSI</th>
+        <th>Volume</th>
+        <th>200 MA</th>
+        <th>Score</th>
+        <th>Trend</th>
+        <th>Verwijderen</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td colspan="7" class="loading">📡 Data laden...</td>
+      </tr>
+    </tbody>
+  </table>
 
-    <!-- ✅ JavaScript bestanden extern laden -->
-    <script src="config.js" defer></script> <!-- Configuratiebestand met API_URL -->
-    <script src="js/technical.js" defer></script> <!-- Zorg ervoor dat het script na de DOM geladen is -->
+  <!-- ✅ Analyse samenvatting -->
+  <h3>📊 Totale Technische Score: <span id="totalTechScore">N/A</span></h3>
+  <h3>📈 Technisch Advies: <span id="technicalAdvice">Neutraal</span></h3>
+  <p id="techStatus" class="loading">📡 Data laden...</p>
+
+  <!-- ✅ Scripts (defer zorgt dat DOM eerst geladen wordt) -->
+  <script src="config.js" type="module" defer></script>
+  <script src="js/technical.js" type="module" defer></script>
 
 </body>
 </html>
