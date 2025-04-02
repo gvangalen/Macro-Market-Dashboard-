@@ -8,37 +8,43 @@ document.addEventListener("DOMContentLoaded", function () {
     setInterval(loadTechAnalysis, 60000); // 🔄 Elke minuut updaten
 });
 
-const apiUrl = `${API_BASE_URL}/technical_data`;  // ✅ Correcte API URL
+const baseUrl = `${API_BASE_URL}/technical_data`;  // ✅ Basis URL
 
-// ✅ **Technische Analyse laden vanaf AWS**
+// ✅ Technische Analyse ophalen vanaf API
 async function loadTechAnalysis() {
     setText("techStatus", "📡 Laden...");
+    const timeframe = document.getElementById("globalTimeframe")?.value || "4hr";
+    const apiUrl = `${baseUrl}?timeframe=${timeframe}`;
 
     try {
-        let data = await safeFetch(apiUrl);  // Haal technische data op
-        if (!data || !Array.isArray(data)) throw new Error("Ongeldige API-response");  // Controleren of het een array is
+        let data = await safeFetch(apiUrl);
+        if (!data || !Array.isArray(data)) throw new Error("Ongeldige API-response");
 
-        console.log("📊 Ontvangen technische analyse data:", data);
-        renderTechTable(data); // ✅ Data is nu een array van assets
+        console.log(`📊 Ontvangen technische analyse data (${timeframe}):`, data);
+        renderTechTable(data);
         setText("techStatus", "✅ Data up-to-date");
     } catch (error) {
         showError("techStatus", "❌ Fout bij laden.");
     }
 }
 
-// ✅ **Tabel vullen met data**
+// ✅ Tabel renderen
 function renderTechTable(assets) {
-    let tableBody = document.querySelector("#analysisTable tbody");
-    tableBody.innerHTML = ""; // Maak de tabel leeg
+    const tbody = document.querySelector("#analysisTable tbody");
+    tbody.innerHTML = "";
+
+    let totalScore = 0;
 
     assets.forEach(asset => {
-        let newRow = document.createElement("tr");
-        newRow.dataset.id = asset.id; // ✅ dataset ID voor verwijderen
+        const row = document.createElement("tr");
+        row.dataset.id = asset.id;
 
-        let score = calculateTechScore(asset);
-        let trend = score >= 1 ? "Bullish 📈" : score <= -1 ? "Bearish 📉" : "Neutraal ⚖️";
+        const score = calculateTechScore(asset);
+        totalScore += score;
 
-        newRow.innerHTML = `
+        const trend = score >= 1 ? "Bullish 📈" : score <= -1 ? "Bearish 📉" : "Neutraal ⚖️";
+
+        row.innerHTML = `
             <td>${asset.symbol}</td>
             <td>${asset.rsi.toFixed(2)}</td>
             <td>${formatNumber(asset.volume)}</td>
@@ -47,17 +53,16 @@ function renderTechTable(assets) {
             <td>${trend}</td>
             <td><button class="btn-remove">❌</button></td>
         `;
-
-        tableBody.appendChild(newRow);
+        tbody.appendChild(row);
     });
 
+    updateScoreSummary(totalScore, assets.length);
     attachDeleteEventListeners();
 }
 
-// ✅ **Score berekenen voor technische indicatoren**
+// ✅ Technische score berekenen
 function calculateTechScore(asset) {
     let score = 0;
-
     if (asset.rsi > 70) score -= 2;
     else if (asset.rsi > 55) score -= 1;
     else if (asset.rsi < 30) score += 2;
@@ -70,105 +75,109 @@ function calculateTechScore(asset) {
     return Math.max(-2, Math.min(2, score));
 }
 
-// ✅ **Asset toevoegen met indicatoren**
+// ✅ Score samenvatting
+function updateScoreSummary(total, count) {
+    const avg = count > 0 ? (total / count).toFixed(1) : "N/A";
+    document.getElementById("totalTechScore").innerText = avg;
+
+    let advice = "Neutraal ⚖️";
+    if (avg >= 1.5) advice = "Bullish 🟢";
+    else if (avg <= -1.5) advice = "Bearish 🔴";
+
+    document.getElementById("technicalAdvice").innerText = advice;
+}
+
+// ✅ Asset toevoegen
 async function addTechRow() {
-    let assetName = prompt("Voer de naam van de asset in:");
-    if (!assetName || assetName.trim() === "") return alert("⚠️ Ongeldige naam!");
+    const name = prompt("Voer de naam van de asset in:");
+    if (!name || name.trim() === "") return alert("⚠️ Ongeldige naam!");
 
     await updateButton("addTechAssetBtn", "⏳ Toevoegen...", async () => {
-        await safeFetch(apiUrl, "POST", { symbol: assetName.trim() });
+        await safeFetch(baseUrl, "POST", { symbol: name.trim() });
         loadTechAnalysis();
     });
 }
 
-// ✅ **Indicator toevoegen aan alle assets**
+// ✅ Indicator toevoegen
 async function addTechIndicator() {
-    let indicatorName = prompt("Voer de naam van de indicator in:");
-    if (!indicatorName || indicatorName.trim() === "") return alert("⚠️ Ongeldige naam!");
+    const name = prompt("Voer de naam van de indicator in:");
+    if (!name || name.trim() === "") return alert("⚠️ Ongeldige naam!");
 
     await updateButton("addTechnicalIndicatorBtn", "⏳ Toevoegen...", async () => {
-        await safeFetch(`${apiUrl}/indicators`, "POST", { name: indicatorName.trim() });
+        await safeFetch(`${baseUrl}/indicators`, "POST", { name: name.trim() });
         loadTechAnalysis();
     });
 }
 
-// ✅ **Asset verwijderen**
+// ✅ Asset verwijderen
 async function removeTechRow(assetId) {
     if (!confirm("Weet je zeker dat je deze asset wilt verwijderen?")) return;
 
     await updateButton(`remove-${assetId}`, "⏳ Verwijderen...", async () => {
-        await safeFetch(`${apiUrl}/${assetId}`, "DELETE");
+        await safeFetch(`${baseUrl}/${assetId}`, "DELETE");
         loadTechAnalysis();
     });
 }
 
-// ✅ **Veilige API-aanroepen met retry**
+// ✅ API-call met retry
 async function safeFetch(url, method = "GET", body = null) {
     let retries = 3;
     while (retries > 0) {
         try {
-            let options = { method, headers: { "Content-Type": "application/json" } };
+            const options = { method, headers: { "Content-Type": "application/json" } };
             if (body) options.body = JSON.stringify(body);
 
-            let response = await fetch(url, options);
-            if (!response.ok) throw new Error(`Serverfout (${response.status})`);
-
-            return method === "GET" ? await response.json() : true;
-        } catch (error) {
-            console.error(`❌ API-fout bij ${url}:`, error);
+            const res = await fetch(url, options);
+            if (!res.ok) throw new Error(`Serverfout (${res.status})`);
+            return method === "GET" ? await res.json() : true;
+        } catch (err) {
+            console.error(`❌ Fout bij ${url}:`, err);
             retries--;
-            if (retries === 0) throw error;
+            if (retries === 0) throw err;
             await new Promise(resolve => setTimeout(resolve, 2000));
         }
     }
 }
 
-// ✅ **Tekst aanpassen in UI**
-function setText(elementId, text) {
-    let el = document.getElementById(elementId);
+// ✅ UI helpers
+function setText(id, text) {
+    const el = document.getElementById(id);
     if (el) el.textContent = text;
 }
 
-// ✅ **Foutmelding tonen in UI**
-function showError(elementId, message) {
-    setText(elementId, message);
-    document.getElementById(elementId).style.color = "red";
+function showError(id, message) {
+    setText(id, message);
+    document.getElementById(id).style.color = "red";
 }
 
-// ✅ **Knop tijdelijk aanpassen bij async bewerking**
-async function updateButton(buttonId, tempText, action) {
-    let button = document.getElementById(buttonId);
-    if (!button) return;
+async function updateButton(id, tempText, action) {
+    const btn = document.getElementById(id);
+    if (!btn) return;
+    const original = btn.textContent;
 
-    let originalText = button.textContent;
-    button.textContent = tempText;
-    button.disabled = true;
+    btn.textContent = tempText;
+    btn.disabled = true;
 
     try {
         await action();
-    } catch (error) {
-        console.error(error);
     } finally {
-        button.textContent = originalText;
-        button.disabled = false;
+        btn.textContent = original;
+        btn.disabled = false;
     }
 }
 
-// ✅ **Event Listeners koppelen voor verwijderen**
 function attachDeleteEventListeners() {
-    document.querySelectorAll(".btn-remove").forEach(button => {
-        button.removeEventListener("click", handleDeleteClick);
-        button.addEventListener("click", handleDeleteClick);
+    document.querySelectorAll(".btn-remove").forEach(btn => {
+        btn.removeEventListener("click", handleDeleteClick);
+        btn.addEventListener("click", handleDeleteClick);
     });
 }
 
-// ✅ **Afhandelen van verwijderen**
-function handleDeleteClick(event) {
-    let assetId = event.target.closest("tr").dataset.id;
+function handleDeleteClick(e) {
+    const assetId = e.target.closest("tr").dataset.id;
     if (assetId) removeTechRow(assetId);
 }
 
-// ✅ **Helper: Getal formatteren**
 function formatNumber(num) {
     return num >= 1e9
         ? `${(num / 1e9).toFixed(2)}B`
