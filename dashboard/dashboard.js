@@ -1,4 +1,3 @@
-// dashboard.js
 import { API_BASE_URL } from "../config.js";
 
 console.log("✅ Dashboard.js versie 2025-04-01 geladen");
@@ -91,7 +90,7 @@ async function fetchDashboardData() {
         const data = await safeFetch("/dashboard_data");
         if (!data) return;
 
-        const macro = await safeFetch("/macro_data/list");
+        const macro = await safeFetch("/macro_data");
         if (macroGauge && macro) {
             updateGauge(macroGauge, calculateMacroScore(macro));
             renderMacroTable(macro);
@@ -229,8 +228,8 @@ function renderSetupTable(setups) {
     }
     setups.forEach(s => {
         const row = tbody.insertRow();
-        row.insertCell().innerText = s.name;
-        row.insertCell().innerText = s.status;
+        row.insertCell().innerText = s.setup_name ?? "–";
+        row.insertCell().innerText = s.conditions ? JSON.stringify(s.conditions) : "–";
         const del = row.insertCell();
         const btn = document.createElement("button");
         btn.innerText = "🗑️";
