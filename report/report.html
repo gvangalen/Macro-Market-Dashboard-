@@ -4,7 +4,32 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>📄 Dagrapport</title>
+
+  <!-- ✅ Basis styling voor layout en tabellen -->
   <link rel="stylesheet" href="css/styles.css" />
+
+  <!-- ✅ Specifieke styling voor de rapportpagina -->
+  <link rel="stylesheet" href="report.css">
+
+  <!-- ✅ Print-vriendelijke styling -->
+  <style>
+    @media print {
+      body {
+        background: white;
+        color: black;
+      }
+
+      .no-print {
+        display: none !important;
+      }
+
+      .table-container {
+        box-shadow: none;
+        padding: 0;
+        margin: 0;
+      }
+    }
+  </style>
 </head>
 <body>
 
@@ -12,11 +37,18 @@
     <h2>📄 Dagelijks Tradingrapport</h2>
     <p id="reportStatus" class="loading">📡 Rapport wordt geladen...</p>
 
+    <!-- ✅ Print/PDF knop -->
+    <div class="no-print" style="text-align: right; margin-bottom: 10px;">
+      <button onclick="window.print()" class="btn-add">📤 Download als PDF / Print</button>
+    </div>
+
+    <!-- ✅ Rapportinhoud -->
     <div id="dailyReportContent" style="text-align: left; margin-top: 20px;">
-      <!-- Rapportinhoud wordt hier geladen -->
+      <!-- Rapportinhoud wordt hier geladen door report.js -->
     </div>
   </div>
 
+  <!-- ✅ JS die het rapport ophaalt -->
   <script type="module" src="js/report.js"></script>
 </body>
 </html>
