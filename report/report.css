@@ -81,6 +81,20 @@ table.report-table th {
     border-radius: 6px;
 }
 
+/* ✅ Voor blokken met <pre> (zoals setup checklist, outlook, etc.) */
+.report-section pre,
+#dailyReportContent pre {
+    background: #f9f9f9;
+    padding: 12px;
+    border-radius: 6px;
+    font-family: monospace;
+    font-size: 15px;
+    white-space: pre-wrap;
+    line-height: 1.5;
+    color: #2d2d2d;
+    overflow-x: auto;
+}
+
 /* ✅ Responsive */
 @media (max-width: 768px) {
     .report-container {
