@@ -1,6 +1,6 @@
 import { API_BASE_URL } from "../config.js";
 
-console.log("✅ Dashboard.js versie 2025-04-01 geladen");
+console.log("✅ Dashboard.js versie 2025-04-06 geladen");
 
 let macroGauge, technicalGauge, setupGauge;
 
@@ -67,6 +67,8 @@ document.addEventListener("DOMContentLoaded", function () {
             }
         });
     }
+
+    renderTradingAdvice(); // ✅ Ook bij pagina-initialisatie
 });
 
 function initEmptyTables() {
@@ -108,6 +110,7 @@ async function fetchDashboardData() {
         }
 
         renderMarketTable(data.market_data, data.technical_data);
+        await renderTradingAdvice(); // ✅ Ook bij refresh
     } catch (err) {
         console.error("❌ Fout tijdens laden dashboard:", err);
     }
@@ -236,4 +239,32 @@ function renderSetupTable(setups) {
         btn.addEventListener("click", () => row.remove()); // Placeholder
         del.appendChild(btn);
     });
+}
+
+// ✅ NIEUW: Tradingadvies ophalen en tonen
+async function renderTradingAdvice() {
+    const box = document.getElementById("tradingAdviceBox");
+    if (!box) return;
+
+    try {
+        const advice = await safeFetch("/trading_advice");
+        if (!advice || advice.error) {
+            box.innerHTML = `<p style="color: #888">❌ Geen advies beschikbaar</p>`;
+            return;
+        }
+
+        box.innerHTML = `
+            <h3>🚀 Actueel Tradingadvies</h3>
+            <p><strong>Setup:</strong> ${advice.setup}</p>
+            <p><strong>Trend:</strong> ${advice.trend}</p>
+            <p><strong>Entry:</strong> $${Number(advice.entry).toFixed(2)}</p>
+            <p><strong>Targets:</strong> ${advice.targets.map(t => `$${t}`).join(" / ")}</p>
+            <p><strong>Stop-loss:</strong> $${advice.stop_loss}</p>
+            <p><strong>Risico:</strong> ${advice.risico}</p>
+            <p style="color: #888"><em>${advice.reden ?? ""}</em></p>
+        `;
+    } catch (err) {
+        console.error("❌ Fout bij ophalen tradingadvies:", err);
+        box.innerHTML = `<p style="color: #888">❌ Fout bij ophalen advies</p>`;
+    }
 }
