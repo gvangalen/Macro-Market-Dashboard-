@@ -1,17 +1,17 @@
 /* ✅ Algemene container styling */
 .setup-container {
-    max-width: 450px;
+    max-width: 500px;
     margin: auto;
-    padding: 20px;
+    padding: 25px;
     background: white;
-    border-radius: 8px;
-    box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
+    border-radius: 12px;
+    box-shadow: 0px 6px 15px rgba(0, 0, 0, 0.1);
     transition: transform 0.3s ease-in-out, box-shadow 0.3s ease-in-out;
 }
 
 .setup-container:hover {
     transform: scale(1.02);
-    box-shadow: 0px 6px 15px rgba(0, 0, 0, 0.15);
+    box-shadow: 0px 8px 20px rgba(0, 0, 0, 0.15);
 }
 
 /* ✅ Koppen styling */
@@ -19,7 +19,7 @@ h2, h3 {
     text-align: center;
     font-weight: bold;
     color: #333;
-    margin-bottom: 15px;
+    margin-bottom: 20px;
 }
 
 /* ✅ Formulier styling */
@@ -38,6 +38,20 @@ input:focus, select:focus {
     border-color: #4caf50;
     outline: none;
     box-shadow: 0px 0px 8px rgba(76, 175, 80, 0.4);
+}
+
+/* ✅ Validatie (visueel) */
+input:invalid, select:invalid {
+    border-color: #d9534f;
+}
+
+/* ✅ Foutmeldingen */
+.error-msg {
+    color: #d9534f;
+    font-size: 0.85rem;
+    margin-top: -6px;
+    margin-bottom: 8px;
+    display: none;
 }
 
 /* ✅ Knop styling */
@@ -61,14 +75,31 @@ button:disabled {
     cursor: not-allowed;
 }
 
+/* ✅ Toastmelding */
+#toast {
+    background: #4caf50;
+    color: white;
+    padding: 12px;
+    border-radius: 6px;
+    margin-top: 15px;
+    text-align: center;
+    display: none;
+    animation: fadein 0.4s ease-in-out;
+}
+
+@keyframes fadein {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
 /* ✅ Lijst van setups */
 #setupList {
     list-style: none;
     padding: 0;
-    margin-top: 15px;
+    margin-top: 20px;
 }
 
-/* ✅ Individuele setup items */
+/* ✅ Setup items */
 #setupList li {
     padding: 12px;
     background: #f8f9fa;
@@ -82,16 +113,15 @@ button:disabled {
 
 #setupList li:hover {
     background: #e0f2f1;
-    box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
+    box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.08);
 }
 
-/* ✅ Actieve setups krijgen visuele prioriteit */
 #setupList li.active {
     background: #c8e6c9;
     font-weight: bold;
 }
 
-/* ✅ Verwijderen knop */
+/* ✅ Verwijderknop */
 .delete-btn {
     background: #d9534f;
     color: white;
@@ -107,7 +137,23 @@ button:disabled {
     transform: scale(1.1);
 }
 
-/* ✅ Laadindicator styling */
+/* ✅ Filteropties (voor latere uitbreiding) */
+.setup-controls {
+    display: flex;
+    gap: 10px;
+    margin: 20px 0 10px;
+    justify-content: space-between;
+}
+
+.setup-controls select {
+    flex: 1;
+    padding: 8px;
+    border-radius: 6px;
+    border: 1px solid #ccc;
+    font-size: 14px;
+}
+
+/* ✅ Laadindicator */
 .loading {
     text-align: center;
     font-size: 16px;
@@ -119,7 +165,7 @@ button:disabled {
 /* ✅ Responsieve optimalisatie */
 @media (max-width: 600px) {
     .setup-container {
-        max-width: 90%;
+        max-width: 95%;
         padding: 15px;
     }
 
