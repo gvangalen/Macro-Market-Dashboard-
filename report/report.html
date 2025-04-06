@@ -7,8 +7,6 @@
 
   <!-- ✅ Basis styling voor layout en tabellen -->
   <link rel="stylesheet" href="css/styles.css" />
-
-  <!-- ✅ Specifieke styling voor de rapportpagina -->
   <link rel="stylesheet" href="report.css">
 
   <!-- ✅ Print-vriendelijke styling -->
@@ -29,6 +27,21 @@
         margin: 0;
       }
     }
+
+    .toolbar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 10px;
+      margin: 10px 0 20px;
+      flex-wrap: wrap;
+    }
+
+    .toolbar select {
+      padding: 6px;
+      font-size: 14px;
+      border-radius: 4px;
+    }
   </style>
 </head>
 <body>
@@ -37,18 +50,24 @@
     <h2>📄 Dagelijks Tradingrapport</h2>
     <p id="reportStatus" class="loading">📡 Rapport wordt geladen...</p>
 
-    <!-- ✅ Print/PDF knop -->
-    <div class="no-print" style="text-align: right; margin-bottom: 10px;">
-      <button onclick="window.print()" class="btn-add">📤 Download als PDF / Print</button>
+    <!-- ✅ Toolbar met datumselector en PDF-knop -->
+    <div class="toolbar no-print">
+      <div>
+        <label for="reportDateSelect">🗓️ Rapportdatum:</label>
+        <select id="reportDateSelect">
+          <option value="latest" selected>Laatste rapport</option>
+        </select>
+      </div>
+      <button id="downloadPdfBtn" class="btn-add">📥 Download als PDF</button>
     </div>
 
     <!-- ✅ Rapportinhoud -->
     <div id="dailyReportContent" style="text-align: left; margin-top: 20px;">
-      <!-- Rapportinhoud wordt hier geladen door report.js -->
+      <!-- Rapport wordt hier geladen via report.js -->
     </div>
   </div>
 
-  <!-- ✅ JS die het rapport ophaalt -->
+  <!-- ✅ Rapport script -->
   <script type="module" src="report/report.js"></script>
 </body>
 </html>
