@@ -210,3 +210,33 @@ button:hover {
         font-size: 13px;
     }
 }
+.advice-card {
+  background: #f9f9f9;
+  padding: 20px;
+  margin-top: 20px;
+  border-radius: 16px;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
+  transition: all 0.3s ease;
+}
+
+.advice-card.bullish {
+  border-left: 6px solid #34c759;
+}
+
+.advice-card.bearish {
+  border-left: 6px solid #ff3b30;
+}
+
+.advice-card.neutral {
+  border-left: 6px solid #ccc;
+}
+
+.advice-card h3 {
+  margin-top: 0;
+  font-size: 1.25rem;
+  margin-bottom: 10px;
+}
+
+.advice-card p {
+  margin: 4px 0;
+}
