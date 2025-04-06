@@ -1,152 +1,47 @@
 <!DOCTYPE html>
 <html lang="nl">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>📊 Setup Editor</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>⚙️ Setup Editor (Next Gen)</title>
   <link rel="stylesheet" href="setup.css" />
-  <style>
-    :root {
-      --green: #4caf50;
-      --red: #e53935;
-      --gray: #999;
-    }
-
-    body {
-      font-family: "Segoe UI", sans-serif;
-      background-color: #f5f5f5;
-      margin: 0;
-      padding: 20px;
-    }
-
-    .setup-container {
-      max-width: 500px;
-      margin: auto;
-      background: white;
-      padding: 25px 30px;
-      border-radius: 12px;
-      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.08);
-    }
-
-    h2, h3 {
-      text-align: center;
-      color: #333;
-    }
-
-    form label {
-      font-weight: 600;
-      margin-top: 12px;
-      display: block;
-      color: #333;
-    }
-
-    input, select {
-      width: 100%;
-      padding: 10px;
-      margin-top: 6px;
-      border-radius: 8px;
-      border: 1px solid #ccc;
-      transition: border 0.3s ease;
-    }
-
-    input:invalid {
-      border-color: var(--red);
-    }
-
-    input:valid {
-      border-color: var(--green);
-    }
-
-    .error-msg {
-      font-size: 13px;
-      color: var(--red);
-      margin-top: 4px;
-      display: none;
-    }
-
-    button {
-      width: 100%;
-      margin-top: 20px;
-      padding: 12px;
-      background: var(--green);
-      color: white;
-      border: none;
-      border-radius: 8px;
-      font-weight: bold;
-      cursor: pointer;
-      transition: background 0.3s ease;
-    }
-
-    button:hover {
-      background: #388e3c;
-    }
-
-    ul {
-      list-style: none;
-      padding: 0;
-    }
-
-    li {
-      background: #fafafa;
-      padding: 10px 12px;
-      margin-top: 8px;
-      border-radius: 8px;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-    }
-
-    .delete-btn {
-      background: var(--red);
-      border: none;
-      color: white;
-      padding: 6px 10px;
-      border-radius: 6px;
-      cursor: pointer;
-    }
-
-    #setupStatus {
-      margin-top: 10px;
-      font-size: 14px;
-      color: var(--gray);
-      text-align: center;
-    }
-
-    .loading {
-      color: #888;
-    }
-  </style>
+  <script type="module" src="setup.js"></script>
 </head>
 <body>
+  <div class="card">
+    <h2>➕ Setup Toevoegen</h2>
+    <form id="setupForm" novalidate>
+      <div class="input-group">
+        <label for="setupName">📛 Naam van Setup</label>
+        <input type="text" id="setupName" required minlength="3" placeholder="Bijv. A-Plus Setup" />
+        <small id="nameError" class="error-msg">Minimaal 3 tekens vereist.</small>
+      </div>
 
-<div class="setup-container">
-  <h2>➕ Setup Toevoegen</h2>
-  <form id="setupForm" novalidate>
-    <label for="setupName">📛 Naam van Setup:</label>
-    <input type="text" id="setupName" placeholder="Bijv. A-Plus Setup" required>
-    <div class="error-msg" id="errorName">Vul een naam in.</div>
+      <div class="input-group">
+        <label for="setupIndicators">📉 Indicatoren</label>
+        <input type="text" id="setupIndicators" required placeholder="Bijv. RSI < 30, SMA200 boven prijs" />
+        <small id="indicatorError" class="error-msg">Geef minstens 1 indicator op.</small>
+      </div>
 
-    <label for="setupIndicators">📉 Indicatoren:</label>
-    <input type="text" id="setupIndicators" placeholder="Bijv. RSI < 30, SMA200 boven prijs" required>
-    <div class="error-msg" id="errorIndicators">Vul minimaal één indicator in.</div>
+      <div class="input-group">
+        <label for="setupTrend">📊 Marktconditie</label>
+        <select id="setupTrend" required>
+          <option value="">-- Kies trend --</option>
+          <option value="bullish">📈 Bullish</option>
+          <option value="bearish">📉 Bearish</option>
+          <option value="neutral">⚖️ Neutraal</option>
+        </select>
+        <small id="trendError" class="error-msg">Selecteer een marktconditie.</small>
+      </div>
 
-    <label for="setupTrend">📊 Marktconditie:</label>
-    <select id="setupTrend" required>
-      <option value="">-- Kies een trend --</option>
-      <option value="bullish">📈 Bullish</option>
-      <option value="bearish">📉 Bearish</option>
-      <option value="neutral">⚖️ Neutraal</option>
-    </select>
+      <button type="submit" class="submit-btn" id="submitButton" disabled>✅ Opslaan</button>
+    </form>
 
-    <button type="submit">✅ Opslaan</button>
-  </form>
+    <div id="toast" class="success-toast" style="display:none">✅ Setup opgeslagen!</div>
 
-  <div id="setupStatus" class="loading">📡 Setups worden geladen...</div>
-
-  <h3>📜 Opgeslagen Setups</h3>
-  <ul id="setupList"></ul>
-</div>
-
-<script type="module" src="setup/setup.js"></script>
+    <h3 style="margin-top: 2rem;">📜 Opgeslagen Setups</h3>
+    <ul id="setupList">🔄 Laden...</ul>
+    <p id="setupStatus" class="loading"></p>
+  </div>
 </body>
 </html>
