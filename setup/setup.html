@@ -4,8 +4,134 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>⚙️ Setup Editor (Next Gen)</title>
-  <link rel="stylesheet" href="setup.css" />
-  <script type="module" src="setup.js"></script>
+  <link rel="stylesheet" href="../css/styles.css" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" />
+  <style>
+    :root {
+      --primary: #4caf50;
+      --danger: #d9534f;
+      --bg: #f9f9f9;
+      --text: #222;
+    }
+
+    body {
+      font-family: system-ui, sans-serif;
+      margin: 0;
+      background: var(--bg);
+      color: var(--text);
+      padding: 2rem;
+    }
+
+    .card {
+      max-width: 550px;
+      background: white;
+      margin: auto;
+      padding: 2rem;
+      border-radius: 12px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    }
+
+    h2, h3 {
+      text-align: center;
+      margin-bottom: 1rem;
+    }
+
+    .input-group {
+      margin-bottom: 1.2rem;
+    }
+
+    .input-group label {
+      font-weight: bold;
+      display: block;
+      margin-bottom: 0.4rem;
+    }
+
+    .input-group input,
+    .input-group select {
+      width: 100%;
+      padding: 10px;
+      font-size: 1rem;
+      border: 1px solid #ccc;
+      border-radius: 6px;
+      transition: border-color 0.3s;
+    }
+
+    .input-group input:invalid {
+      border-color: var(--danger);
+    }
+
+    .error-msg {
+      color: var(--danger);
+      font-size: 0.85rem;
+      display: none;
+    }
+
+    .submit-btn {
+      width: 100%;
+      padding: 12px;
+      font-size: 1rem;
+      background: var(--primary);
+      color: white;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      font-weight: bold;
+    }
+
+    .submit-btn:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+    }
+
+    .success-toast {
+      background: var(--primary);
+      color: white;
+      text-align: center;
+      padding: 12px;
+      margin-top: 1rem;
+      border-radius: 6px;
+      animation: fadein 0.5s ease-in-out;
+    }
+
+    @keyframes fadein {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .filters {
+      display: flex;
+      justify-content: space-between;
+      margin: 1.2rem 0;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+
+    .filters select {
+      padding: 8px;
+      border-radius: 6px;
+      font-size: 0.95rem;
+    }
+
+    .setup-list li {
+      background: #fff;
+      padding: 10px;
+      border-radius: 6px;
+      margin-bottom: 8px;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.06);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .delete-btn {
+      background: var(--danger);
+      color: white;
+      border: none;
+      padding: 6px 10px;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+  </style>
 </head>
 <body>
   <div class="card">
@@ -39,9 +165,23 @@
 
     <div id="toast" class="success-toast" style="display:none">✅ Setup opgeslagen!</div>
 
-    <h3 style="margin-top: 2rem;">📜 Opgeslagen Setups</h3>
-    <ul id="setupList">🔄 Laden...</ul>
-    <p id="setupStatus" class="loading"></p>
+    <h3>📜 Opgeslagen Setups</h3>
+    <div class="filters">
+      <select id="trendFilter">
+        <option value="all">🔍 Toon alles</option>
+        <option value="bullish">📈 Bullish</option>
+        <option value="bearish">📉 Bearish</option>
+        <option value="neutral">⚖️ Neutraal</option>
+      </select>
+      <select id="sortBy">
+        <option value="name">🔠 Sorteer op naam</option>
+      </select>
+    </div>
+
+    <ul id="setupList" class="setup-list"></ul>
+    <p id="setupStatus"></p>
   </div>
+
+  <script type="module" src="setup.js"></script>
 </body>
 </html>
