@@ -1,8 +1,8 @@
 <!DOCTYPE html>
 <html lang="nl">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>⚙️ Setup Editor (Next Gen)</title>
   <link rel="stylesheet" href="../css/styles.css" />
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" />
@@ -23,7 +23,7 @@
     }
 
     .card {
-      max-width: 550px;
+      max-width: 600px;
       background: white;
       margin: auto;
       padding: 2rem;
@@ -54,10 +54,6 @@
       border: 1px solid #ccc;
       border-radius: 6px;
       transition: border-color 0.3s;
-    }
-
-    .input-group input:invalid {
-      border-color: var(--danger);
     }
 
     .error-msg {
@@ -119,17 +115,39 @@
       margin-bottom: 8px;
       box-shadow: 0 2px 5px rgba(0,0,0,0.06);
       display: flex;
-      justify-content: space-between;
-      align-items: center;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .setup-actions {
+      display: flex;
+      gap: 10px;
+    }
+
+    .setup-actions button {
+      padding: 6px 10px;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 0.85rem;
+    }
+
+    .edit-btn {
+      background: #2196f3;
+      color: white;
     }
 
     .delete-btn {
       background: var(--danger);
       color: white;
-      border: none;
-      padding: 6px 10px;
-      border-radius: 4px;
-      cursor: pointer;
+    }
+
+    .ai-response {
+      background: #f1f8e9;
+      padding: 10px;
+      border-radius: 6px;
+      font-size: 0.95rem;
+      color: #333;
     }
   </style>
 </head>
