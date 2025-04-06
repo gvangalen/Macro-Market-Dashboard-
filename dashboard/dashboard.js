@@ -68,7 +68,12 @@ document.addEventListener("DOMContentLoaded", function () {
         });
     }
 
-    renderTradingAdvice(); // ✅ Ook bij pagina-initialisatie
+    const symbolSelect = document.getElementById("symbolSelect");
+    if (symbolSelect) {
+        symbolSelect.addEventListener("change", () => renderTradingAdvice());
+    }
+
+    renderTradingAdvice(); // ✅ ook bij load
 });
 
 function initEmptyTables() {
@@ -110,7 +115,7 @@ async function fetchDashboardData() {
         }
 
         renderMarketTable(data.market_data, data.technical_data);
-        await renderTradingAdvice(); // ✅ Ook bij refresh
+        await renderTradingAdvice(); // ✅ ook bij refresh
     } catch (err) {
         console.error("❌ Fout tijdens laden dashboard:", err);
     }
@@ -241,30 +246,42 @@ function renderSetupTable(setups) {
     });
 }
 
-// ✅ NIEUW: Tradingadvies ophalen en tonen
+// ✅ Tradingadvies ophalen en tonen
 async function renderTradingAdvice() {
     const box = document.getElementById("tradingAdviceBox");
     if (!box) return;
 
+    const symbol = document.getElementById("symbolSelect")?.value || "BTC";
+    const assetName = symbol === "SOL" ? "Solana" : "Bitcoin";
+
     try {
-        const advice = await safeFetch("/trading_advice");
+        const advice = await safeFetch(`/trading_advice?symbol=${symbol}`);
         if (!advice || advice.error) {
-            box.innerHTML = `<p style="color: #888">❌ Geen advies beschikbaar</p>`;
+            box.innerHTML = `<p style="color: #888">❌ Geen advies beschikbaar voor ${symbol}</p>`;
+            box.className = "advice-card neutral";
             return;
         }
 
+        const trendClass = advice.trend === "Bullish"
+            ? "bullish"
+            : advice.trend === "Bearish"
+                ? "bearish"
+                : "neutral";
+
+        box.className = `advice-card ${trendClass}`;
         box.innerHTML = `
-            <h3>🚀 Actueel Tradingadvies</h3>
-            <p><strong>Setup:</strong> ${advice.setup}</p>
-            <p><strong>Trend:</strong> ${advice.trend}</p>
-            <p><strong>Entry:</strong> $${Number(advice.entry).toFixed(2)}</p>
-            <p><strong>Targets:</strong> ${advice.targets.map(t => `$${t}`).join(" / ")}</p>
-            <p><strong>Stop-loss:</strong> $${advice.stop_loss}</p>
-            <p><strong>Risico:</strong> ${advice.risico}</p>
-            <p style="color: #888"><em>${advice.reden ?? ""}</em></p>
+            <h3>🚀 Actueel Tradingadvies (${assetName})</h3>
+            <p><strong>📋 Setup:</strong> ${advice.setup}</p>
+            <p><strong>📈 Trend:</strong> ${advice.trend}</p>
+            <p><strong>🎯 Entry:</strong> $${Number(advice.entry).toFixed(2)}</p>
+            <p><strong>🎯 Targets:</strong> ${advice.targets.map(t => `$${t}`).join(" / ")}</p>
+            <p><strong>🛑 Stop-loss:</strong> $${advice.stop_loss}</p>
+            <p><strong>⚠️ Risico:</strong> ${advice.risico}</p>
+            <p style="color: #666;"><em>${advice.reden ?? ""}</em></p>
         `;
     } catch (err) {
         console.error("❌ Fout bij ophalen tradingadvies:", err);
         box.innerHTML = `<p style="color: #888">❌ Fout bij ophalen advies</p>`;
+        box.className = "advice-card neutral";
     }
 }
