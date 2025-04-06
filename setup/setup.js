@@ -2,16 +2,14 @@ import { API_BASE_URL } from "../config.js";
 
 console.log("✅ setup.js geladen!");
 
-document.addEventListener("DOMContentLoaded", function () {
-  console.log("📌 Setup Manager geladen!");
+const apiUrl = `${API_BASE_URL}/setups`;
+const aiUrl = `${API_BASE_URL}/ai/explain_setup`;
+
+document.addEventListener("DOMContentLoaded", () => {
   loadSetups();
   setupFilters();
 });
 
-const apiUrl = `${API_BASE_URL}/setups`;
-const aiUrl = `${API_BASE_URL}/ai/explain_setup`; // ✅ AI-uitleg endpoint
-
-// ✅ Setup toevoegen
 const form = document.getElementById("setupForm");
 form?.addEventListener("submit", async function (e) {
   e.preventDefault();
@@ -48,7 +46,6 @@ function showValidationErrors(name, indicators, trend) {
   document.getElementById("trendError").style.display = trend ? "none" : "block";
 }
 
-// ✅ Setup lijst laden en tonen
 async function loadSetups() {
   try {
     const setups = await safeFetch(apiUrl);
@@ -58,7 +55,6 @@ async function loadSetups() {
   }
 }
 
-// ✅ Setuplijst tonen (met filtering + AI-uitleg)
 async function renderSetupList(setups) {
   const list = document.getElementById("setupList");
   if (!list) return;
@@ -67,8 +63,7 @@ async function renderSetupList(setups) {
   const sortBy = document.getElementById("sortBy")?.value;
 
   let filtered = [...setups];
-  if (filter) filtered = filtered.filter(s => s.trend === filter);
-
+  if (filter && filter !== "all") filtered = filtered.filter(s => s.trend === filter);
   if (sortBy === "name") filtered.sort((a, b) => a.name.localeCompare(b.name));
 
   list.innerHTML = "<li>⏳ Laden...</li>";
@@ -76,20 +71,31 @@ async function renderSetupList(setups) {
   const rendered = await Promise.all(
     filtered.map(async setup => {
       const explanation = await generateExplanation(setup);
-      return `<li data-id="${setup.id}">
-        <div><strong>${setup.name}</strong> (${setup.trend})</div>
-        <div style="font-size: 0.95em; color: #555">${setup.indicators}</div>
-        <div style="font-size: 0.85em; color: #888; margin: 5px 0">💡 ${explanation}</div>
-        <button class="delete-btn">❌</button>
-      </li>`;
+      return `
+        <li data-id="${setup.id}">
+          <div class="editable">
+            <input class="edit-name" value="${setup.name}" />
+            <input class="edit-indicators" value="${setup.indicators}" />
+            <select class="edit-trend">
+              <option value="bullish" ${setup.trend === "bullish" ? "selected" : ""}>📈 Bullish</option>
+              <option value="bearish" ${setup.trend === "bearish" ? "selected" : ""}>📉 Bearish</option>
+              <option value="neutral" ${setup.trend === "neutral" ? "selected" : ""}>⚖️ Neutraal</option>
+            </select>
+          </div>
+          <div style="font-size: 0.85em; color: #888; margin: 5px 0">💡 ${explanation}</div>
+          <div class="setup-actions">
+            <button class="save-btn">💾</button>
+            <button class="delete-btn">❌</button>
+          </div>
+        </li>`;
     })
   );
 
   list.innerHTML = rendered.join("");
-  attachDeleteEventListeners();
+  attachDeleteEvents();
+  attachSaveEvents();
 }
 
-// ✅ Genereer uitleg via AI
 async function generateExplanation(setup) {
   try {
     const res = await fetch(aiUrl, {
@@ -107,13 +113,10 @@ async function generateExplanation(setup) {
 }
 
 function setupFilters() {
-  const trendSelect = document.getElementById("trendFilter");
-  const sortSelect = document.getElementById("sortBy");
-  if (trendSelect) trendSelect.addEventListener("change", loadSetups);
-  if (sortSelect) sortSelect.addEventListener("change", loadSetups);
+  document.getElementById("trendFilter")?.addEventListener("change", loadSetups);
+  document.getElementById("sortBy")?.addEventListener("change", loadSetups);
 }
 
-// ✅ Setup verwijderen
 async function deleteSetup(id) {
   if (!confirm("Weet je zeker dat je deze setup wilt verwijderen?")) return;
   try {
@@ -124,7 +127,50 @@ async function deleteSetup(id) {
   }
 }
 
-// ✅ Veilige fetch
+async function updateSetup(id, updatedData) {
+  try {
+    await safeFetch(`${apiUrl}/${id}`, "PUT", updatedData);
+    loadSetups();
+  } catch (err) {
+    alert("❌ Bewerken mislukt.");
+  }
+}
+
+function attachDeleteEvents() {
+  document.querySelectorAll(".delete-btn").forEach(btn => {
+    btn.removeEventListener("click", handleDeleteClick);
+    btn.addEventListener("click", handleDeleteClick);
+  });
+}
+
+function handleDeleteClick(e) {
+  const id = e.target.closest("li")?.dataset.id;
+  if (id) deleteSetup(id);
+}
+
+function attachSaveEvents() {
+  document.querySelectorAll(".save-btn").forEach(btn => {
+    btn.removeEventListener("click", handleSaveClick);
+    btn.addEventListener("click", handleSaveClick);
+  });
+}
+
+function handleSaveClick(e) {
+  const li = e.target.closest("li");
+  const id = li?.dataset.id;
+  const name = li.querySelector(".edit-name")?.value.trim();
+  const indicators = li.querySelector(".edit-indicators")?.value.trim();
+  const trend = li.querySelector(".edit-trend")?.value;
+
+  if (!name || !indicators || !trend) {
+    alert("⚠️ Vul alle velden correct in.");
+    return;
+  }
+
+  const updated = { name, indicators, trend };
+  updateSetup(id, updated);
+}
+
 async function safeFetch(url, method = "GET", body = null) {
   const options = {
     method,
@@ -135,16 +181,4 @@ async function safeFetch(url, method = "GET", body = null) {
   const res = await fetch(url, options);
   if (!res.ok) throw new Error(`Fout bij ${url}`);
   return method === "GET" ? res.json() : true;
-}
-
-function attachDeleteEventListeners() {
-  document.querySelectorAll(".delete-btn").forEach(btn => {
-    btn.removeEventListener("click", handleDeleteClick);
-    btn.addEventListener("click", handleDeleteClick);
-  });
-}
-
-function handleDeleteClick(e) {
-  const id = e.target.closest("li")?.dataset.id;
-  if (id) deleteSetup(id);
 }
