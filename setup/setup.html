@@ -1,225 +1,152 @@
 <!DOCTYPE html>
 <html lang="nl">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>📊 Setup Toevoegen</title>
-    <link rel="stylesheet" href="setup.css">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>📊 Setup Editor</title>
+  <link rel="stylesheet" href="setup.css" />
+  <style>
+    :root {
+      --green: #4caf50;
+      --red: #e53935;
+      --gray: #999;
+    }
+
+    body {
+      font-family: "Segoe UI", sans-serif;
+      background-color: #f5f5f5;
+      margin: 0;
+      padding: 20px;
+    }
+
+    .setup-container {
+      max-width: 500px;
+      margin: auto;
+      background: white;
+      padding: 25px 30px;
+      border-radius: 12px;
+      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.08);
+    }
+
+    h2, h3 {
+      text-align: center;
+      color: #333;
+    }
+
+    form label {
+      font-weight: 600;
+      margin-top: 12px;
+      display: block;
+      color: #333;
+    }
+
+    input, select {
+      width: 100%;
+      padding: 10px;
+      margin-top: 6px;
+      border-radius: 8px;
+      border: 1px solid #ccc;
+      transition: border 0.3s ease;
+    }
+
+    input:invalid {
+      border-color: var(--red);
+    }
+
+    input:valid {
+      border-color: var(--green);
+    }
+
+    .error-msg {
+      font-size: 13px;
+      color: var(--red);
+      margin-top: 4px;
+      display: none;
+    }
+
+    button {
+      width: 100%;
+      margin-top: 20px;
+      padding: 12px;
+      background: var(--green);
+      color: white;
+      border: none;
+      border-radius: 8px;
+      font-weight: bold;
+      cursor: pointer;
+      transition: background 0.3s ease;
+    }
+
+    button:hover {
+      background: #388e3c;
+    }
+
+    ul {
+      list-style: none;
+      padding: 0;
+    }
+
+    li {
+      background: #fafafa;
+      padding: 10px 12px;
+      margin-top: 8px;
+      border-radius: 8px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .delete-btn {
+      background: var(--red);
+      border: none;
+      color: white;
+      padding: 6px 10px;
+      border-radius: 6px;
+      cursor: pointer;
+    }
+
+    #setupStatus {
+      margin-top: 10px;
+      font-size: 14px;
+      color: var(--gray);
+      text-align: center;
+    }
+
+    .loading {
+      color: #888;
+    }
+  </style>
 </head>
 <body>
 
 <div class="setup-container">
-    <h2>➕ Setup Toevoegen</h2>
-    <form id="setupForm">
-        <label for="setupName">📛 Naam van Setup:</label>
-        <input type="text" id="setupName" placeholder="Bijv. A-Plus Setup" required>
+  <h2>➕ Setup Toevoegen</h2>
+  <form id="setupForm" novalidate>
+    <label for="setupName">📛 Naam van Setup:</label>
+    <input type="text" id="setupName" placeholder="Bijv. A-Plus Setup" required>
+    <div class="error-msg" id="errorName">Vul een naam in.</div>
 
-        <label for="setupIndicators">📉 Indicatoren (bijv. RSI < 30, SMA200 boven prijs):</label>
-        <input type="text" id="setupIndicators" placeholder="Bijv. RSI < 30, SMA200 boven prijs" required>
+    <label for="setupIndicators">📉 Indicatoren:</label>
+    <input type="text" id="setupIndicators" placeholder="Bijv. RSI < 30, SMA200 boven prijs" required>
+    <div class="error-msg" id="errorIndicators">Vul minimaal één indicator in.</div>
 
-        <label for="setupTrend">📊 Marktconditie:</label>
-        <select id="setupTrend">
-            <option value="bullish">📈 Bullish</option>
-            <option value="bearish">📉 Bearish</option>
-            <option value="neutral">⚖️ Neutraal</option>
-        </select>
+    <label for="setupTrend">📊 Marktconditie:</label>
+    <select id="setupTrend" required>
+      <option value="">-- Kies een trend --</option>
+      <option value="bullish">📈 Bullish</option>
+      <option value="bearish">📉 Bearish</option>
+      <option value="neutral">⚖️ Neutraal</option>
+    </select>
 
-        <button type="submit" id="submitButton">✅ Opslaan</button>
-    </form>
+    <button type="submit">✅ Opslaan</button>
+  </form>
 
-    <h3>📜 Opgeslagen Setups</h3>
-    <ul id="setupList">🔄 Laden...</ul>
-    <p id="statusMessage" class="loading"></p>
+  <div id="setupStatus" class="loading">📡 Setups worden geladen...</div>
+
+  <h3>📜 Opgeslagen Setups</h3>
+  <ul id="setupList"></ul>
 </div>
 
-<script>
-    const apiUrl = "http://13.60.235.90:5002/setups"; // ✅ AWS API endpoint
-
-    document.addEventListener("DOMContentLoaded", function () {
-        loadSetups();
-    });
-
-    document.getElementById("setupForm").addEventListener("submit", async function (e) {
-        e.preventDefault();
-        
-        let name = document.getElementById("setupName").value.trim();
-        let indicators = document.getElementById("setupIndicators").value.trim();
-        let trend = document.getElementById("setupTrend").value;
-        let submitButton = document.getElementById("submitButton");
-
-        if (!name || !indicators) {
-            alert("⚠️ Vul alle velden in!");
-            return;
-        }
-
-        let setup = { name, indicators, trend };
-
-        submitButton.disabled = true; // ✅ Knop tijdelijk uitschakelen
-        document.getElementById("statusMessage").innerText = "📡 Opslaan...";
-        
-        try {
-            await saveSetup(setup);
-            document.getElementById("setupForm").reset();
-            loadSetups();
-        } catch (error) {
-            console.error("❌ Setup opslaan mislukt:", error);
-            document.getElementById("statusMessage").innerText = "❌ Fout bij opslaan.";
-        } finally {
-            submitButton.disabled = false; // ✅ Knop weer inschakelen
-        }
-    });
-
-    async function saveSetup(setup) {
-        try {
-            let response = await fetch(apiUrl, {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify(setup)
-            });
-
-            if (!response.ok) throw new Error(`Serverfout (${response.status}): Setup niet opgeslagen.`);
-            
-            console.log("✅ Setup succesvol opgeslagen:", setup);
-            document.getElementById("statusMessage").innerText = "✅ Setup opgeslagen!";
-            setTimeout(() => { document.getElementById("statusMessage").innerText = ""; }, 3000); // ✅ Bericht verdwijnt na 3 sec
-        } catch (error) {
-            console.error("❌ Fout bij opslaan setup:", error);
-            document.getElementById("statusMessage").innerText = "❌ Setup opslaan mislukt!";
-        }
-    }
-
-    async function loadSetups() {
-        try {
-            let response = await fetch(apiUrl);
-            if (!response.ok) throw new Error(`Serverfout (${response.status}): Setups niet geladen.`);
-            
-            let setups = await response.json();
-            let list = document.getElementById("setupList");
-            list.innerHTML = ""; // ✅ Eerst lijst leegmaken
-
-            if (setups.length === 0) {
-                list.innerHTML = "<li>🚫 Geen setups opgeslagen</li>";
-                return;
-            }
-
-            setups.forEach((setup) => {
-                let li = document.createElement("li");
-                li.innerHTML = `
-                    <span class="setup-item"><strong>${setup.name}</strong> (${setup.trend}) - ${setup.indicators}</span>
-                    ${setup.id ? `<button class="delete-btn" onclick="deleteSetup('${setup.id}')">❌</button>` : ""}
-                `;
-                list.appendChild(li);
-            });
-
-            console.log("✅ Setups succesvol geladen:", setups);
-        } catch (error) {
-            console.error("❌ Setup laden mislukt:", error);
-            document.getElementById("setupList").innerHTML = "<li>⚠️ Setup ophalen mislukt!</li>";
-        }
-    }
-
-    async function deleteSetup(id) {
-        if (!confirm("⚠️ Weet je zeker dat je deze setup wilt verwijderen?")) return;
-
-        try {
-            let response = await fetch(`${apiUrl}/${id}`, { method: "DELETE" });
-            if (!response.ok) throw new Error(`Serverfout (${response.status}): Setup niet verwijderd.`);
-
-            console.log(`✅ Setup ${id} succesvol verwijderd.`);
-            loadSetups(); // ✅ Lijst verversen
-        } catch (error) {
-            console.error("❌ Fout bij verwijderen setup:", error);
-            alert("❌ Setup verwijderen mislukt!");
-        }
-    }
-</script>
-
-<style>
-/* ✅ Algemene container styling */
-.setup-container {
-    max-width: 450px;
-    margin: auto;
-    padding: 20px;
-    background: white;
-    border-radius: 8px;
-    box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
-    transition: transform 0.3s ease-in-out;
-}
-
-.setup-container:hover {
-    transform: scale(1.02);
-}
-
-h2, h3 {
-    text-align: center;
-    font-weight: bold;
-    color: #333;
-}
-
-/* ✅ Formulier styling */
-input, select, button {
-    width: 100%;
-    margin: 10px 0;
-    padding: 12px;
-    border-radius: 6px;
-    border: 1px solid #ccc;
-    font-size: 16px;
-    transition: all 0.3s ease-in-out;
-}
-
-/* ✅ Input velden focus effect */
-input:focus, select:focus {
-    border-color: #4caf50;
-    outline: none;
-    box-shadow: 0px 0px 8px rgba(76, 175, 80, 0.3);
-}
-
-/* ✅ Knop styling */
-button {
-    background: #4caf50;
-    color: white;
-    border: none;
-    cursor: pointer;
-    font-weight: bold;
-    text-transform: uppercase;
-    transition: background 0.3s ease-in-out;
-}
-
-button:hover {
-    background: #388e3c;
-}
-
-/* ✅ Setup lijst */
-#setupList {
-    list-style: none;
-    padding: 0;
-    margin-top: 15px;
-}
-
-/* ✅ Setup item */
-.setup-item {
-    display: inline-block;
-    max-width: 80%;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-}
-
-/* ✅ Verwijderen knop in lijst */
-.delete-btn {
-    background: #d9534f;
-    color: white;
-    border: none;
-    padding: 8px 12px;
-    border-radius: 6px;
-    cursor: pointer;
-    transition: background 0.3s ease-in-out;
-}
-
-.delete-btn:hover {
-    background: #c9302c;
-}
-</style>
-
+<script type="module" src="setup/setup.js"></script>
 </body>
 </html>
