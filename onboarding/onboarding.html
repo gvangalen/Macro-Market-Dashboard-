@@ -1,1 +1,45 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>🚀 Onboarding Wizard</title>
+  <link rel="stylesheet" href="onboarding.css" />
+</head>
+<body>
+  <div class="onboarding-container">
+    <h2>👋 Welkom bij jouw Trading Dashboard</h2>
+    <div class="progress-bar"><div class="progress" id="progress"></div></div>
+
+    <ul class="onboarding-steps">
+      <li data-step="1">
+        <span class="label">📋 Setup toevoegen</span>
+        <a href="../setup.html" class="step-link">➡️ Naar setup</a>
+        <span class="status" id="step1-status"></span>
+      </li>
+      <li data-step="2">
+        <span class="label">📊 Technische indicatoren toevoegen</span>
+        <a href="../technical.html" class="step-link">➡️ Naar technische input</a>
+        <span class="status" id="step2-status"></span>
+      </li>
+      <li data-step="3">
+        <span class="label">🌐 Macro indicatoren toevoegen</span>
+        <a href="../macro.html" class="step-link">➡️ Naar macro input</a>
+        <span class="status" id="step3-status"></span>
+      </li>
+      <li data-step="4">
+        <span class="label">📈 Dashboard bekijken</span>
+        <a href="../dashboard.html" class="step-link">➡️ Ga naar dashboard</a>
+        <span class="status" id="step4-status"></span>
+      </li>
+    </ul>
+
+    <div id="onboarding-done" class="done-banner" style="display:none">
+      ✅ Alle stappen voltooid! Je kunt nu beginnen. <a href="../dashboard.html">Ga naar je dashboard</a>
+    </div>
+  </div>
+
+  <script type="module" src="onboarding.js"></script>
+</body>
+</html>
 
