@@ -49,6 +49,9 @@ async function updateMacroData() {
     updateMacroIndicator("fearGreed", fearGreed);
     updateMacroIndicator("btcDominance", btcDominance);
     updateMacroIndicator("dxy", dxy);
+
+    // ✅ Onboarding-stap markeren als voltooid
+    markStepDone(3);
 }
 
 function getValue(indicators, name) {
@@ -126,8 +129,23 @@ function addMacroRow() {
     `;
 }
 
+// ✅ Rij verwijderen (voor handmatig toegevoegde rows)
 function removeRow(btn) {
     const row = btn.parentNode.parentNode;
     row.parentNode.removeChild(row);
     updateMacroScore();
+}
+
+// ✅ Onboarding stap voltooien (step 3)
+function markStepDone(stepNumber) {
+    const userId = localStorage.getItem("user_id");
+    if (!userId) return;
+
+    fetch(`${API_BASE_URL}/api/onboarding_progress/${userId}`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ step: stepNumber })
+    }).then(res => {
+        if (!res.ok) console.warn(`⚠️ Kan stap ${stepNumber} niet bijwerken.`);
+    });
 }
