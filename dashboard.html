@@ -36,18 +36,19 @@
       </div>
     </div>
 
+    <!-- ✅ Asset selectie -->
     <div style="margin: 20px 0;">
-  <label for="symbolSelect"><strong>🔁 Kies asset:</strong></label>
-  <select id="symbolSelect" style="margin-left: 10px; padding: 6px;">
-    <option value="BTC" selected>BTC</option>
-    <option value="SOL">SOL</option>
-  </select>
-</div>
+      <label for="symbolSelect"><strong>🔁 Kies asset:</strong></label>
+      <select id="symbolSelect" style="margin-left: 10px; padding: 6px;">
+        <option value="BTC" selected>BTC</option>
+        <option value="SOL">SOL</option>
+      </select>
+    </div>
 
-    <!-- ✅ Nieuw: Tradingadvies -->
+    <!-- ✅ Tradingadvies -->
     <section id="tradingAdviceBox" class="advice-card">
-  <!-- Advies wordt geladen door JS -->
-</section>
+      <!-- Advies wordt geladen door JS -->
+    </section>
 
     <!-- ✅ Market Data -->
     <h3>📊 Market Data</h3>
@@ -121,13 +122,17 @@
     Versie: 2025-04-06
   </p>
 
+  <!-- ✅ Onboarding functionaliteit -->
   <script type="module" src="js/onboarding-helper.js"></script>
-<script type="module" src="dashboard/dashboard.js"></script>
-<script type="module">
-  import { markStepDone } from "./js/onboarding-helper.js";
-  document.addEventListener("DOMContentLoaded", () => {
-    markStepDone(4);
-  });
-</script>
+  <script type="module">
+    import { markStepDone } from "./js/onboarding-helper.js";
+    document.addEventListener("DOMContentLoaded", () => {
+      markStepDone(4); // ✅ Dashboardstap voltooid
+    });
+  </script>
+
+  <!-- ✅ Dashboard logica -->
+  <script type="module" src="dashboard/dashboard.js"></script>
+
 </body>
 </html>
