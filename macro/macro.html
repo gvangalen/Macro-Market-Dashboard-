@@ -1,192 +1,187 @@
 <!DOCTYPE html>
 <html lang="nl">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>📊 Macro Indicatoren</title>
-    <link rel="stylesheet" href="styles.css"> <!-- ✅ Voeg CSS toe -->
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>📊 Macro Indicatoren</title>
+  <link rel="stylesheet" href="styles.css">
 </head>
 <body>
 
 <div class="macro-container">
-    <h2>📊 Macro Indicatoren</h2>
-    
-    <button class="btn-add" onclick="addMacroRow()">➕ Indicator toevoegen</button>
+  <h2>📊 Macro Indicatoren</h2>
 
-    <table id="macroTable">
-        <thead>
-            <tr>
-                <th>Indicator</th>
-                <th>Huidig Niveau</th>
-                <th>Trend</th>
-                <th>Interpretatie</th>
-                <th>Actie</th>
-                <th>Score</th>
-                <th>Verwijderen</th>
-            </tr>
-        </thead>
-        <tbody id="macroBody">
-            <tr>
-                <td>Fear & Greed Index</td>
-                <td id="fearGreed">📡 Laden...</td>
-                <td id="fearGreedTrend" class="trend-cell">N/A</td>
-                <td id="fearGreedInterpretation">N/A</td>
-                <td id="fearGreedAction">N/A</td>
-                <td class="macro-score" id="fearGreedScore">-</td>
-                <td><button class="btn-remove" onclick="removeRow(this)">❌</button></td>
-            </tr>
-            <tr>
-                <td>Bitcoin Dominantie</td>
-                <td id="btcDominance">📡 Laden...</td>
-                <td id="btcDominanceTrend" class="trend-cell">N/A</td>
-                <td id="btcDominanceInterpretation">N/A</td>
-                <td id="btcDominanceAction">N/A</td>
-                <td class="macro-score" id="btcDominanceScore">-</td>
-                <td><button class="btn-remove" onclick="removeRow(this)">❌</button></td>
-            </tr>
-            <tr>
-                <td>Dollar Index (DXY)</td>
-                <td id="dxy">📡 Laden...</td>
-                <td id="dxyTrend" class="trend-cell">N/A</td>
-                <td id="dxyInterpretation">N/A</td>
-                <td id="dxyAction">N/A</td>
-                <td class="macro-score" id="dxyScore">-</td>
-                <td><button class="btn-remove" onclick="removeRow(this)">❌</button></td>
-            </tr>
-        </tbody>
-    </table>
+  <button class="btn-add" onclick="addMacroRow()">➕ Indicator toevoegen</button>
 
-    <h3>🌍 Totale Macro Score: <span id="macroTotalScore">N/A</span></h3>
-    <h3>📈 Macro Advies: <span id="macroAdvice">Neutraal</span></h3>
-    <p id="macroStatus" class="loading">📡 Data laden...</p>
+  <table id="macroTable">
+    <thead>
+      <tr>
+        <th>Indicator</th>
+        <th>Huidig Niveau</th>
+        <th>Trend</th>
+        <th>Interpretatie</th>
+        <th>Actie</th>
+        <th>Score</th>
+        <th>Verwijderen</th>
+      </tr>
+    </thead>
+    <tbody id="macroBody">
+      <tr>
+        <td>Fear & Greed Index</td>
+        <td id="fearGreed">📡 Laden...</td>
+        <td id="fearGreedTrend" class="trend-cell">N/A</td>
+        <td id="fearGreedInterpretation">N/A</td>
+        <td id="fearGreedAction">N/A</td>
+        <td class="macro-score" id="fearGreedScore">-</td>
+        <td><button class="btn-remove" onclick="removeRow(this)">❌</button></td>
+      </tr>
+      <tr>
+        <td>Bitcoin Dominantie</td>
+        <td id="btcDominance">📡 Laden...</td>
+        <td id="btcDominanceTrend" class="trend-cell">N/A</td>
+        <td id="btcDominanceInterpretation">N/A</td>
+        <td id="btcDominanceAction">N/A</td>
+        <td class="macro-score" id="btcDominanceScore">-</td>
+        <td><button class="btn-remove" onclick="removeRow(this)">❌</button></td>
+      </tr>
+      <tr>
+        <td>Dollar Index (DXY)</td>
+        <td id="dxy">📡 Laden...</td>
+        <td id="dxyTrend" class="trend-cell">N/A</td>
+        <td id="dxyInterpretation">N/A</td>
+        <td id="dxyAction">N/A</td>
+        <td class="macro-score" id="dxyScore">-</td>
+        <td><button class="btn-remove" onclick="removeRow(this)">❌</button></td>
+      </tr>
+    </tbody>
+  </table>
+
+  <h3>🌍 Totale Macro Score: <span id="macroTotalScore">N/A</span></h3>
+  <h3>📈 Macro Advies: <span id="macroAdvice">Neutraal</span></h3>
+  <p id="macroStatus" class="loading">📡 Data laden...</p>
 </div>
 
-<script>
-    const API_BASE_URL = "http://13.60.235.90:5002"; // ✅ AWS API-endpoint
+<script type="module">
+  import { API_BASE_URL } from "../config.js";
 
-    // ✅ **Macro-indicatoren met drempelwaarden**
-    const indicators = {
-        "fearGreed": { thresholds: [30, 50, 70], positive: true },
-        "btcDominance": { thresholds: [45, 50, 55], positive: true },
-        "dxy": { thresholds: [100, 103, 106], positive: false }
-    };
+  const indicators = {
+    "fearGreed": { thresholds: [30, 50, 70], positive: true },
+    "btcDominance": { thresholds: [45, 50, 55], positive: true },
+    "dxy": { thresholds: [100, 103, 106], positive: false }
+  };
 
-    // ✅ **Haalt macro-data op en werkt de UI bij**
-    async function fetchMacroData() {
-        try {
-            let response = await fetch(`${API_BASE_URL}/macro_data`);
-            if (!response.ok) throw new Error("Fout bij ophalen macro-data");
+  async function fetchMacroData() {
+    try {
+      const response = await fetch(`${API_BASE_URL}/macro_data`);
+      if (!response.ok) throw new Error("Fout bij ophalen macro-data");
+      const data = await response.json();
 
-            let data = await response.json();
-            console.log("📊 Ontvangen Macro Data:", data);
+      Object.keys(indicators).forEach(id => {
+        const value = data[id] ?? "N/A";
+        const { thresholds, positive } = indicators[id];
+        updateMacroIndicator(id, value, thresholds, positive);
+      });
 
-            // ✅ **Update indicatoren**
-            Object.keys(indicators).forEach(id => {
-                let value = data[id] ?? "N/A"; // Fallback als waarde ontbreekt
-                let { thresholds, positive } = indicators[id];
+      updateMacroScore();
+      document.getElementById("macroStatus").textContent = "✅ Macrodata up-to-date";
 
-                updateMacroIndicator(id, value, thresholds, positive);
-            });
+      markStepDone(3); // ✅ Onboarding stap 3 voltooid
 
-            updateMacroScore();
-            document.getElementById("macroStatus").textContent = "✅ Macrodata up-to-date";
-        } catch (error) {
-            console.error("❌ Macrodata ophalen mislukt:", error);
-            document.getElementById("macroStatus").textContent = "❌ Fout bij ophalen macro-data.";
-        }
+    } catch (error) {
+      console.error("❌ Macrodata ophalen mislukt:", error);
+      document.getElementById("macroStatus").textContent = "❌ Fout bij ophalen macro-data.";
     }
+  }
 
-    // ✅ **Update een macro-indicator in de DOM en bereken score**
-    function updateMacroIndicator(id, value, thresholds, positive) {
-        let valueElement = document.getElementById(id);
-        let trendElement = document.getElementById(`${id}Trend`);
-        let interpretationElement = document.getElementById(`${id}Interpretation`);
-        let actionElement = document.getElementById(`${id}Action`);
-        let scoreElement = document.getElementById(`${id}Score`);
+  function updateMacroIndicator(id, value, thresholds, positive) {
+    const el = document.getElementById(id);
+    const trendEl = document.getElementById(`${id}Trend`);
+    const interpEl = document.getElementById(`${id}Interpretation`);
+    const actionEl = document.getElementById(`${id}Action`);
+    const scoreEl = document.getElementById(`${id}Score`);
 
-        valueElement.textContent = `${value}${id === "btcDominance" ? "%" : ""}`;
+    el.textContent = `${value}${id === "btcDominance" ? "%" : ""}`;
+    const score = calculateScore(value, thresholds, positive);
+    scoreEl.textContent = score;
 
-        let score = calculateScore(value, thresholds, positive);
-        scoreElement.textContent = score;
+    const trend = score >= 1 ? "Bullish 📈" : score <= -1 ? "Bearish 📉" : "Neutraal ⚖️";
+    const interp = score >= 1 ? "Positief signaal" : score <= -1 ? "Negatief signaal" : "Geen duidelijke richting";
+    const action = score >= 1 ? "Overwegen om te kopen 🟢" : score <= -1 ? "Voorzichtigheid geboden 🔴" : "Geen actie nodig";
 
-        let trend = score >= 1 ? "Bullish 📈" : score <= -1 ? "Bearish 📉" : "Neutraal ⚖️";
-        trendElement.textContent = trend;
+    trendEl.textContent = trend;
+    interpEl.textContent = interp;
+    actionEl.textContent = action;
 
-        let interpretation = score >= 1 ? "Positief signaal" : score <= -1 ? "Negatief signaal" : "Geen duidelijke richting";
-        interpretationElement.textContent = interpretation;
+    trendEl.classList.remove("bullish", "bearish", "neutral");
+    trendEl.classList.add(score >= 1 ? "bullish" : score <= -1 ? "bearish" : "neutral");
+  }
 
-        let action = score >= 1 ? "Overwegen om te kopen 🟢" : score <= -1 ? "Voorzichtigheid geboden 🔴" : "Geen actie nodig";
-        actionElement.textContent = action;
+  function calculateScore(value, thresholds, positive) {
+    if (isNaN(value)) return "N/A";
+    value = parseFloat(value);
 
-        // ✅ **Voeg kleur toe op basis van trend**
-        trendElement.classList.remove("bullish", "bearish", "neutral");
-        if (score >= 1) trendElement.classList.add("bullish");
-        else if (score <= -1) trendElement.classList.add("bearish");
-        else trendElement.classList.add("neutral");
-    }
+    return positive
+      ? value > thresholds[2] ? 2 : value > thresholds[1] ? 1 : value > thresholds[0] ? -1 : -2
+      : value < thresholds[0] ? 2 : value < thresholds[1] ? 1 : value < thresholds[2] ? -1 : -2;
+  }
 
-    // ✅ **Score berekenen op basis van thresholds**
-    function calculateScore(value, thresholds, positive) {
-        if (isNaN(value)) return "N/A";
-        value = parseFloat(value);
-
-        if (positive) {
-            return value > thresholds[2] ? 2 : value > thresholds[1] ? 1 : value > thresholds[0] ? -1 : -2;
-        } else {
-            return value < thresholds[0] ? 2 : value < thresholds[1] ? 1 : value < thresholds[2] ? -1 : -2;
-        }
-    }
-
-    // ✅ **Totale macro-score berekenen**
-    function updateMacroScore() {
-        let scores = document.querySelectorAll(".macro-score");
-        let totalScore = 0, count = 0;
-
-        scores.forEach(cell => {
-            let score = parseInt(cell.textContent);
-            if (!isNaN(score)) {
-                totalScore += score;
-                count++;
-            }
-        });
-
-        let avgScore = count > 0 ? (totalScore / count).toFixed(1) : "N/A";
-        document.getElementById("macroTotalScore").textContent = avgScore;
-        updateMacroAdvice(avgScore);
-    }
-
-    // ✅ **Advies genereren op basis van macro-score**
-    function updateMacroAdvice(score) {
-        let advice = score >= 1.5 ? "Bullish 🟢" : score <= -1.5 ? "Bearish 🔴" : "Neutraal ⚖️";
-        document.getElementById("macroAdvice").textContent = advice;
-    }
-
-    // ✅ **Indicator handmatig toevoegen**
-    function addMacroRow() {
-        let table = document.getElementById("macroTable").getElementsByTagName('tbody')[0];
-        let newRow = table.insertRow();
-
-        newRow.innerHTML = `
-            <td><input type="text" placeholder="Naam Indicator"></td>
-            <td>Laden...</td>
-            <td>N/A</td>
-            <td>N/A</td>
-            <td>N/A</td>
-            <td class="macro-score">-</td>
-            <td><button class="btn-remove" onclick="removeRow(this)">❌</button></td>
-        `;
-    }
-
-    function removeRow(button) {
-        let row = button.parentNode.parentNode;
-        row.parentNode.removeChild(row);
-        updateMacroScore();
-    }
-
-    document.addEventListener("DOMContentLoaded", function () {
-        fetchMacroData();
-        setInterval(fetchMacroData, 60000);
+  function updateMacroScore() {
+    let total = 0, count = 0;
+    document.querySelectorAll(".macro-score").forEach(cell => {
+      const score = parseInt(cell.textContent);
+      if (!isNaN(score)) {
+        total += score;
+        count++;
+      }
     });
+
+    const avg = count > 0 ? (total / count).toFixed(1) : "N/A";
+    document.getElementById("macroTotalScore").textContent = avg;
+    updateMacroAdvice(avg);
+  }
+
+  function updateMacroAdvice(score) {
+    const advice = score >= 1.5 ? "🟢 Bullish" : score <= -1.5 ? "🔴 Bearish" : "⚖️ Neutraal";
+    document.getElementById("macroAdvice").textContent = advice;
+  }
+
+  function addMacroRow() {
+    const table = document.getElementById("macroTable").getElementsByTagName('tbody')[0];
+    const newRow = table.insertRow();
+    newRow.innerHTML = `
+      <td><input type="text" placeholder="Naam Indicator"></td>
+      <td>Laden...</td>
+      <td>N/A</td>
+      <td>N/A</td>
+      <td>N/A</td>
+      <td class="macro-score">-</td>
+      <td><button class="btn-remove" onclick="removeRow(this)">❌</button></td>
+    `;
+  }
+
+  function removeRow(btn) {
+    const row = btn.parentNode.parentNode;
+    row.parentNode.removeChild(row);
+    updateMacroScore();
+  }
+
+  function markStepDone(step) {
+    const userId = localStorage.getItem("user_id");
+    if (!userId) return;
+
+    fetch(`${API_BASE_URL}/api/onboarding_progress/${userId}`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ step })
+    }).then(res => {
+      if (!res.ok) console.warn("⚠️ Stap niet bijgewerkt");
+    });
+  }
+
+  document.addEventListener("DOMContentLoaded", () => {
+    fetchMacroData();
+    setInterval(fetchMacroData, 60000);
+  });
 </script>
 </body>
 </html>
