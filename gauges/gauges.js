@@ -51,9 +51,9 @@ async function fetchGaugeData() {
     const tech = await fetchScore("/api/score/technical");
     const setup = await fetchScore("/api/score/setup");
 
-    setGaugeWithText(macroGauge, macro.total_score, "macroExplanation");
-    setGaugeWithText(technicalGauge, tech.total_score, "technicalExplanation");
-    setGaugeWithText(setupGauge, setup.total_score, "setupExplanation");
+    setGaugeWithText(macroGauge, macro.total_score, "macroExplanation", macro.scores);
+    setGaugeWithText(technicalGauge, tech.total_score, "technicalExplanation", tech.scores);
+    setGaugeWithText(setupGauge, setup.total_score, "setupExplanation", setup.scores);
 
   } catch (err) {
     console.error("❌ Fout bij ophalen van scores:", err);
@@ -66,24 +66,36 @@ async function fetchScore(path) {
   return await res.json();
 }
 
-function setGaugeWithText(gauge, score, explanationId) {
+function setGaugeWithText(gauge, score, explanationId, indicators = {}) {
   const labelIndex = Math.max(0, Math.min(4, Math.round((score + 2) / 4 * 4)));
   const label = SCORE_LABELS[labelIndex];
   const explanation = EXPLANATION_MAP[score?.toString()] || "Geen uitleg.";
 
-  // ✅ Gauge aanpassen
   if (gauge) {
     gauge.data.datasets[0].data = gauge.data.datasets[0].data.map((_, i) => i === labelIndex ? 100 : 20);
     gauge.update();
   }
 
-  // ✅ Tekst uitleg onder de meter
   const explanationDiv = document.getElementById(explanationId);
   if (explanationDiv) {
-    explanationDiv.innerHTML = `
+    let html = `
       <div style="text-align:center; margin-top: 8px;">
         <strong style="font-size: 1.1rem;">${label}</strong><br />
         <span style="font-size: 0.9rem; color: #666;">${explanation}</span>
-      </div>`;
+      </div>
+    `;
+
+    if (indicators && Object.keys(indicators).length > 0) {
+      html += `<ul class="log-block">`;
+      for (const [key, val] of Object.entries(indicators)) {
+        const label = val?.label || key;
+        const value = val?.value ?? "-";
+        const score = val?.score ?? "-";
+        html += `<li><strong>${label}</strong>: ${value} → <code>score ${score}</code></li>`;
+      }
+      html += `</ul>`;
+    }
+
+    explanationDiv.innerHTML = html;
   }
 }
