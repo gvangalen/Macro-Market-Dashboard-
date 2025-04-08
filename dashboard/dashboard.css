@@ -240,3 +240,27 @@ button:hover {
 .advice-card p {
   margin: 4px 0;
 }
+
+.score-label {
+  margin-top: 8px;
+  font-weight: bold;
+  color: #333;
+  font-size: 0.95rem;
+}
+
+.explanation {
+  margin-top: 4px;
+  font-style: italic;
+  font-size: 0.9rem;
+  color: #666;
+}
+
+.log-block {
+  margin-top: 6px;
+  font-size: 0.85rem;
+  line-height: 1.4;
+  background: #f9f9f9;
+  padding: 6px 10px;
+  border-radius: 6px;
+  border: 1px solid #eee;
+}
