@@ -12,27 +12,41 @@
 
   <!-- ✅ Navigatiebalk -->
   <nav style="background: #222; padding: 10px; text-align: center;">
-    <a href="dashboard.html" style="color: white; margin: 0 15px; font-weight: bold; text-decoration: none;">📊 Dashboard</a>
-    <a href="report.html" style="color: white; margin: 0 15px; font-weight: bold; text-decoration: none;">📄 Dagrapport</a>
+    <a href="dashboard.html" style="color: white; margin: 0 15px; font-weight: bold;">📊 Dashboard</a>
+    <a href="report.html" style="color: white; margin: 0 15px; font-weight: bold;">📄 Dagrapport</a>
   </nav>
 
   <div class="table-container">
     <h2>📊 Dashboard</h2>
     <p id="dashboardStatus" class="loading">📡 Data laden...</p>
 
-    <!-- ✅ Meters -->
+    <!-- ✅ Meters met uitleg/log -->
     <div class="dashboard-container">
+      <!-- 🔹 Macro -->
       <div class="gauge-wrapper">
         <canvas id="macroGauge"></canvas>
         <span>📉 Macro</span>
+        <div class="score-label" id="macroScore">Score: ⏳</div>
+        <div class="explanation" id="macroExplanation">Uitleg wordt geladen...</div>
+        <div class="log-block" id="macroLog"></div>
       </div>
+
+      <!-- 🔹 Technisch -->
       <div class="gauge-wrapper">
         <canvas id="technicalGauge"></canvas>
         <span>📈 Technisch</span>
+        <div class="score-label" id="technicalScore">Score: ⏳</div>
+        <div class="explanation" id="technicalExplanation">Uitleg wordt geladen...</div>
+        <div class="log-block" id="technicalLog"></div>
       </div>
+
+      <!-- 🔹 Setup -->
       <div class="gauge-wrapper">
         <canvas id="setupGauge"></canvas>
         <span>📊 Setup</span>
+        <div class="score-label" id="setupScore">Score: ⏳</div>
+        <div class="explanation" id="setupExplanation">Uitleg wordt geladen...</div>
+        <div class="log-block" id="setupLog"></div>
       </div>
     </div>
 
@@ -133,6 +147,5 @@
 
   <!-- ✅ Dashboard logica -->
   <script type="module" src="dashboard/dashboard.js"></script>
-
 </body>
 </html>
