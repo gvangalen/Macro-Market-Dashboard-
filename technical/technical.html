@@ -8,14 +8,14 @@
   <!-- ✅ CSS-bestand -->
   <link rel="stylesheet" href="css/styles.css" />
 
-  <!-- ✅ Eventueel extra meta -->
+  <!-- ✅ Meta -->
   <meta name="description" content="Live technische analyse van crypto assets met RSI, volume en 200MA.">
 </head>
 <body>
 
   <h2>📉 Technische Analyse</h2>
 
-  <!-- ✅ Bediening -->
+  <!-- ✅ Bedieningsopties -->
   <div class="controls">
     <button id="addTechAssetBtn" class="btn-add" onclick="addTechRow()">➕ Asset toevoegen</button>
     <button id="addTechnicalIndicatorBtn" class="btn-add" onclick="addTechIndicator()">➕ Indicator toevoegen</button>
@@ -29,7 +29,7 @@
     </select>
   </div>
 
-  <!-- ✅ Tabel voor technische data -->
+  <!-- ✅ Technische analyse tabel -->
   <table id="analysisTable">
     <thead>
       <tr>
@@ -54,9 +54,10 @@
   <h3>📈 Technisch Advies: <span id="technicalAdvice">Neutraal</span></h3>
   <p id="techStatus" class="loading">📡 Data laden...</p>
 
-  <!-- ✅ Scripts (defer zorgt dat DOM eerst geladen wordt) -->
-  <script src="config.js" type="module" defer></script>
-  <script src="js/technical.js" type="module" defer></script>
+  <!-- ✅ Scripts -->
+  <script type="module" src="config.js"></script>
+  <script type="module" src="js/onboarding-helper.js"></script> <!-- ✅ Toegevoegd -->
+  <script type="module" src="js/technical.js"></script>
 
 </body>
 </html>
