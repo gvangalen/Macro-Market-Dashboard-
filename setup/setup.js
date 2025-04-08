@@ -5,10 +5,14 @@ console.log("✅ setup.js geladen!");
 const apiUrl = `${API_BASE_URL}/setups`;
 const aiUrl = `${API_BASE_URL}/ai/explain_setup`;
 
-// ✅ Start: laad setups en filters
 document.addEventListener("DOMContentLoaded", () => {
   loadSetups();
   setupFilters();
+
+  // Toggle advanced section
+  document.getElementById("toggleAdvanced")?.addEventListener("click", () => {
+    document.getElementById("advancedSection").classList.toggle("hidden");
+  });
 });
 
 const form = document.getElementById("setupForm");
@@ -18,19 +22,37 @@ form?.addEventListener("submit", async function (e) {
   const name = document.getElementById("setupName")?.value.trim();
   const indicators = document.getElementById("setupIndicators")?.value.trim();
   const trend = document.getElementById("setupTrend")?.value;
+  const timeframe = document.getElementById("setupTimeframe")?.value;
 
-  if (!name || name.length < 3 || !indicators || !trend) {
+  const account_type = document.getElementById("accountType")?.value;
+  const strategy_type = document.getElementById("strategyType")?.value;
+  const symbol = document.getElementById("symbol")?.value.trim();
+  const min_investment = parseFloat(document.getElementById("minInvestment")?.value) || null;
+  const dynamic = document.getElementById("dynamicInvestment")?.checked || false;
+
+  if (!name || name.length < 3 || !indicators || !trend || !timeframe) {
     showValidationErrors(name, indicators, trend);
     return;
   }
 
-  const setup = { name, indicators, trend };
+  const setup = {
+    name,
+    indicators,
+    trend,
+    timeframe,
+    account_type,
+    strategy_type,
+    symbol,
+    min_investment,
+    dynamic
+  };
+
   const submitBtn = document.getElementById("submitButton");
   submitBtn.disabled = true;
 
   try {
     await safeFetch(apiUrl, "POST", setup);
-    await markStepDone(1); // ✅ Stap 1 voltooid
+    await markStepDone(1);
     form.reset();
     document.getElementById("toast").style.display = "block";
     setTimeout(() => (document.getElementById("toast").style.display = "none"), 3000);
@@ -42,14 +64,12 @@ form?.addEventListener("submit", async function (e) {
   }
 });
 
-// ✅ Validatiefouten tonen
 function showValidationErrors(name, indicators, trend) {
   document.getElementById("nameError").style.display = name.length >= 3 ? "none" : "block";
   document.getElementById("indicatorError").style.display = indicators ? "none" : "block";
   document.getElementById("trendError").style.display = trend ? "none" : "block";
 }
 
-// ✅ Setuplijst ophalen en tonen
 async function loadSetups() {
   try {
     const setups = await safeFetch(apiUrl);
@@ -59,7 +79,6 @@ async function loadSetups() {
   }
 }
 
-// ✅ Setup-renders incl. AI-uitleg
 async function renderSetupList(setups) {
   const list = document.getElementById("setupList");
   if (!list) return;
@@ -101,7 +120,6 @@ async function renderSetupList(setups) {
   attachSaveEvents();
 }
 
-// ✅ AI-uitleg ophalen
 async function generateExplanation(setup) {
   try {
     const res = await fetch(aiUrl, {
@@ -118,13 +136,11 @@ async function generateExplanation(setup) {
   }
 }
 
-// ✅ Filters
 function setupFilters() {
   document.getElementById("trendFilter")?.addEventListener("change", loadSetups);
   document.getElementById("sortBy")?.addEventListener("change", loadSetups);
 }
 
-// ✅ Setup verwijderen
 async function deleteSetup(id) {
   if (!confirm("Weet je zeker dat je deze setup wilt verwijderen?")) return;
   try {
@@ -135,7 +151,6 @@ async function deleteSetup(id) {
   }
 }
 
-// ✅ Setup bewerken
 async function updateSetup(id, updatedData) {
   try {
     await safeFetch(`${apiUrl}/${id}`, "PUT", updatedData);
@@ -145,13 +160,13 @@ async function updateSetup(id, updatedData) {
   }
 }
 
-// ✅ Eventhandlers
 function attachDeleteEvents() {
   document.querySelectorAll(".delete-btn").forEach(btn => {
     btn.removeEventListener("click", handleDeleteClick);
     btn.addEventListener("click", handleDeleteClick);
   });
 }
+
 function handleDeleteClick(e) {
   const id = e.target.closest("li")?.dataset.id;
   if (id) deleteSetup(id);
@@ -163,6 +178,7 @@ function attachSaveEvents() {
     btn.addEventListener("click", handleSaveClick);
   });
 }
+
 function handleSaveClick(e) {
   const li = e.target.closest("li");
   const id = li?.dataset.id;
@@ -179,7 +195,6 @@ function handleSaveClick(e) {
   updateSetup(id, updated);
 }
 
-// ✅ Backend-aanroepen veilig uitvoeren
 async function safeFetch(url, method = "GET", body = null) {
   const options = {
     method,
@@ -192,7 +207,6 @@ async function safeFetch(url, method = "GET", body = null) {
   return method === "GET" ? res.json() : true;
 }
 
-// ✅ Onboarding stap markeren
 async function markStepDone(step) {
   const userId = localStorage.getItem("user_id");
   if (!userId) return;
