@@ -13,6 +13,12 @@ document.addEventListener("DOMContentLoaded", () => {
   document.getElementById("toggleAdvanced")?.addEventListener("click", () => {
     document.getElementById("advancedSection").classList.toggle("hidden");
   });
+
+  // Live preview updates
+  ["setupName", "setupIndicators", "setupTrend", "setupTimeframe", "setupSymbol", "setupStrategy"].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.addEventListener("input", updateLivePreview);
+  });
 });
 
 const form = document.getElementById("setupForm");
@@ -29,6 +35,8 @@ form?.addEventListener("submit", async function (e) {
   const symbol = document.getElementById("symbol")?.value.trim();
   const min_investment = parseFloat(document.getElementById("minInvestment")?.value) || null;
   const dynamic = document.getElementById("dynamicInvestment")?.checked || false;
+  const tags = document.getElementById("setupTags")?.value.trim();
+  const favorite = document.getElementById("favoriteToggle")?.classList.contains("active");
 
   if (!name || name.length < 3 || !indicators || !trend || !timeframe) {
     showValidationErrors(name, indicators, trend);
@@ -44,7 +52,9 @@ form?.addEventListener("submit", async function (e) {
     strategy_type,
     symbol,
     min_investment,
-    dynamic
+    dynamic,
+    tags,
+    favorite
   };
 
   const submitBtn = document.getElementById("submitButton");
@@ -57,6 +67,7 @@ form?.addEventListener("submit", async function (e) {
     document.getElementById("toast").style.display = "block";
     setTimeout(() => (document.getElementById("toast").style.display = "none"), 3000);
     loadSetups();
+    updateLivePreview();
   } catch (err) {
     alert("❌ Setup opslaan mislukt.");
   } finally {
@@ -68,6 +79,27 @@ function showValidationErrors(name, indicators, trend) {
   document.getElementById("nameError").style.display = name.length >= 3 ? "none" : "block";
   document.getElementById("indicatorError").style.display = indicators ? "none" : "block";
   document.getElementById("trendError").style.display = trend ? "none" : "block";
+}
+
+function updateLivePreview() {
+  const preview = document.getElementById("livePreview");
+  if (!preview) return;
+
+  const name = document.getElementById("setupName")?.value;
+  const indicators = document.getElementById("setupIndicators")?.value;
+  const trend = document.getElementById("setupTrend")?.value;
+  const timeframe = document.getElementById("setupTimeframe")?.value;
+  const symbol = document.getElementById("symbol")?.value;
+  const strategy = document.getElementById("strategyType")?.value;
+
+  preview.innerHTML = `
+    <strong>Naam:</strong> ${name || '-'}<br>
+    <strong>Indicatoren:</strong> ${indicators || '-'}<br>
+    <strong>Trend:</strong> ${trend || '-'}<br>
+    <strong>Timeframe:</strong> ${timeframe || '-'}<br>
+    <strong>Symbool:</strong> ${symbol || '-'}<br>
+    <strong>Strategie:</strong> ${strategy || '-'}
+  `;
 }
 
 async function loadSetups() {
