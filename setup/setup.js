@@ -5,6 +5,7 @@ console.log("✅ setup.js geladen!");
 const apiUrl = `${API_BASE_URL}/setups`;
 const aiUrl = `${API_BASE_URL}/ai/explain_setup`;
 
+// ✅ Start: laad setups en filters
 document.addEventListener("DOMContentLoaded", () => {
   loadSetups();
   setupFilters();
@@ -29,6 +30,7 @@ form?.addEventListener("submit", async function (e) {
 
   try {
     await safeFetch(apiUrl, "POST", setup);
+    await markStepDone(1); // ✅ Stap 1 voltooid
     form.reset();
     document.getElementById("toast").style.display = "block";
     setTimeout(() => (document.getElementById("toast").style.display = "none"), 3000);
@@ -40,12 +42,14 @@ form?.addEventListener("submit", async function (e) {
   }
 });
 
+// ✅ Validatiefouten tonen
 function showValidationErrors(name, indicators, trend) {
   document.getElementById("nameError").style.display = name.length >= 3 ? "none" : "block";
   document.getElementById("indicatorError").style.display = indicators ? "none" : "block";
   document.getElementById("trendError").style.display = trend ? "none" : "block";
 }
 
+// ✅ Setuplijst ophalen en tonen
 async function loadSetups() {
   try {
     const setups = await safeFetch(apiUrl);
@@ -55,6 +59,7 @@ async function loadSetups() {
   }
 }
 
+// ✅ Setup-renders incl. AI-uitleg
 async function renderSetupList(setups) {
   const list = document.getElementById("setupList");
   if (!list) return;
@@ -96,6 +101,7 @@ async function renderSetupList(setups) {
   attachSaveEvents();
 }
 
+// ✅ AI-uitleg ophalen
 async function generateExplanation(setup) {
   try {
     const res = await fetch(aiUrl, {
@@ -112,11 +118,13 @@ async function generateExplanation(setup) {
   }
 }
 
+// ✅ Filters
 function setupFilters() {
   document.getElementById("trendFilter")?.addEventListener("change", loadSetups);
   document.getElementById("sortBy")?.addEventListener("change", loadSetups);
 }
 
+// ✅ Setup verwijderen
 async function deleteSetup(id) {
   if (!confirm("Weet je zeker dat je deze setup wilt verwijderen?")) return;
   try {
@@ -127,6 +135,7 @@ async function deleteSetup(id) {
   }
 }
 
+// ✅ Setup bewerken
 async function updateSetup(id, updatedData) {
   try {
     await safeFetch(`${apiUrl}/${id}`, "PUT", updatedData);
@@ -136,13 +145,13 @@ async function updateSetup(id, updatedData) {
   }
 }
 
+// ✅ Eventhandlers
 function attachDeleteEvents() {
   document.querySelectorAll(".delete-btn").forEach(btn => {
     btn.removeEventListener("click", handleDeleteClick);
     btn.addEventListener("click", handleDeleteClick);
   });
 }
-
 function handleDeleteClick(e) {
   const id = e.target.closest("li")?.dataset.id;
   if (id) deleteSetup(id);
@@ -154,7 +163,6 @@ function attachSaveEvents() {
     btn.addEventListener("click", handleSaveClick);
   });
 }
-
 function handleSaveClick(e) {
   const li = e.target.closest("li");
   const id = li?.dataset.id;
@@ -171,6 +179,7 @@ function handleSaveClick(e) {
   updateSetup(id, updated);
 }
 
+// ✅ Backend-aanroepen veilig uitvoeren
 async function safeFetch(url, method = "GET", body = null) {
   const options = {
     method,
@@ -181,4 +190,21 @@ async function safeFetch(url, method = "GET", body = null) {
   const res = await fetch(url, options);
   if (!res.ok) throw new Error(`Fout bij ${url}`);
   return method === "GET" ? res.json() : true;
+}
+
+// ✅ Onboarding stap markeren
+async function markStepDone(step) {
+  const userId = localStorage.getItem("user_id");
+  if (!userId) return;
+  try {
+    await fetch(`/api/onboarding_status/${userId}`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ step })
+    });
+    console.log(`✅ Stap ${step} gemarkeerd als voltooid`);
+    if (window.updateStepStatus) updateStepStatus();
+  } catch (err) {
+    console.warn("⚠️ Kon stap niet markeren als voltooid:", err);
+  }
 }
