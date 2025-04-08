@@ -1,14 +1,14 @@
-import { API_BASE_URL } from "../config.js"; // ✅ API-config ophalen
+import { API_BASE_URL } from "../config.js";
 
 console.log("✅ technical.js geladen!");
+
+const baseUrl = `${API_BASE_URL}/technical_data`;
 
 document.addEventListener("DOMContentLoaded", function () {
     console.log("📌 Technische Analyse geladen!");
     loadTechAnalysis();
     setInterval(loadTechAnalysis, 60000); // 🔄 Elke minuut updaten
 });
-
-const baseUrl = `${API_BASE_URL}/technical_data`;  // ✅ Basis URL
 
 // ✅ Technische Analyse ophalen vanaf API
 async function loadTechAnalysis() {
@@ -94,6 +94,7 @@ async function addTechRow() {
 
     await updateButton("addTechAssetBtn", "⏳ Toevoegen...", async () => {
         await safeFetch(baseUrl, "POST", { symbol: name.trim() });
+        await markStepDone(2); // ✅ Stap 2 gemarkeerd
         loadTechAnalysis();
     });
 }
@@ -105,6 +106,7 @@ async function addTechIndicator() {
 
     await updateButton("addTechnicalIndicatorBtn", "⏳ Toevoegen...", async () => {
         await safeFetch(`${baseUrl}/indicators`, "POST", { name: name.trim() });
+        await markStepDone(2); // ✅ Stap 2 gemarkeerd
         loadTechAnalysis();
     });
 }
@@ -136,6 +138,23 @@ async function safeFetch(url, method = "GET", body = null) {
             if (retries === 0) throw err;
             await new Promise(resolve => setTimeout(resolve, 2000));
         }
+    }
+}
+
+// ✅ Onboarding stap melden aan backend
+async function markStepDone(step) {
+    const userId = localStorage.getItem("user_id");
+    if (!userId) return;
+    try {
+        await fetch(`/api/onboarding_status/${userId}`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ step })
+        });
+        console.log(`✅ Stap ${step} gemarkeerd als voltooid`);
+        if (window.updateStepStatus) updateStepStatus(); // 👈 Eventuele live update
+    } catch (err) {
+        console.warn("⚠️ Kon stap niet markeren als voltooid:", err);
     }
 }
 
