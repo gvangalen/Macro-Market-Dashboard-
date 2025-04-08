@@ -121,6 +121,13 @@
     Versie: 2025-04-06
   </p>
 
-  <script type="module" src="dashboard/dashboard.js"></script>
+  <script type="module" src="js/onboarding-helper.js"></script>
+<script type="module" src="dashboard/dashboard.js"></script>
+<script type="module">
+  import { markStepDone } from "./js/onboarding-helper.js";
+  document.addEventListener("DOMContentLoaded", () => {
+    markStepDone(4);
+  });
+</script>
 </body>
 </html>
