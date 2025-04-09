@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>📈 Strategieën</title>
+  <link rel="stylesheet" href="strategie/strategieën.css" />
+</head>
+<body>
+  <!-- ✅ Navigatiebalk -->
+  <nav style="background: #222; padding: 10px; text-align: center;">
+    <a href="dashboard.html" style="color: white; margin: 0 15px; font-weight: bold;">📊 Dashboard</a>
+    <a href="report.html" style="color: white; margin: 0 15px; font-weight: bold;">📄 Dagrapport</a>
+    <a href="strategieën.html" style="color: #34c759; margin: 0 15px; font-weight: bold;">📈 Strategieën</a>
+  </nav>
+
+  <div class="strategie-container">
+    <h2>📈 Strategieën Overzicht</h2>
+
+    <!-- ✅ Filters -->
+    <div class="filter-controls">
+      <label>Asset:</label>
+      <select id="filterAsset">
+        <option value="ALL">Alle</option>
+        <option value="BTC">Bitcoin</option>
+        <option value="SOL">Solana</option>
+      </select>
+      <label>Timeframe:</label>
+      <select id="filterTimeframe">
+        <option value="ALL">Alle</option>
+        <option value="4H">4H</option>
+        <option value="1D">1D</option>
+        <option value="1W">1W</option>
+      </select>
+    </div>
+
+    <!-- ✅ Strategieën lijst -->
+    <div id="strategieLijst"></div>
+  </div>
+
+  <!-- ✅ Scripts -->
+  <script type="module" src="strategie/strategieën.js"></script>
+</body>
+</html>
