@@ -1,5 +1,5 @@
 <!-- ✅ Setup Inspector Popup -->
-<div id="setupInspector" class="popup-form" style="display:none">
+<div id="setupInspector" class="popup-form" style="display:none; max-height:80vh; overflow-y:auto;">
   <h3>📋 Setup Inspectie</h3>
   <div id="setupListDetails"></div>
   <button onclick="hideSetupInspector()">❌ Sluiten</button>
@@ -9,26 +9,27 @@
   window.showSetupInspector = async function () {
     try {
       const res = await fetch(`${API_BASE_URL}/api/score/setup`);
-      if (!res.ok) throw new Error("Fout bij ophalen van setups");
+      if (!res.ok) throw new Error("Fout bij ophalen van setup scores");
       const data = await res.json();
-      const setups = data.setups || [];
 
+      const setups = (data.setups || []).sort((a, b) => b.score - a.score);
       const container = document.getElementById("setupListDetails");
+
       container.innerHTML = setups.map(setup => {
-        const scoreClass = `score-${setup.score}`.replace("-", "minus");
-        const star = setup.score >= 1 ? "⭐️" : "";
+        const highlight = setup.score >= 1 ? '⭐️ ' : '';
+        const scoreClass = `score-${setup.score}`;
         return `
-          <div class="setup-box ${scoreClass}">
-            <strong><span class="highlight">${star}</span>${setup.name}</strong>
-            <code>score ${setup.score}</code>
-            <em>${setup.explanation || "Geen uitleg beschikbaar"}</em>
+          <div class="setup-block ${scoreClass}">
+            <strong>${highlight}${setup.name}</strong>
+            <div><code>Score:</code> ${setup.score}</div>
+            <div class="explanation">${setup.explanation || 'Geen uitleg beschikbaar.'}</div>
           </div>
         `;
       }).join("");
-
+      
       document.getElementById("setupInspector").style.display = "block";
     } catch (err) {
-      alert("❌ Setupgegevens ophalen mislukt.");
+      alert("❌ Setup info ophalen mislukt.");
       console.error(err);
     }
   }
