@@ -264,3 +264,34 @@ button:hover {
   border-radius: 6px;
   border: 1px solid #eee;
 }
+
+/* ✅ Setup Inspector lijstjes */
+#setupListDetails > div {
+  margin-bottom: 12px;
+  padding: 10px;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  background: #fff;
+}
+
+#setupListDetails strong {
+  display: inline-block;
+  margin-bottom: 4px;
+  font-size: 1rem;
+  color: #222;
+}
+
+#setupListDetails code {
+  background: #f0f0f0;
+  padding: 2px 5px;
+  border-radius: 4px;
+  font-family: monospace;
+}
+
+#setupListDetails em {
+  color: #666;
+  font-style: italic;
+  display: block;
+  margin-top: 4px;
+  font-size: 0.9rem;
+}
