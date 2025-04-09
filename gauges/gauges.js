@@ -53,7 +53,12 @@ async function fetchGaugeData() {
 
     setGaugeWithText(macroGauge, macro.total_score, "macroExplanation", macro.scores);
     setGaugeWithText(technicalGauge, tech.total_score, "technicalExplanation", tech.scores);
-    setGaugeWithText(setupGauge, setup.total_score, "setupExplanation", setup.scores);
+
+    // Beste setup selecteren
+    const best = findBestSetup(setup.setups);
+    if (best) {
+      setGaugeWithBestSetup(setupGauge, best, "setupExplanation");
+    }
 
   } catch (err) {
     console.error("❌ Fout bij ophalen van scores:", err);
@@ -66,6 +71,7 @@ async function fetchScore(path) {
   return await res.json();
 }
 
+// ✅ Macro & Technisch – gemiddelden
 function setGaugeWithText(gauge, score, explanationId, indicators = {}) {
   const labelIndex = Math.max(0, Math.min(4, Math.round((score + 2) / 4 * 4)));
   const label = SCORE_LABELS[labelIndex];
@@ -88,14 +94,45 @@ function setGaugeWithText(gauge, score, explanationId, indicators = {}) {
     if (indicators && Object.keys(indicators).length > 0) {
       html += `<ul class="log-block">`;
       for (const [key, val] of Object.entries(indicators)) {
-        const label = val?.label || key;
         const value = val?.value ?? "-";
         const score = val?.score ?? "-";
-        html += `<li><strong>${label}</strong>: ${value} → <code>score ${score}</code></li>`;
+        html += `<li><strong>${key}</strong>: ${value} → <code>score ${score}</code></li>`;
       }
       html += `</ul>`;
     }
 
     explanationDiv.innerHTML = html;
   }
+}
+
+// ✅ Beste setup tonen
+function setGaugeWithBestSetup(gauge, setup, explanationId) {
+  const score = setup.score ?? 0;
+  const labelIndex = Math.max(0, Math.min(4, Math.round((score + 2) / 4 * 4)));
+  const label = SCORE_LABELS[labelIndex];
+  const explanation = setup.explanation || "Geen uitleg.";
+  const name = setup.name || "Onbekende setup";
+
+  if (gauge) {
+    gauge.data.datasets[0].data = gauge.data.datasets[0].data.map((_, i) => i === labelIndex ? 100 : 20);
+    gauge.update();
+  }
+
+  const explanationDiv = document.getElementById(explanationId);
+  if (explanationDiv) {
+    explanationDiv.innerHTML = `
+      <div style="text-align:center; margin-top: 8px;">
+        <strong style="font-size: 1.1rem;">⭐️ ${name}</strong><br />
+        <span style="font-size: 1rem; font-weight:bold;">${label} (${score})</span><br />
+        <span style="font-size: 0.9rem; color: #666;">${explanation}</span><br />
+        <button onclick="window.showSetupInspector()" style="margin-top: 8px;">🔎 Bekijk alle setups</button>
+      </div>
+    `;
+  }
+}
+
+// ✅ Hulp: Beste setup bepalen
+function findBestSetup(setups) {
+  if (!Array.isArray(setups)) return null;
+  return setups.sort((a, b) => (b.score ?? 0) - (a.score ?? 0))[0];
 }
