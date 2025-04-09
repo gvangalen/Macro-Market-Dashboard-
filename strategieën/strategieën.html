@@ -15,21 +15,21 @@
     <a href="strategieën.html" style="color: #34c759; margin: 0 15px; font-weight: bold;">📈 Strategieën</a>
   </nav>
 
-  <!-- ✅ Strategie Container -->
-  <div class="strategy-container">
+  <!-- ✅ Container -->
+  <div class="strategie-container">
     <h2>📈 Strategieën Overzicht</h2>
 
-    <!-- ✅ Filteropties -->
-    <div class="strategy-filters">
-      <label for="filterAsset">Asset:</label>
-      <select id="filterAsset">
+    <!-- ✅ Filters -->
+    <div class="filter-controls">
+      <label for="assetFilter">Asset:</label>
+      <select id="assetFilter">
         <option value="ALL">Alle</option>
         <option value="BTC">Bitcoin</option>
         <option value="SOL">Solana</option>
       </select>
 
-      <label for="filterTimeframe">Timeframe:</label>
-      <select id="filterTimeframe">
+      <label for="timeframeFilter">Timeframe:</label>
+      <select id="timeframeFilter">
         <option value="ALL">Alle</option>
         <option value="4H">4H</option>
         <option value="1D">1D</option>
@@ -38,12 +38,11 @@
     </div>
 
     <!-- ✅ Strategieën lijst -->
-    <div id="strategieLijst">
-      <!-- Strategiekaarten worden hier ingeladen via JavaScript -->
-    </div>
+    <div id="strategieLijst"></div>
   </div>
 
-  <!-- ✅ JavaScript logica -->
+  <!-- ✅ Script -->
   <script type="module" src="strategie/strategieën.js"></script>
+
 </body>
 </html>
