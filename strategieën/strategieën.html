@@ -39,27 +39,41 @@
 
     <!-- ✅ Strategieën lijst -->
     <div id="strategieLijst"></div>
+
+    <hr style="margin: 40px 0;" />
+
+    <!-- ✅ Strategie Toevoegen Formulier -->
+    <div class="strategie-form">
+      <h3>➕ Strategie Toevoegen</h3>
+      <form id="strategieForm">
+        <label for="strategieNaam">📌 Naam van strategie:</label>
+        <input type="text" id="strategieNaam" required placeholder="Bijv. 'BTC Swing Wyckoff'" />
+
+        <label>🔗 Koppel actieve setups:</label>
+        <div id="setupCheckboxes">
+          <!-- Dynamisch geladen -->
+        </div>
+
+        <label for="botGebruik">🤖 Bot gebruiken?</label>
+        <select id="botGebruik">
+          <option value="false">Nee</option>
+          <option value="true">Ja</option>
+        </select>
+
+        <label for="scoreDrempel">📊 Score-drempel (optioneel):</label>
+        <input type="number" id="scoreDrempel" placeholder="Bijv. 7" min="0" max="10" step="0.1" />
+
+        <label for="strategieNotities">🧠 Notities of samenvatting:</label>
+        <textarea id="strategieNotities" rows="3" placeholder="Bijv. 'Alleen actief in bullish marktconditie'"></textarea>
+
+        <button type="submit">✅ Strategie opslaan</button>
+      </form>
+    </div>
   </div>
 
-  <div class="strategie-kaart">
-  <div class="kaart-header">
-    <strong>🎯 Solana Range Bounce</strong>
-    <span class="kaart-score">⭐️ 1.4 (neutraal/bullish)</span>
-  </div>
-  <div class="kaart-body">
-    <div><b>🔗 Setup:</b> RSI Reversal / Wyckoff Support</div>
-    <div><b>⏱️ Asset/TF:</b> SOL/USDT – 4H</div>
-    <div><b>🧠 Context:</b> Wyckoff zwakte in range $182–$193</div>
-    <div><b>📥 Entry:</b> $180 – $182</div>
-    <div><b>🎯 Targets:</b> $190, $193</div>
-    <div><b>🛑 Stop-Loss:</b> Onder $178</div>
-    <div><b>📊 R:R:</b> ~2.5x – 3x</div>
-    <div><b>🤖 Feedback:</b> “Minder kracht dan BTC, alleen long op support bevestiging”</div>
-  </div>
-</div>
-
-  <!-- ✅ Script -->
+  <!-- ✅ Scripts -->
   <script type="module" src="strategie/strategieën.js"></script>
+  <script type="module" src="strategie/strategieën-form.js"></script>
 
 </body>
 </html>
