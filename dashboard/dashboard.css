@@ -365,3 +365,49 @@ button:hover {
     color: #aaa;
   }
 }
+
+.setup-block {
+  padding: 12px 14px;
+  margin-bottom: 12px;
+  border: 2px solid #ccc;
+  border-radius: 10px;
+  background: #fdfdfd;
+  transition: all 0.2s ease-in-out;
+}
+
+.setup-block strong {
+  font-size: 1.05rem;
+}
+
+.setup-block .explanation {
+  font-size: 0.9rem;
+  color: #555;
+  margin-top: 4px;
+  font-style: italic;
+}
+
+/* 🎨 Scorekleuren */
+.score-2 {
+  border-color: #34c759;
+  background: #eaffea;
+}
+
+.score-1 {
+  border-color: #4cd964;
+  background: #efffea;
+}
+
+.score-0 {
+  border-color: #ccc;
+  background: #fdfdfd;
+}
+
+.score--1 {
+  border-color: #ff9500;
+  background: #fff4e5;
+}
+
+.score--2 {
+  border-color: #ff3b30;
+  background: #ffeaea;
+}
