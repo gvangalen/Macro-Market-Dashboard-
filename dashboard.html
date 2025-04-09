@@ -20,9 +20,8 @@
     <h2>📊 Dashboard</h2>
     <p id="dashboardStatus" class="loading">📡 Data laden...</p>
 
-    <!-- ✅ Meters met uitleg/log -->
+    <!-- ✅ Meters met uitleg en log -->
     <div class="dashboard-container">
-      <!-- 🔹 Macro -->
       <div class="gauge-wrapper">
         <canvas id="macroGauge"></canvas>
         <span>📉 Macro</span>
@@ -31,7 +30,6 @@
         <div class="log-block" id="macroLog"></div>
       </div>
 
-      <!-- 🔹 Technisch -->
       <div class="gauge-wrapper">
         <canvas id="technicalGauge"></canvas>
         <span>📈 Technisch</span>
@@ -40,7 +38,6 @@
         <div class="log-block" id="technicalLog"></div>
       </div>
 
-      <!-- 🔹 Setup -->
       <div class="gauge-wrapper">
         <canvas id="setupGauge"></canvas>
         <span>📊 Setup</span>
@@ -119,7 +116,10 @@
 
     <!-- ✅ Setups -->
     <h3>📊 Setups</h3>
-    <button id="addSetupBtn">➕ Toevoegen</button>
+    <div style="margin-bottom: 10px;">
+      <button onclick="showSetupInspector()">🔍 Bekijk beste setup scores</button>
+      <button id="addSetupBtn">➕ Toevoegen</button>
+    </div>
     <table id="setupTable">
       <thead>
         <tr>
@@ -132,8 +132,15 @@
     </table>
   </div>
 
+  <!-- ✅ Popup: Setup Inspector -->
+  <div id="setupInspector" class="popup-form" style="display:none;">
+    <h3>📋 Setup Inspector</h3>
+    <div id="setupListDetails"></div>
+    <button onclick="hideSetupInspector()">❌ Sluiten</button>
+  </div>
+
   <p style="font-size: 11px; color: gray; text-align: center; margin-top: 40px;">
-    Versie: 2025-04-06
+    Versie: 2025-04-09
   </p>
 
   <!-- ✅ Onboarding functionaliteit -->
@@ -145,7 +152,9 @@
     });
   </script>
 
-  <!-- ✅ Dashboard logica -->
+  <!-- ✅ Scripts -->
   <script type="module" src="dashboard/dashboard.js"></script>
+  <script src="dashboard/setup-inspector.js"></script>
+
 </body>
 </html>
