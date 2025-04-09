@@ -4,8 +4,8 @@ import { API_BASE_URL } from "../config.js";
 console.log("📈 Strategieën module geladen!");
 
 document.addEventListener("DOMContentLoaded", async function () {
-  const assetSelect = document.getElementById("assetFilter");
-  const timeframeSelect = document.getElementById("timeframeFilter");
+  const assetSelect = document.getElementById("filterAsset");
+  const timeframeSelect = document.getElementById("filterTimeframe");
 
   assetSelect.addEventListener("change", fetchStrategieen);
   timeframeSelect.addEventListener("change", fetchStrategieen);
@@ -14,8 +14,8 @@ document.addEventListener("DOMContentLoaded", async function () {
 });
 
 async function fetchStrategieen() {
-  const asset = document.getElementById("assetFilter").value;
-  const timeframe = document.getElementById("timeframeFilter").value;
+  const asset = document.getElementById("filterAsset").value;
+  const timeframe = document.getElementById("filterTimeframe").value;
   const container = document.getElementById("strategieLijst");
 
   container.innerHTML = "<p>🔄 Strategieën laden...</p>";
@@ -30,7 +30,7 @@ async function fetchStrategieen() {
       return;
     }
 
-    const html = data.strategieën.map(s => renderStrategieBlock(s)).join("\n");
+    const html = data.strategieën.map(s => renderStrategieKaart(s)).join("\n");
     container.innerHTML = html;
 
   } catch (err) {
@@ -39,28 +39,54 @@ async function fetchStrategieen() {
   }
 }
 
-function renderStrategieBlock(s) {
+function renderStrategieKaart(s) {
   const label = s.type || "Swingstrategie";
-  const score = s.score != null ? `⭐️ ${s.score}/10` : "";
-  const entry = s.entry || "?";
-  const targets = s.targets?.join(", ") || "?";
-  const sl = s.stop_loss || "?";
-  const setup = s.setup_name || "Onbekend";
+  const score = s.score != null ? `${s.score}/10` : "-";
+  const entry = s.entry || "–";
+  const targets = s.targets?.join(", ") || "–";
+  const stopLoss = s.stop_loss || "–";
+  const rr = s.risk_reward || "–";
+  const setup = s.setup_name || "–";
   const explanation = s.explanation || "Geen uitleg beschikbaar.";
+  const asset = s.asset || "BTC";
+  const timeframe = s.timeframe || "1D";
 
   return `
-    <div class="strategie-card">
-      <div class="strategie-header">
-        <strong>${label} – ${s.asset} (${s.timeframe})</strong>
-        <span class="strategie-score">${score}</span>
-      </div>
-      <div class="strategie-body">
-        <p><strong>🎯 Entry:</strong> ${entry}</p>
-        <p><strong>📈 Targets:</strong> ${targets}</p>
-        <p><strong>🛡️ Stop-loss:</strong> ${sl}</p>
-        <p><strong>📋 Setup:</strong> ${setup}</p>
-        <p class="strategie-explanation">${explanation}</p>
-      </div>
+    <div class="strategie-kaart">
+      <table>
+        <tr>
+          <th>🎯 Strategie</th>
+          <td><strong>${label}</strong> – ${asset} (${timeframe})</td>
+        </tr>
+        <tr>
+          <th>⭐️ Score</th>
+          <td>${score}</td>
+        </tr>
+        <tr>
+          <th>📋 Setup</th>
+          <td>${setup}</td>
+        </tr>
+        <tr>
+          <th>🎯 Entry</th>
+          <td>${entry}</td>
+        </tr>
+        <tr>
+          <th>🎯 Targets</th>
+          <td>${targets}</td>
+        </tr>
+        <tr>
+          <th>🛡️ Stop-Loss</th>
+          <td>${stopLoss}</td>
+        </tr>
+        <tr>
+          <th>📊 R:R Ratio</th>
+          <td>${rr}</td>
+        </tr>
+        <tr>
+          <th>🧠 Uitleg</th>
+          <td>${explanation}</td>
+        </tr>
+      </table>
     </div>
   `;
 }
