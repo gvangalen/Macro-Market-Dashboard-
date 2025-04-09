@@ -32,7 +32,7 @@ document.addEventListener("DOMContentLoaded", function () {
   setupGauge = createGauge(document.getElementById("setupGauge"));
 
   fetchGaugeData();
-  setInterval(fetchGaugeData, 60000); // elke minuut
+  setInterval(fetchGaugeData, 60000); // Elke minuut verversen
 });
 
 const SCORE_LABELS = ["Strong Sell", "Sell", "Neutral", "Buy", "Strong Buy"];
@@ -44,20 +44,20 @@ const EXPLANATION_MAP = {
   "2": "🚀 Sterk positief signaal!"
 };
 
-// 🔁 Gauges vullen op basis van API-score
+// ✅ Ophalen en tonen van gauges
 async function fetchGaugeData() {
   try {
     const macro = await fetchScore("/api/score/macro");
     const tech = await fetchScore("/api/score/technical");
     const setup = await fetchScore("/api/score/setup");
 
-    setGaugeWithText(macroGauge, macro.total_score, "macroExplanation", macro.scores);
-    setGaugeWithText(technicalGauge, tech.total_score, "technicalExplanation", tech.scores);
+    setGaugeWithText(macroGauge, macro.total_score, "macroExplanation", macro.scores, "macroScore", "macroLog");
+    setGaugeWithText(technicalGauge, tech.total_score, "technicalExplanation", tech.scores, "technicalScore", "technicalLog");
 
-    // Beste setup selecteren
     const best = findBestSetup(setup.setups);
     if (best) {
-      setGaugeWithBestSetup(setupGauge, best, "setupExplanation");
+      setGaugeWithBestSetup(setupGauge, best, "setupExplanation", "setupScore", "setupLog");
+      showTopSetupsMini(setup.setups);
     }
 
   } catch (err) {
@@ -71,8 +71,8 @@ async function fetchScore(path) {
   return await res.json();
 }
 
-// ✅ Macro & Technisch – gemiddelden
-function setGaugeWithText(gauge, score, explanationId, indicators = {}) {
+// ✅ Macro & Technisch: Toon score, uitleg, log
+function setGaugeWithText(gauge, score, explanationId, indicators = {}, scoreId, logId) {
   const labelIndex = Math.max(0, Math.min(4, Math.round((score + 2) / 4 * 4)));
   const label = SCORE_LABELS[labelIndex];
   const explanation = EXPLANATION_MAP[score?.toString()] || "Geen uitleg.";
@@ -82,31 +82,33 @@ function setGaugeWithText(gauge, score, explanationId, indicators = {}) {
     gauge.update();
   }
 
+  const scoreEl = document.getElementById(scoreId);
+  if (scoreEl) scoreEl.textContent = `Score: ${score}`;
+
   const explanationDiv = document.getElementById(explanationId);
   if (explanationDiv) {
-    let html = `
+    explanationDiv.innerHTML = `
       <div style="text-align:center; margin-top: 8px;">
         <strong style="font-size: 1.1rem;">${label}</strong><br />
         <span style="font-size: 0.9rem; color: #666;">${explanation}</span>
       </div>
     `;
+  }
 
-    if (indicators && Object.keys(indicators).length > 0) {
-      html += `<ul class="log-block">`;
-      for (const [key, val] of Object.entries(indicators)) {
-        const value = val?.value ?? "-";
-        const score = val?.score ?? "-";
-        html += `<li><strong>${key}</strong>: ${value} → <code>score ${score}</code></li>`;
-      }
-      html += `</ul>`;
+  const logDiv = document.getElementById(logId);
+  if (logDiv && indicators && Object.keys(indicators).length > 0) {
+    logDiv.innerHTML = `<ul>`;
+    for (const [key, val] of Object.entries(indicators)) {
+      const value = val?.value ?? "-";
+      const score = val?.score ?? "-";
+      logDiv.innerHTML += `<li><strong>${key}</strong>: ${value} → <code>score ${score}</code></li>`;
     }
-
-    explanationDiv.innerHTML = html;
+    logDiv.innerHTML += `</ul>`;
   }
 }
 
-// ✅ Beste setup tonen
-function setGaugeWithBestSetup(gauge, setup, explanationId) {
+// ✅ Beste setup tonen in meter
+function setGaugeWithBestSetup(gauge, setup, explanationId, scoreId, logId) {
   const score = setup.score ?? 0;
   const labelIndex = Math.max(0, Math.min(4, Math.round((score + 2) / 4 * 4)));
   const label = SCORE_LABELS[labelIndex];
@@ -117,6 +119,9 @@ function setGaugeWithBestSetup(gauge, setup, explanationId) {
     gauge.data.datasets[0].data = gauge.data.datasets[0].data.map((_, i) => i === labelIndex ? 100 : 20);
     gauge.update();
   }
+
+  const scoreEl = document.getElementById(scoreId);
+  if (scoreEl) scoreEl.textContent = `Score: ${score}`;
 
   const explanationDiv = document.getElementById(explanationId);
   if (explanationDiv) {
@@ -129,9 +134,35 @@ function setGaugeWithBestSetup(gauge, setup, explanationId) {
       </div>
     `;
   }
+
+  const logDiv = document.getElementById(logId);
+  if (logDiv && setup.indicators) {
+    logDiv.innerHTML = `<ul>`;
+    for (const [key, val] of Object.entries(setup.indicators)) {
+      const value = val?.value ?? "-";
+      const score = val?.score ?? "-";
+      logDiv.innerHTML += `<li><strong>${key}</strong>: ${value} → <code>score ${score}</code></li>`;
+    }
+    logDiv.innerHTML += `</ul>`;
+  }
 }
 
-// ✅ Hulp: Beste setup bepalen
+// ✅ Top 3 mini-overzicht
+function showTopSetupsMini(setups) {
+  const top = setups
+    .filter(s => typeof s.score === "number")
+    .sort((a, b) => b.score - a.score)
+    .slice(0, 3);
+
+  const mini = document.getElementById("topSetupsMini");
+  if (!mini) return;
+
+  mini.innerHTML = `<strong>Top 3 setups</strong><ul style="padding-left: 16px;">` +
+    top.map(s => `<li>⭐️ <strong>${s.name}</strong> → <code>${s.score}</code></li>`).join("") +
+    `</ul>`;
+}
+
+// ✅ Helper
 function findBestSetup(setups) {
   if (!Array.isArray(setups)) return null;
   return setups.sort((a, b) => (b.score ?? 0) - (a.score ?? 0))[0];
