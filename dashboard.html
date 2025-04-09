@@ -44,6 +44,10 @@
         <div class="score-label" id="setupScore">Score: ⏳</div>
         <div class="explanation" id="setupExplanation">Uitleg wordt geladen...</div>
         <div class="log-block" id="setupLog"></div>
+
+        <!-- ✅ Mini overzicht top 3 -->
+        <div id="topSetupsMini" class="log-block" style="margin-top: 10px;"></div>
+        <button onclick="showSetupInspector()">🔍 Bekijk alle setups</button>
       </div>
     </div>
 
@@ -154,6 +158,7 @@
 
   <!-- ✅ Scripts -->
   <script type="module" src="dashboard/dashboard.js"></script>
+  <script type="module" src="dashboard/gauges.js"></script>
   <script src="dashboard/setup-inspector.js"></script>
 
 </body>
