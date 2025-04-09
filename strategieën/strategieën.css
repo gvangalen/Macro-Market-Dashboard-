@@ -26,7 +26,7 @@
   font-size: 14px;
 }
 
-/* ✅ Strategiekaarten */
+/* ✅ Oude strategiekaarten */
 .strategy-card {
   background: var(--bg-color, #fff);
   color: var(--text-color, #000);
@@ -59,6 +59,41 @@
   color: #888;
 }
 
+/* ✅ Nieuwe strategiekaarten in tabelstijl */
+.strategie-kaart {
+  background: var(--bg-color, #fff);
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.06);
+  overflow: hidden;
+  border: 1px solid #ddd;
+  margin-bottom: 20px;
+  font-size: 0.95rem;
+}
+
+.strategie-kaart table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.strategie-kaart th {
+  background: #f5f5f5;
+  padding: 10px 12px;
+  text-align: left;
+  font-weight: bold;
+  border-bottom: 1px solid #ddd;
+  width: 30%;
+  white-space: nowrap;
+}
+
+.strategie-kaart td {
+  padding: 10px 12px;
+  border-bottom: 1px solid #eee;
+}
+
+.strategie-kaart tr:last-child td {
+  border-bottom: none;
+}
+
 /* ✅ Donkere modus */
 @media (prefers-color-scheme: dark) {
   :root {
@@ -66,25 +101,43 @@
     --text-color: #f5f5f5;
   }
 
-  .strategy-card {
+  .strategy-card,
+  .strategie-kaart {
     background: var(--bg-color);
     color: var(--text-color);
     border-left-color: #0f0;
+    border-color: #444;
   }
 
-  .strategy-card:hover {
+  .strategie-kaart th {
+    background: #333;
+    border-bottom: 1px solid #555;
+  }
+
+  .strategie-kaart td {
+    border-bottom: 1px solid #444;
+  }
+
+  .strategy-card:hover,
+  .strategie-kaart:hover {
     box-shadow: 0 4px 12px rgba(255, 255, 255, 0.05);
   }
 }
 
 /* ✅ Responsief */
 @media (max-width: 768px) {
-  .strategy-card {
+  .strategy-card,
+  .strategie-kaart {
     padding: 16px;
   }
 
   .strategy-filters {
     flex-direction: column;
     gap: 10px;
+  }
+
+  .strategie-kaart th,
+  .strategie-kaart td {
+    padding: 8px;
   }
 }
