@@ -19,6 +19,12 @@
   <div class="strategie-container">
     <h2>📈 Strategieën Overzicht</h2>
 
+    <!-- ✅ AI Strategie generatie -->
+    <div class="ai-strategie-gen">
+      <button id="genereerStrategieënBtn">🚀 Genereer strategieën automatisch (AI)</button>
+      <p id="genereerStatus" style="margin-top: 10px; font-size: 0.95rem;"></p>
+    </div>
+
     <!-- ✅ Filters -->
     <div class="filter-controls">
       <label for="assetFilter">Asset:</label>
@@ -74,6 +80,46 @@
   <!-- ✅ Scripts -->
   <script type="module" src="strategie/strategieën.js"></script>
   <script type="module" src="strategie/strategieën-form.js"></script>
+  <script>
+    const API_BASE_URL = "http://localhost:5002/api"; // pas aan indien nodig
 
+    document.getElementById("genereerStrategieënBtn").addEventListener("click", async () => {
+      const statusP = document.getElementById("genereerStatus");
+      statusP.textContent = "⏳ Strategieën worden gegenereerd...";
+      try {
+        const res = await fetch(`${API_BASE_URL}/strategie/generate_all`, { method: "POST" });
+        const data = await res.json();
+        if (res.ok && data.task_id) {
+          statusP.textContent = "✅ AI-strategiegeneratie gestart... (ID: " + data.task_id + ")";
+          // Automatische statuscheck (optioneel)
+          setTimeout(() => checkStatus(data.task_id), 5000);
+        } else {
+          statusP.textContent = "⚠️ Fout: " + (data.error || "Onbekende fout");
+        }
+      } catch (err) {
+        console.error(err);
+        statusP.textContent = "❌ Fout bij starten van AI-strategiegeneratie";
+      }
+    });
+
+    async function checkStatus(taskId) {
+      const statusP = document.getElementById("genereerStatus");
+      try {
+        const res = await fetch(`${API_BASE_URL}/task_status/${taskId}`);
+        const data = await res.json();
+        if (data.status === "SUCCESS") {
+          statusP.textContent = "✅ Strategieën succesvol gegenereerd!";
+        } else if (data.status === "FAILURE") {
+          statusP.textContent = "❌ Fout tijdens generatie";
+        } else {
+          statusP.textContent = `⌛ Status: ${data.status}... (ID: ${taskId})`;
+          setTimeout(() => checkStatus(taskId), 3000); // opnieuw checken na 3s
+        }
+      } catch (err) {
+        statusP.textContent = "⚠️ Kan status niet ophalen";
+        console.error(err);
+      }
+    }
+  </script>
 </body>
 </html>
