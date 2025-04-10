@@ -4,28 +4,30 @@ import { API_BASE_URL } from "../config.js";
 console.log("📈 Strategieën module geladen!");
 
 document.addEventListener("DOMContentLoaded", async function () {
-  const assetSelect = document.getElementById("filterAsset");
-  const timeframeSelect = document.getElementById("filterTimeframe");
+  const assetSelect = document.getElementById("assetFilter");
+  const timeframeSelect = document.getElementById("timeframeFilter");
   const form = document.getElementById("strategieForm");
+  const aiBtn = document.getElementById("genereerStrategieënBtn");
 
   assetSelect.addEventListener("change", fetchStrategieen);
   timeframeSelect.addEventListener("change", fetchStrategieen);
 
-  form.addEventListener("submit", handleStrategieSubmit);
+  if (form) form.addEventListener("submit", handleStrategieSubmit);
+  if (aiBtn) aiBtn.addEventListener("click", handleStrategieGeneratie);
 
   await fetchStrategieen();
   await loadSetupCheckboxes();
 });
 
 async function fetchStrategieen() {
-  const asset = document.getElementById("filterAsset").value;
-  const timeframe = document.getElementById("filterTimeframe").value;
+  const asset = document.getElementById("assetFilter").value;
+  const timeframe = document.getElementById("timeframeFilter").value;
   const container = document.getElementById("strategieLijst");
 
   container.innerHTML = "<p>🔄 Strategieën laden...</p>";
 
   try {
-    const res = await fetch(`${API_BASE_URL}/api/strategieën?asset=${asset}&timeframe=${timeframe}`);
+    const res = await fetch(`${API_BASE_URL}/strategieën?asset=${asset}&timeframe=${timeframe}`);
     if (!res.ok) throw new Error("Strategie data niet beschikbaar");
     const data = await res.json();
 
@@ -75,10 +77,10 @@ async function handleStrategieSubmit(e) {
   e.preventDefault();
   const form = e.target;
 
-  const name = form.name.value.trim();
-  const notes = form.notes.value.trim();
-  const bot_enabled = form.bot.checked;
-  const min_score = parseFloat(form.min_score.value) || null;
+  const name = form.strategieNaam.value.trim();
+  const notes = form.strategieNotities.value.trim();
+  const bot_enabled = form.botGebruik.value === "true";
+  const min_score = parseFloat(form.scoreDrempel.value) || null;
 
   const setupCheckboxes = document.querySelectorAll("input[name='active_setups[]']:checked");
   const setups = Array.from(setupCheckboxes).map(cb => cb.value);
@@ -92,7 +94,7 @@ async function handleStrategieSubmit(e) {
   };
 
   try {
-    const res = await fetch(`${API_BASE_URL}/api/strategieën`, {
+    const res = await fetch(`${API_BASE_URL}/strategieën`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(payload)
@@ -110,9 +112,11 @@ async function handleStrategieSubmit(e) {
 
 async function loadSetupCheckboxes() {
   const container = document.getElementById("setupCheckboxes");
+  if (!container) return;
+
   container.innerHTML = "⏳ Laden...";
   try {
-    const res = await fetch(`${API_BASE_URL}/api/setups`);
+    const res = await fetch(`${API_BASE_URL}/setups`);
     const data = await res.json();
     if (!Array.isArray(data.setups)) throw new Error("Geen setups gevonden");
     container.innerHTML = data.setups.map(setup => `
@@ -123,6 +127,44 @@ async function loadSetupCheckboxes() {
     `).join("");
   } catch (err) {
     container.innerHTML = "❌ Fout bij laden setups";
+    console.error(err);
+  }
+}
+
+async function handleStrategieGeneratie() {
+  const statusP = document.getElementById("genereerStatus");
+  statusP.textContent = "⏳ Strategieën worden gegenereerd...";
+  try {
+    const res = await fetch(`${API_BASE_URL}/strategie/generate_all`, { method: "POST" });
+    const data = await res.json();
+    if (res.ok && data.task_id) {
+      statusP.textContent = "✅ AI-strategiegeneratie gestart... (ID: " + data.task_id + ")";
+      setTimeout(() => checkStrategieTaskStatus(data.task_id), 5000);
+    } else {
+      statusP.textContent = "⚠️ Fout: " + (data.error || "Onbekende fout");
+    }
+  } catch (err) {
+    console.error(err);
+    statusP.textContent = "❌ Fout bij starten van AI-strategiegeneratie";
+  }
+}
+
+async function checkStrategieTaskStatus(taskId) {
+  const statusP = document.getElementById("genereerStatus");
+  try {
+    const res = await fetch(`${API_BASE_URL}/task_status/${taskId}`);
+    const data = await res.json();
+    if (data.status === "SUCCESS") {
+      statusP.textContent = "✅ Strategieën succesvol gegenereerd!";
+      await fetchStrategieen();
+    } else if (data.status === "FAILURE") {
+      statusP.textContent = "❌ Fout tijdens generatie";
+    } else {
+      statusP.textContent = `⌛ Status: ${data.status}... (ID: ${taskId})`;
+      setTimeout(() => checkStrategieTaskStatus(taskId), 3000);
+    }
+  } catch (err) {
+    statusP.textContent = "⚠️ Kan status niet ophalen";
     console.error(err);
   }
 }
