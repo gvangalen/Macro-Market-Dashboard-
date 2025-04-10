@@ -4,21 +4,22 @@ import { API_BASE_URL } from "../config.js";
 console.log("📈 Strategieën module geladen!");
 
 document.addEventListener("DOMContentLoaded", async function () {
-  const assetSelect = document.getElementById("assetFilter");
-  const timeframeSelect = document.getElementById("timeframeFilter");
+  const assetSelect = document.getElementById("filterAsset");
+  const timeframeSelect = document.getElementById("filterTimeframe");
+  const form = document.getElementById("strategieForm");
 
   assetSelect.addEventListener("change", fetchStrategieen);
   timeframeSelect.addEventListener("change", fetchStrategieen);
 
+  form.addEventListener("submit", handleStrategieSubmit);
+
   await fetchStrategieen();
   await loadSetupCheckboxes();
-
-  document.getElementById("strategieForm").addEventListener("submit", handleStrategieSubmit);
 });
 
 async function fetchStrategieen() {
-  const asset = document.getElementById("assetFilter").value;
-  const timeframe = document.getElementById("timeframeFilter").value;
+  const asset = document.getElementById("filterAsset").value;
+  const timeframe = document.getElementById("filterTimeframe").value;
   const container = document.getElementById("strategieLijst");
 
   container.innerHTML = "<p>🔄 Strategieën laden...</p>";
@@ -44,7 +45,7 @@ async function fetchStrategieen() {
 
 function renderStrategieKaart(s) {
   const label = s.name || "Swingstrategie";
-  const score = s.score != null ? `${s.score}/10` : "–";
+  const score = s.score != null ? `${s.score}/10` : "-";
   const entry = s.entry || "–";
   const targets = s.targets?.join(", ") || "–";
   const stopLoss = s.stop_loss || "–";
@@ -70,47 +71,24 @@ function renderStrategieKaart(s) {
   `;
 }
 
-// ✅ Laad setup-checkboxes
-async function loadSetupCheckboxes() {
-  const container = document.getElementById("setupCheckboxes");
-  if (!container) return;
-
-  try {
-    const res = await fetch(`${API_BASE_URL}/api/setups`);
-    const data = await res.json();
-    if (!Array.isArray(data.setups)) throw new Error("Setups niet gevonden");
-
-    container.innerHTML = data.setups.map(setup => `
-      <label><input type="checkbox" name="setupIds" value="${setup.id}" /> ${setup.name}</label>
-    `).join("<br>");
-
-  } catch (err) {
-    console.error("❌ Fout bij ophalen van setups:", err);
-    container.innerHTML = "<p style='color:red;'>❌ Fout bij ophalen van setups.</p>";
-  }
-}
-
-// ✅ Formulierverwerking
 async function handleStrategieSubmit(e) {
   e.preventDefault();
-  const naam = document.getElementById("strategieNaam").value;
-  const bot = document.getElementById("botGebruik").value === "true";
-  const drempel = document.getElementById("scoreDrempel").value;
-  const notities = document.getElementById("strategieNotities").value;
+  const form = e.target;
 
-  const setupIds = Array.from(document.querySelectorAll("input[name='setupIds']:checked")).map(cb => cb.value);
+  const name = form.name.value.trim();
+  const notes = form.notes.value.trim();
+  const bot_enabled = form.bot.checked;
+  const min_score = parseFloat(form.min_score.value) || null;
 
-  if (!naam || setupIds.length === 0) {
-    alert("Naam en minimaal 1 gekoppelde setup zijn verplicht.");
-    return;
-  }
+  const setupCheckboxes = document.querySelectorAll("input[name='active_setups[]']:checked");
+  const setups = Array.from(setupCheckboxes).map(cb => cb.value);
 
   const payload = {
-    name: naam,
-    setup_ids: setupIds,
-    use_bot: bot,
-    score_threshold: drempel ? parseFloat(drempel) : null,
-    notes: notities
+    name,
+    notes,
+    bot_enabled,
+    min_score,
+    setup_ids: setups
   };
 
   try {
@@ -120,13 +98,31 @@ async function handleStrategieSubmit(e) {
       body: JSON.stringify(payload)
     });
 
-    if (!res.ok) throw new Error("Strategie toevoegen mislukt");
-
-    alert("✅ Strategie succesvol toegevoegd!");
-    document.getElementById("strategieForm").reset();
+    if (!res.ok) throw new Error("Fout bij opslaan strategie");
+    alert("✅ Strategie toegevoegd!");
+    form.reset();
     await fetchStrategieen();
   } catch (err) {
-    console.error("❌ Strategie opslaan mislukt:", err);
-    alert("❌ Er ging iets mis bij het opslaan van de strategie.");
+    console.error("❌ Strategie toevoegen mislukt:", err);
+    alert("❌ Strategie opslaan mislukt");
+  }
+}
+
+async function loadSetupCheckboxes() {
+  const container = document.getElementById("setupCheckboxes");
+  container.innerHTML = "⏳ Laden...";
+  try {
+    const res = await fetch(`${API_BASE_URL}/api/setups`);
+    const data = await res.json();
+    if (!Array.isArray(data.setups)) throw new Error("Geen setups gevonden");
+    container.innerHTML = data.setups.map(setup => `
+      <label style="display:block; margin-bottom:4px;">
+        <input type="checkbox" name="active_setups[]" value="${setup.id}" />
+        ${setup.name}
+      </label>
+    `).join("");
+  } catch (err) {
+    container.innerHTML = "❌ Fout bij laden setups";
+    console.error(err);
   }
 }
