@@ -9,6 +9,7 @@ document.addEventListener("DOMContentLoaded", function () {
   updateMacroData();
   setInterval(updateMacroData, 60000);
 
+  // Sorteerbare kolommen
   const headers = document.querySelectorAll("#macroTable thead th.sortable");
   headers.forEach(header => {
     header.addEventListener("click", () => sortMacroTable(header.dataset.key));
@@ -39,7 +40,7 @@ async function updateMacroData() {
 
   macroData = dashboard.macro_data;
   renderMacroTable(macroData);
-  markStepDone(3);
+  markStepDone(3); // ✅ Onboarding stap gemarkeerd
 }
 
 function renderMacroTable(data) {
@@ -67,7 +68,10 @@ function renderMacroTable(data) {
       <td>${ind.interpretation || "–"}</td>
       <td>${ind.action || "–"}</td>
       <td class="macro-score ${scoreColor}">${score}</td>
-      <td><button onclick="removeRow(this)">❌</button></td>
+      <td>
+        <button class="btn-edit" onclick="editRow('${ind.name}', '${ind.value}')">✏️</button>
+        <button class="btn-remove" onclick="removeRow(this)">❌</button>
+      </td>
     `;
     tbody.appendChild(row);
   });
@@ -114,13 +118,25 @@ function getIndicatorExplanation(indicator) {
   return uitleg[indicator] || "Geen uitleg beschikbaar";
 }
 
-// ✅ Rijen handmatig verwijderen (voor demo/test)
+// ✅ Rijen verwijderen
 function removeRow(btn) {
   const row = btn.closest("tr");
   if (row) row.remove();
   updateMacroScore();
 }
 
+// ✅ Rijen bewerken
+function editRow(indicatorName, currentValue) {
+  const nieuweWaarde = prompt(`Wijzig waarde voor ${indicatorName}:`, currentValue);
+  if (nieuweWaarde && !isNaN(parseFloat(nieuweWaarde))) {
+    macroData = macroData.map(ind =>
+      ind.name === indicatorName ? { ...ind, value: parseFloat(nieuweWaarde) } : ind
+    );
+    renderMacroTable(macroData);
+  }
+}
+
+// ✅ Macro totaal score herberekenen
 function updateMacroScore() {
   const scores = document.querySelectorAll(".macro-score");
   let total = 0;
