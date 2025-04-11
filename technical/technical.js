@@ -5,6 +5,7 @@ console.log("✅ technical.js geladen!");
 const baseUrl = `${API_BASE_URL}/technical_data`;
 let currentSortField = "symbol";
 let currentSortOrder = "asc";
+let allAssets = [];
 
 document.addEventListener("DOMContentLoaded", () => {
   loadTechAnalysis();
@@ -20,30 +21,52 @@ document.addEventListener("DOMContentLoaded", () => {
         currentSortField = field;
         currentSortOrder = "asc";
       }
-      loadTechAnalysis(); // herlaadt met sortering
+      renderTechTable(allAssets); // herlaadt gesorteerde data
     });
   });
+
+  // Zoekfilter
+  document.getElementById("techSearch").addEventListener("input", (e) => {
+    const query = e.target.value.toLowerCase();
+    const filtered = allAssets.filter(asset => asset.symbol.toLowerCase().includes(query));
+    renderTechTable(filtered);
+  });
+
+  // Timeframe selectie
+  document.getElementById("techTimeframe").addEventListener("change", loadTechAnalysis);
 });
 
 async function loadTechAnalysis() {
+  showLoadingSpinner(true);
   setText("techStatus", "📡 Laden...");
-  const timeframe = document.getElementById("globalTimeframe")?.value || "4hr";
+
+  const timeframe = document.getElementById("techTimeframe")?.value || "4hr";
 
   try {
     const data = await safeFetch(`${baseUrl}?timeframe=${timeframe}`);
     if (!Array.isArray(data)) throw new Error("Ongeldige API-response");
 
+    allAssets = data;
     renderTechTable(data);
     setText("techStatus", "✅ Data up-to-date");
   } catch (err) {
     showError("techStatus", "❌ Fout bij laden.");
     console.error(err);
+    renderTechTable([]);
+  } finally {
+    showLoadingSpinner(false);
   }
 }
 
 function renderTechTable(assets) {
   const tbody = document.querySelector("#analysisTable tbody");
   tbody.innerHTML = "";
+
+  if (!assets.length) {
+    tbody.innerHTML = `<tr><td colspan="7">⚠️ Geen data gevonden.</td></tr>`;
+    updateScoreSummary(0, 0);
+    return;
+  }
 
   // Sorteerdata
   assets.sort((a, b) => {
@@ -108,7 +131,6 @@ function updateScoreSummary(total, count) {
   document.getElementById("technicalAdvice").innerText = advies;
 }
 
-// Herbruikbare functies
 async function removeTechRow(assetId) {
   if (!confirm("Weet je zeker dat je deze asset wilt verwijderen?")) return;
   await safeFetch(`${baseUrl}/${assetId}`, "DELETE");
@@ -162,4 +184,9 @@ function showError(id, msg) {
     el.textContent = msg;
     el.style.color = "red";
   }
+}
+
+function showLoadingSpinner(show) {
+  const el = document.getElementById("techSpinner");
+  if (el) el.style.display = show ? "inline-block" : "none";
 }
