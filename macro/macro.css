@@ -17,39 +17,55 @@ h2 {
 .macro-container {
     text-align: center;
     padding: 20px;
-    max-width: 90%;
+    max-width: 95%;
     margin: auto;
 }
 
-/* ✅ Dynamische kleuren voor scores */
+/* ✅ Score kleurcodering */
 .macro-score {
     font-weight: bold;
     transition: color 0.3s ease-in-out;
 }
 
-.macro-score.positive {
+.macro-score.score-high {
     color: #2e7d32; /* Donkergroen */
 }
 
-.macro-score.negative {
-    color: #d32f2f; /* Donkerrood */
+.macro-score.score-mid {
+    color: #fbc02d; /* Geel */
 }
 
-#macroAdvice {
-    font-size: 1.5rem;
-    font-weight: bold;
-    margin-top: 10px;
-    padding: 10px;
-    background: #e8f5e9;
-    color: #2e7d32;
-    border-radius: 8px;
-    display: inline-block;
+.macro-score.score-low {
+    color: #d32f2f; /* Rood */
+}
+
+/* ✅ Tooltip styling */
+.tooltip {
+    position: relative;
+    cursor: help;
+}
+
+.tooltip:hover::after {
+    content: attr(data-tooltip);
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
+    top: 120%;
+    background: #333;
+    color: #fff;
+    padding: 6px 10px;
+    border-radius: 6px;
+    font-size: 13px;
+    white-space: pre-line;
+    z-index: 10;
+    max-width: 240px;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.2);
 }
 
 /* ✅ Tabel styling */
 table {
     width: 100%;
-    max-width: 900px;
+    max-width: 1100px;
     margin: 20px auto;
     border-collapse: collapse;
     background: white;
@@ -70,6 +86,20 @@ th {
     color: white;
     font-weight: bold;
     text-transform: uppercase;
+    cursor: default;
+}
+
+th.sortable {
+    cursor: pointer;
+    position: relative;
+}
+
+th.sortable::after {
+    content: "⇅";
+    font-size: 12px;
+    position: absolute;
+    right: 10px;
+    color: #ccc;
 }
 
 tr:nth-child(even) {
@@ -82,29 +112,71 @@ tr:hover {
 }
 
 /* ✅ Knoppen styling */
-.btn-add, .btn-remove {
+.btn-add,
+button {
     background-color: #4caf50;
     color: white;
     border: none;
-    padding: 10px 15px;
-    margin: 10px;
+    padding: 8px 12px;
+    margin: 6px;
     cursor: pointer;
     border-radius: 5px;
     font-size: 14px;
     transition: background 0.3s ease-in-out;
 }
 
-.btn-add:hover {
+.btn-add:hover,
+button:hover {
     background-color: #388e3c;
 }
 
-.btn-remove {
+button.btn-remove {
     background-color: #d32f2f;
-    padding: 6px 10px;
 }
 
-.btn-remove:hover {
+button.btn-remove:hover {
     background-color: #b71c1c;
+}
+
+/* ✅ Macro advies styling */
+#macroAdvice {
+    font-size: 1.5rem;
+    font-weight: bold;
+    margin-top: 10px;
+    padding: 10px 16px;
+    background: #e8f5e9;
+    color: #2e7d32;
+    border-radius: 8px;
+    display: inline-block;
+    min-width: 160px;
+}
+
+/* ✅ Modal styling */
+.modal {
+    display: none;
+    position: fixed;
+    top: 20%;
+    left: 50%;
+    transform: translateX(-50%);
+    background-color: #fff;
+    border: 1px solid #ccc;
+    border-radius: 12px;
+    padding: 20px;
+    z-index: 1001;
+    width: 90%;
+    max-width: 400px;
+    box-shadow: 0 8px 20px rgba(0,0,0,0.25);
+}
+
+.modal-overlay {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    height: 100vh;
+    width: 100vw;
+    background: rgba(0,0,0,0.4);
+    z-index: 1000;
 }
 
 /* ✅ Responsieve optimalisatie */
@@ -116,9 +188,12 @@ tr:hover {
     th, td {
         padding: 8px;
     }
-
     .btn-add {
         font-size: 14px;
         padding: 8px;
+    }
+    #macroAdvice {
+        font-size: 1.2rem;
+        padding: 8px 12px;
     }
 }
