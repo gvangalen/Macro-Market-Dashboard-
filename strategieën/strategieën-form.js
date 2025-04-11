@@ -15,11 +15,11 @@ async function loadSetupCheckboxes() {
 
   try {
     const res = await fetch(`${API_BASE_URL}/api/setups`);
-    const setups = await res.json();
+    const data = await res.json();
 
-    if (!Array.isArray(setups)) throw new Error("Setups niet gevonden");
+    if (!Array.isArray(data.setups)) throw new Error("Setups niet gevonden");
 
-    container.innerHTML = setups
+    container.innerHTML = data.setups
       .map(setup => `
         <label style="display:block; margin-bottom:4px;">
           <input type="checkbox" name="setup_ids" value="${setup.id}" />
@@ -44,6 +44,7 @@ async function handleStrategieSubmit(e) {
   const botGebruik = document.getElementById("botGebruik").value === "true";
   const scoreDrempel = parseFloat(document.getElementById("scoreDrempel").value) || null;
   const notities = document.getElementById("strategieNotities").value.trim();
+  const tags = document.getElementById("strategieTags").value.trim().split(",").map(t => t.trim()).filter(Boolean);
 
   if (!strategieNaam || setup_ids.length === 0) {
     alert("❗ Vul de strategie-naam in en selecteer minimaal 1 setup.");
@@ -51,11 +52,15 @@ async function handleStrategieSubmit(e) {
   }
 
   const payload = {
-    name: strategieNaam,
+    setup_name: strategieNaam,
     setup_ids,
     bot_enabled: botGebruik,
     min_score: scoreDrempel,
-    notes: notities,
+    explanation: notities,
+    tags: tags,
+    favorite: false,
+    origin: "Handmatig",
+    ai_reason: ""
   };
 
   try {
