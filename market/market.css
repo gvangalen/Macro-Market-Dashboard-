@@ -1,90 +1,149 @@
-/* ✅ Algemene Tabelstijl */
+/* ✅ Container rond de tabel */
 .table-container {
     background: white;
     padding: 20px;
-    border-radius: 10px;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-    margin-bottom: 20px;
-    width: 90%;
-    max-width: 1000px; /* ✅ Voorkomt extreem brede tabellen */
-    margin-left: auto;
-    margin-right: auto;
-    overflow-x: auto; /* ✅ Zorgt ervoor dat de tabel niet breekt op kleine schermen */
+    border-radius: 12px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+    margin: 20px auto;
+    max-width: 1100px;
+    overflow-x: auto;
 }
 
-/* ✅ Standaard tabel styling */
+/* ✅ Algemene tabelstijl */
 table {
     width: 100%;
     border-collapse: collapse;
-    margin-top: 10px;
+    border-radius: 12px;
+    overflow: hidden;
     background: white;
-    border-radius: 8px;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-    overflow: hidden; /* ✅ Voorkomt dat border-radius niet werkt op tabelranden */
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
 }
 
 th, td {
-    border: 1px solid #ddd;
-    padding: 12px;
+    padding: 12px 16px;
+    border: 1px solid #eee;
     text-align: center;
-    font-size: 16px;
-    transition: background 0.3s ease-in-out; /* ✅ Zachte hover-animatie */
+    font-size: 15px;
 }
 
 th {
-    background-color: #388e3c;
+    background-color: #2e7d32;
     color: white;
-    font-weight: bold;
+    font-weight: 600;
+    cursor: pointer;
+    user-select: none;
 }
 
-tr:nth-child(even) {
-    background-color: #f9f9f9;
+th.sortable:hover {
+    background-color: #1b5e20;
 }
 
+/* ✅ Hover rij */
 tr:hover {
-    background-color: #e8f5e9; /* ✅ Lichte groene tint bij hover */
+    background-color: #f1f8e9;
 }
 
-/* ✅ Dynamische laadtoestand */
-.loading {
-    text-align: center;
-    font-size: 16px;
-    color: #777;
-    font-style: italic;
-    margin-top: 10px;
+/* ✅ Om-en-om kleur */
+tr:nth-child(even) {
+    background-color: #fcfcfc;
 }
 
-/* ✅ Stijging/Daling Animatie */
-.green {
-    color: green;
-    font-weight: bold;
-    animation: fadeIn 0.5s ease-in-out;
-}
-
-.red {
-    color: red;
-    font-weight: bold;
-    animation: fadeIn 0.5s ease-in-out;
-}
-
-@keyframes fadeIn {
-    from { opacity: 0; }
-    to { opacity: 1; }
-}
-
-/* ✅ Extra responsieve optimalisatie */
+/* ✅ Responsieve optimalisatie */
 @media (max-width: 768px) {
-    .table-container {
-        width: 100%;
-        padding: 15px;
-    }
-
     th, td {
-        padding: 8px;
-        font-size: 14px;
+        font-size: 13px;
+        padding: 8px 10px;
     }
 
     table {
         font-size: 12px;
+    }
+}
+
+/* ✅ Visuele kleurcodering voor score */
+.score-green {
+    color: green;
+    font-weight: bold;
+}
+
+.score-red {
+    color: red;
+    font-weight: bold;
+}
+
+.score-neutral {
+    color: #555;
+    font-weight: bold;
+}
+
+/* ✅ Status loading */
+.loading {
+    font-style: italic;
+    color: #888;
+    text-align: center;
+    margin-top: 10px;
+}
+
+/* ✅ Feedback boxen */
+#marketAdvice {
+    font-weight: bold;
+    padding-left: 6px;
+}
+
+/* ✅ Tooltip (optioneel) */
+th[title] {
+    position: relative;
+}
+
+th[title]:hover::after {
+    content: attr(title);
+    position: absolute;
+    left: 0;
+    top: 120%;
+    background: #333;
+    color: #fff;
+    padding: 6px 10px;
+    border-radius: 6px;
+    font-size: 13px;
+    white-space: pre-line;
+    z-index: 10;
+}
+
+/* ✅ Donkere modus ondersteuning */
+@media (prefers-color-scheme: dark) {
+    body {
+        background: #121212;
+        color: #f0f0f0;
+    }
+
+    .table-container,
+    table {
+        background-color: #1e1e1e;
+        color: #f0f0f0;
+        border-color: #444;
+    }
+
+    th {
+        background-color: #333;
+    }
+
+    tr:nth-child(even) {
+        background-color: #2a2a2a;
+    }
+
+    tr:hover {
+        background-color: #2e2e2e;
+    }
+
+    .score-green {
+        color: #8bc34a;
+    }
+
+    .score-red {
+        color: #f44336;
+    }
+
+    .score-neutral {
+        color: #ccc;
     }
 }
