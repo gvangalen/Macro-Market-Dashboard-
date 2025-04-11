@@ -1,159 +1,234 @@
 /* ✅ Algemene styling */
 body {
-    font-family: Arial, sans-serif;
-    text-align: center;
-    background-color: #f4f4f4;
-    margin: 0;
-    padding: 0;
-    transition: background 0.3s ease-in-out;
+  font-family: Arial, sans-serif;
+  text-align: center;
+  background-color: #f4f4f4;
+  margin: 0;
+  padding: 0;
+  transition: background 0.3s ease-in-out;
 }
 
 /* ✅ Donkere modus ondersteuning */
 @media (prefers-color-scheme: dark) {
-    body {
-        background-color: #1e1e1e;
-        color: #f1f1f1;
-    }
+  body {
+    background-color: #1e1e1e;
+    color: #f1f1f1;
+  }
+
+  table {
+    background-color: #2e2e2e;
+  }
+
+  th {
+    background-color: #4caf50;
+  }
 }
 
 /* ✅ Titel */
 h2 {
-    margin-top: 20px;
-    color: #333;
-    font-size: 24px;
-    text-transform: uppercase;
-    letter-spacing: 1px;
+  margin-top: 20px;
+  color: #333;
+  font-size: 24px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
 }
 
 /* ✅ Container voor knoppen */
 .controls {
-    display: flex;
-    justify-content: center;
-    flex-wrap: wrap;
-    gap: 10px;
-    margin-bottom: 15px;
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-bottom: 15px;
+}
+
+/* ✅ Zoekveld */
+#techSearch {
+  padding: 10px;
+  font-size: 16px;
+  width: 200px;
+  border-radius: 5px;
+  border: 1px solid #ccc;
+  transition: all 0.3s ease-in-out;
+}
+
+#techSearch:focus {
+  outline: none;
+  border-color: #388e3c;
+  box-shadow: 0 0 5px rgba(56, 142, 60, 0.5);
 }
 
 /* ✅ Timeframe dropdown */
-#globalTimeframe {
-    padding: 10px;
-    font-size: 16px;
-    border: 1px solid #388e3c;
-    border-radius: 5px;
-    cursor: pointer;
-    transition: all 0.3s ease-in-out;
+#techTimeframe {
+  padding: 10px;
+  font-size: 16px;
+  border: 1px solid #388e3c;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: all 0.3s ease-in-out;
 }
 
-#globalTimeframe:hover {
-    background-color: #e8f5e9;
+#techTimeframe:hover {
+  background-color: #e8f5e9;
 }
 
 /* ✅ Tabellen styling */
 table {
-    width: 90%;
-    margin: 20px auto;
-    border-collapse: collapse;
-    background: white;
-    box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
-    border-radius: 8px;
-    overflow: hidden;
-    transition: box-shadow 0.3s ease-in-out;
+  width: 90%;
+  margin: 20px auto;
+  border-collapse: collapse;
+  background: white;
+  box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+  border-radius: 8px;
+  overflow: hidden;
+  transition: box-shadow 0.3s ease-in-out;
 }
 
 table:hover {
-    box-shadow: 0px 0px 20px rgba(0, 0, 0, 0.15);
-}
-
-/* ✅ Responsieve tabel voor kleine schermen */
-@media (max-width: 768px) {
-    table {
-        display: block;
-        overflow-x: auto;
-        white-space: nowrap;
-    }
+  box-shadow: 0px 0px 20px rgba(0, 0, 0, 0.15);
 }
 
 /* ✅ Tabellen cellen */
 th, td {
-    padding: 12px;
-    border: 1px solid #ddd;
-    text-align: center;
-    font-size: 16px;
-    transition: background 0.3s ease-in-out;
+  padding: 12px;
+  border: 1px solid #ddd;
+  text-align: center;
+  font-size: 16px;
+  transition: background 0.3s ease-in-out;
 }
 
-/* ✅ Tabellen hoofding */
 th {
-    background: #388e3c;
-    color: white;
-    font-weight: bold;
-    text-transform: uppercase;
+  background: #388e3c;
+  color: white;
+  font-weight: bold;
+  text-transform: uppercase;
+  cursor: pointer;
+  user-select: none;
 }
 
-/* ✅ Dynamische hover voor rijen */
+/* ✅ Sortable kolommen hint */
+th[data-sort]::after {
+  content: " ⬍";
+  font-size: 12px;
+  opacity: 0.6;
+}
+
+/* ✅ Rijen hover */
 tr:hover {
-    background-color: #f1f8e9;
-    cursor: pointer;
+  background-color: #f1f8e9;
+  cursor: pointer;
 }
 
-/* ✅ Toevoegknoppen */
+/* ✅ Scorekleuren */
+.score-positive {
+  color: green;
+  font-weight: bold;
+}
+
+.score-neutral {
+  color: orange;
+  font-weight: bold;
+}
+
+.score-negative {
+  color: red;
+  font-weight: bold;
+}
+
+/* ✅ Trend-cell */
+.trend-cell {
+  font-weight: bold;
+}
+
+/* ✅ Tooltip basisstijl */
+[title] {
+  position: relative;
+}
+
+[title]:hover::after {
+  content: attr(title);
+  position: absolute;
+  background-color: #333;
+  color: #fff;
+  padding: 6px 10px;
+  border-radius: 5px;
+  top: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+  white-space: nowrap;
+  font-size: 14px;
+  z-index: 9999;
+}
+
+/* ✅ Knoppen */
 .btn-add {
-    background-color: #4caf50;
-    color: white;
-    border: none;
-    padding: 12px 18px;
-    cursor: pointer;
-    border-radius: 5px;
-    font-size: 16px;
-    transition: all 0.3s ease-in-out;
-    font-weight: bold;
+  background-color: #4caf50;
+  color: white;
+  border: none;
+  padding: 12px 18px;
+  cursor: pointer;
+  border-radius: 5px;
+  font-size: 16px;
+  transition: all 0.3s ease-in-out;
+  font-weight: bold;
 }
 
 .btn-add:hover {
-    background-color: #388e3c;
-    transform: scale(1.05);
+  background-color: #388e3c;
+  transform: scale(1.05);
 }
 
-/* ✅ Verwijderknoppen */
 .btn-remove {
-    background-color: #d9534f;
-    color: white;
-    border: none;
-    padding: 8px 12px;
-    cursor: pointer;
-    border-radius: 5px;
-    font-size: 16px;
-    transition: all 0.3s ease-in-out;
+  background-color: #d9534f;
+  color: white;
+  border: none;
+  padding: 8px 12px;
+  cursor: pointer;
+  border-radius: 5px;
+  font-size: 16px;
+  transition: all 0.3s ease-in-out;
 }
 
 .btn-remove:hover {
-    background-color: #c9302c;
-    transform: scale(1.05);
+  background-color: #c9302c;
+  transform: scale(1.05);
 }
 
-/* ✅ Laadtoestand */
-.loading {
-    text-align: center;
-    font-size: 18px;
-    font-style: italic;
-    color: #777;
-    margin-top: 20px;
-    transition: opacity 0.3s ease-in-out;
+/* ✅ Loading spinner */
+.spinner {
+  font-size: 18px;
+  color: #777;
+  margin: 10px auto;
+  font-style: italic;
+  animation: blink 1.2s linear infinite;
 }
 
-/* ✅ Responsief design voor kleinere schermen */
+@keyframes blink {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.2; }
+}
+
+/* ✅ Responsive layout */
 @media (max-width: 768px) {
-    .controls {
-        flex-direction: column;
-        align-items: center;
-    }
+  .controls {
+    flex-direction: column;
+    align-items: center;
+  }
 
-    .btn-add {
-        font-size: 14px;
-        padding: 10px 14px;
-    }
+  .btn-add {
+    font-size: 14px;
+    padding: 10px 14px;
+  }
 
-    table {
-        font-size: 14px;
-    }
+  #techSearch {
+    width: 90%;
+  }
+
+  table {
+    font-size: 14px;
+  }
+
+  th, td {
+    padding: 8px;
+  }
 }
