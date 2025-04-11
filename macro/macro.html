@@ -5,59 +5,25 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>📊 Macro Indicatoren</title>
   <link rel="stylesheet" href="styles.css">
-  <style>
-    .sortable:hover { cursor: pointer; text-decoration: underline; }
-    .bullish { color: #28a745; font-weight: bold; }
-    .bearish { color: #dc3545; font-weight: bold; }
-    .neutral { color: #6c757d; font-weight: bold; }
-    .macro-score[data-tooltip]:hover::after {
-      content: attr(data-tooltip);
-      position: absolute;
-      background: #333;
-      color: white;
-      padding: 6px 10px;
-      border-radius: 5px;
-      font-size: 12px;
-      white-space: pre;
-      top: 100%;
-      left: 0;
-      z-index: 100;
-    }
-    .macro-filters {
-      display: flex;
-      gap: 15px;
-      margin: 10px 0;
-      align-items: center;
-    }
-    @media (max-width: 768px) {
-      .macro-filters { flex-direction: column; align-items: flex-start; }
-    }
-  </style>
 </head>
 <body>
 
 <div class="macro-container">
   <h2>📊 Macro Indicatoren</h2>
 
-  <!-- ✅ Filters -->
-  <div class="macro-filters">
-    <label for="macroFilter">🔍 Filter op naam:</label>
-    <input type="text" id="macroFilter" placeholder="bijv. fear, dxy..." />
+  <button class="btn-add" onclick="addMacroRow()">➕ Indicator toevoegen</button>
 
-    <button class="btn-add" onclick="addMacroRow()">➕ Indicator toevoegen</button>
-  </div>
-
-  <!-- ✅ Tabel -->
   <table id="macroTable">
     <thead>
       <tr>
-        <th class="sortable" onclick="sortMacroTable('name')">Indicator</th>
+        <th>Indicator</th>
         <th>Huidig Niveau</th>
-        <th class="sortable" onclick="sortMacroTable('trend')">Trend</th>
+        <th>Trend</th>
         <th>Interpretatie</th>
         <th>Actie</th>
-        <th class="sortable" onclick="sortMacroTable('score')">Score</th>
-        <th>Verwijderen</th>
+        <th>Score</th>
+        <th>Bewerk</th>
+        <th>Verwijder</th>
       </tr>
     </thead>
     <tbody id="macroBody">
@@ -67,8 +33,9 @@
         <td id="fearGreedTrend" class="trend-cell">N/A</td>
         <td id="fearGreedInterpretation">N/A</td>
         <td id="fearGreedAction">N/A</td>
-        <td class="macro-score" id="fearGreedScore" data-tooltip="Score gebaseerd op extremen: <30 = -2, >70 = +2">-</td>
-        <td><button class="btn-remove" onclick="removeRow(this)">❌</button></td>
+        <td class="macro-score" id="fearGreedScore">-</td>
+        <td><button onclick="editIndicator('fear_greed_index')">✏️</button></td>
+        <td><button onclick="deleteMacroIndicator('fear_greed_index')">❌</button></td>
       </tr>
       <tr>
         <td>Bitcoin Dominantie</td>
@@ -76,8 +43,9 @@
         <td id="btcDominanceTrend" class="trend-cell">N/A</td>
         <td id="btcDominanceInterpretation">N/A</td>
         <td id="btcDominanceAction">N/A</td>
-        <td class="macro-score" id="btcDominanceScore" data-tooltip="Score gebaseerd op drempels: 45/50/55">-</td>
-        <td><button class="btn-remove" onclick="removeRow(this)">❌</button></td>
+        <td class="macro-score" id="btcDominanceScore">-</td>
+        <td><button onclick="editIndicator('btc_dominance')">✏️</button></td>
+        <td><button onclick="deleteMacroIndicator('btc_dominance')">❌</button></td>
       </tr>
       <tr>
         <td>Dollar Index (DXY)</td>
@@ -85,8 +53,9 @@
         <td id="dxyTrend" class="trend-cell">N/A</td>
         <td id="dxyInterpretation">N/A</td>
         <td id="dxyAction">N/A</td>
-        <td class="macro-score" id="dxyScore" data-tooltip="Lager is positiever: <100 = +2, >106 = -2">-</td>
-        <td><button class="btn-remove" onclick="removeRow(this)">❌</button></td>
+        <td class="macro-score" id="dxyScore">-</td>
+        <td><button onclick="editIndicator('dxy')">✏️</button></td>
+        <td><button onclick="deleteMacroIndicator('dxy')">❌</button></td>
       </tr>
     </tbody>
   </table>
@@ -94,6 +63,20 @@
   <h3>🌍 Totale Macro Score: <span id="macroTotalScore">N/A</span></h3>
   <h3>📈 Macro Advies: <span id="macroAdvice">Neutraal</span></h3>
   <p id="macroStatus" class="loading">📡 Data laden...</p>
+</div>
+
+<!-- Modal voor bewerken -->
+<div id="editModal" style="display:none; position:fixed; top:20%; left:50%; transform:translateX(-50%); background:white; padding:20px; border:1px solid #ccc; border-radius:10px; z-index:1000;">
+  <h3>Bewerk Indicator</h3>
+  <label>Nieuwe drempelwaarden (laag, midden, hoog):</label><br>
+  <input id="editThresholds" placeholder="Bijv. 30, 50, 70" style="width: 90%" /><br><br>
+  <label>Positieve correlatie:</label>
+  <select id="editPositive">
+    <option value="true">Ja</option>
+    <option value="false">Nee</option>
+  </select><br><br>
+  <button onclick="saveEditChanges()">💾 Opslaan</button>
+  <button onclick="closeEditModal()">❌ Annuleren</button>
 </div>
 
 <script type="module" src="js/macro.js"></script>
