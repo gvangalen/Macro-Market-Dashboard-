@@ -25,7 +25,7 @@
       <p id="genereerStatus" style="margin-top: 10px; font-size: 0.95rem;"></p>
     </div>
 
-    <!-- ✅ Filters en sortering -->
+    <!-- ✅ Filters -->
     <div class="filter-controls">
       <label for="assetFilter">Asset:</label>
       <select id="assetFilter">
@@ -41,22 +41,17 @@
         <option value="1D">1D</option>
         <option value="1W">1W</option>
       </select>
-
-      <label for="sortFilter">Sorteer op:</label>
-      <select id="sortFilter">
-        <option value="recent">📅 Nieuwste</option>
-        <option value="score">⭐️ Hoogste score</option>
-      </select>
     </div>
 
+    <!-- ✅ Sorteeropties -->
     <div class="strategie-sorteer" style="margin-top: 20px;">
-  <label for="sorteerSelect">📊 Sorteer op:</label>
-  <select id="sorteerSelect">
-    <option value="datum">Datum (nieuwste)</option>
-    <option value="score">Score (hoog-laag)</option>
-    <option value="favoriet">Favoriet eerst ⭐️</option>
-  </select>
-</div>
+      <label for="sorteerSelect">📊 Sorteer op:</label>
+      <select id="sorteerSelect">
+        <option value="datum">📅 Nieuwste</option>
+        <option value="score">⭐️ Hoogste score</option>
+        <option value="favoriet">⭐️ Favorieten eerst</option>
+      </select>
+    </div>
 
     <!-- ✅ Strategieën lijst -->
     <div id="strategieLijst"></div>
