@@ -1,35 +1,45 @@
 <!DOCTYPE html>
 <html lang="nl">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>📊 Marktdata</title>
-    <link rel="stylesheet" href="css/styles.css">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>📊 Marktdata</title>
+  <link rel="stylesheet" href="css/styles.css" />
 </head>
 <body>
 
-    <h2>📊 Marktdata</h2>
+  <!-- ✅ Titel -->
+  <h2>📊 Marktdata</h2>
 
-    <p id="marketStatus" class="loading">📡 Data wordt geladen...</p>
+  <!-- ✅ Status -->
+  <p id="marketStatus" class="loading">📡 Data wordt geladen...</p>
 
-    <table>
-        <thead>
-            <tr>
-                <th>Asset</th>
-                <th>Open</th>
-                <th>High</th>
-                <th>Low</th>
-                <th>Close</th>
-                <th>24h Verandering</th>
-                <th>Marktkapitalisatie</th>
-                <th>Volume</th>
-            </tr>
-        </thead>
-        <tbody id="marketBody">
-            <!-- Marktdata wordt hier geladen -->
-        </tbody>
-    </table>
+  <!-- ✅ Score samenvatting -->
+  <div style="margin: 10px 0;">
+    <strong>Gemiddelde score:</strong> <span id="marketAvgScore">–</span> |
+    <strong>Advies:</strong> <span id="marketAdvice">⚖️ Neutraal</span>
+  </div>
 
-    <script src="js/market.js"></script> <!-- Verwijzing naar het JavaScript bestand -->
+  <!-- ✅ Markt Tabel -->
+  <table id="marketTable">
+    <thead>
+      <tr>
+        <th class="sortable" data-sort="symbol">Asset</th>
+        <th class="sortable" data-sort="price" title="Huidige prijs">💰 Prijs</th>
+        <th class="sortable" data-sort="change" title="Verandering t.o.v. 24u geleden">📉 24h %</th>
+        <th class="sortable" data-sort="volume" title="Volume in 24u">📊 Volume</th>
+        <th class="sortable" data-sort="rsi" title="Relative Strength Index">📈 RSI</th>
+        <th class="sortable" data-sort="ma" title="200 Moving Average">📏 200MA Positie</th>
+        <th class="sortable" data-sort="score" title="Technische score">🧠 Score</th>
+        <th>⏱️ Laatst geüpdatet</th>
+      </tr>
+    </thead>
+    <tbody id="marketBody">
+      <!-- ✅ Rijen worden dynamisch geladen -->
+    </tbody>
+  </table>
+
+  <!-- ✅ JS -->
+  <script type="module" src="js/market.js"></script>
 </body>
 </html>
