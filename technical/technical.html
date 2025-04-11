@@ -5,59 +5,63 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>📉 Technische Analyse</title>
 
-  <!-- ✅ CSS-bestand -->
+  <!-- ✅ CSS -->
   <link rel="stylesheet" href="css/styles.css" />
 
-  <!-- ✅ Meta -->
   <meta name="description" content="Live technische analyse van crypto assets met RSI, volume en 200MA.">
 </head>
 <body>
 
-  <h2>📉 Technische Analyse</h2>
+  <div class="technical-container">
+    <h2>📉 Technische Analyse</h2>
 
-  <!-- ✅ Bedieningsopties -->
-  <div class="controls">
-    <button id="addTechAssetBtn" class="btn-add" onclick="addTechRow()">➕ Asset toevoegen</button>
-    <button id="addTechnicalIndicatorBtn" class="btn-add" onclick="addTechIndicator()">➕ Indicator toevoegen</button>
+    <!-- ✅ Bedieningsopties -->
+    <div class="controls">
+      <input type="text" id="techSearch" placeholder="🔍 Zoek asset..." />
 
-    <!-- ✅ Timeframe dropdown -->
-    <select id="globalTimeframe" onchange="loadTechAnalysis()">
-      <option value="1hr">1H</option>
-      <option value="4hr" selected>4H</option>
-      <option value="1day">1D</option>
-      <option value="1week">1W</option>
-    </select>
+      <select id="techTimeframe">
+        <option value="1hr">1H</option>
+        <option value="4hr" selected>4H</option>
+        <option value="1day">1D</option>
+        <option value="1week">1W</option>
+      </select>
+
+      <button id="addTechAssetBtn" class="btn-add" onclick="addTechRow()">➕ Asset toevoegen</button>
+      <button id="addTechnicalIndicatorBtn" class="btn-add" onclick="addTechIndicator()">➕ Indicator toevoegen</button>
+    </div>
+
+    <!-- ✅ Laadindicator -->
+    <div id="techSpinner" class="spinner" style="display: none;">⏳ Bezig met laden...</div>
+
+    <!-- ✅ Tabel -->
+    <table id="analysisTable">
+      <thead>
+        <tr>
+          <th data-sort="symbol">Asset ⬍</th>
+          <th data-sort="rsi">RSI ⬍</th>
+          <th data-sort="volume">Volume ⬍</th>
+          <th data-sort="ma_200">200 MA ⬍</th>
+          <th data-sort="score">Score ⬍</th>
+          <th>Trend</th>
+          <th>Verwijderen</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td colspan="7" class="loading">📡 Data laden...</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <!-- ✅ Samenvatting -->
+    <h3>📊 Totale Technische Score: <span id="totalTechScore">N/A</span></h3>
+    <h3>📈 Technisch Advies: <span id="technicalAdvice">Neutraal</span></h3>
+    <p id="techStatus" class="loading">📡 Data laden...</p>
   </div>
-
-  <!-- ✅ Technische analyse tabel -->
-  <table id="analysisTable">
-    <thead>
-      <tr>
-        <th>Asset</th>
-        <th>RSI</th>
-        <th>Volume</th>
-        <th>200 MA</th>
-        <th>Score</th>
-        <th>Trend</th>
-        <th>Verwijderen</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr>
-        <td colspan="7" class="loading">📡 Data laden...</td>
-      </tr>
-    </tbody>
-  </table>
-
-  <!-- ✅ Analyse samenvatting -->
-  <h3>📊 Totale Technische Score: <span id="totalTechScore">N/A</span></h3>
-  <h3>📈 Technisch Advies: <span id="technicalAdvice">Neutraal</span></h3>
-  <p id="techStatus" class="loading">📡 Data laden...</p>
 
   <!-- ✅ Scripts -->
   <script type="module" src="config.js"></script>
-  <script type="module" src="js/onboarding-helper.js"></script> <!-- ✅ Toegevoegd -->
+  <script type="module" src="js/onboarding-helper.js"></script>
   <script type="module" src="js/technical.js"></script>
-
 </body>
 </html>
