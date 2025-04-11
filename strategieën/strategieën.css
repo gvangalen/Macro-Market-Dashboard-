@@ -12,54 +12,23 @@
 }
 
 /* ✅ Filters */
-.strategy-filters {
+.strategy-filters,
+.strategie-sorteer {
   display: flex;
   gap: 15px;
   margin-bottom: 20px;
   flex-wrap: wrap;
 }
 
-.strategy-filters select {
+.strategy-filters select,
+.strategie-sorteer select {
   padding: 8px 12px;
   border: 1px solid #ccc;
   border-radius: 8px;
   font-size: 14px;
 }
 
-/* ✅ Oude strategiekaarten */
-.strategy-card {
-  background: var(--bg-color, #fff);
-  color: var(--text-color, #000);
-  border-radius: 12px;
-  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.08);
-  padding: 20px;
-  margin-bottom: 20px;
-  transition: transform 0.2s ease;
-  border-left: 5px solid #34c759;
-}
-
-.strategy-card:hover {
-  transform: translateY(-4px);
-}
-
-.strategy-card h3 {
-  margin-top: 0;
-  font-size: 1.25rem;
-}
-
-.strategy-details {
-  font-size: 0.95rem;
-  line-height: 1.5;
-  margin-top: 10px;
-}
-
-.strategy-tags {
-  margin-top: 10px;
-  font-size: 0.85rem;
-  color: #888;
-}
-
-/* ✅ Nieuwe strategiekaarten in tabelstijl */
+/* ✅ Strategiekaarten */
 .strategie-kaart {
   background: var(--bg-color, #fff);
   border-radius: 12px;
@@ -68,6 +37,11 @@
   border: 1px solid #ddd;
   margin-bottom: 20px;
   font-size: 0.95rem;
+  transition: box-shadow 0.2s ease;
+}
+
+.strategie-kaart:hover {
+  box-shadow: 0 6px 14px rgba(0, 0, 0, 0.1);
 }
 
 .strategie-kaart table {
@@ -94,6 +68,90 @@
   border-bottom: none;
 }
 
+/* ✅ Knoppen binnen strategiekaart */
+.strategie-kaart button {
+  margin-left: 6px;
+  padding: 6px 10px;
+  font-size: 0.85rem;
+  border-radius: 6px;
+  border: none;
+  cursor: pointer;
+  font-weight: 500;
+  transition: all 0.2s ease;
+}
+
+.opslaan-btn {
+  background: #34c759;
+  color: white;
+}
+
+.opslaan-btn:hover {
+  background: #28a745;
+}
+
+.verwijder-btn {
+  background: #dc3545;
+  color: white;
+}
+
+.verwijder-btn:hover {
+  background: #b02a37;
+}
+
+.hergenereer-btn {
+  background: #007bff;
+  color: white;
+}
+
+.hergenereer-btn:hover {
+  background: #0062cc;
+}
+
+/* ✅ Inline velden */
+.strategie-kaart input,
+.strategie-kaart textarea {
+  width: 100%;
+  padding: 6px 10px;
+  font-size: 0.9rem;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  background: white;
+  color: #333;
+}
+
+.strategie-kaart textarea {
+  resize: vertical;
+  min-height: 60px;
+}
+
+/* ✅ Tooltip (bij 🛈) */
+.tooltip {
+  position: relative;
+  cursor: help;
+}
+
+.tooltip:hover::after {
+  content: attr(data-tooltip);
+  position: absolute;
+  left: 0;
+  top: 120%;
+  background: #333;
+  color: #fff;
+  padding: 6px 10px;
+  border-radius: 6px;
+  font-size: 13px;
+  white-space: pre-line;
+  z-index: 10;
+}
+
+/* ✅ Favoriet toggle */
+.favoriet-toggle {
+  font-size: 1.4rem;
+  cursor: pointer;
+  color: gold;
+  user-select: none;
+}
+
 /* ✅ Donkere modus */
 @media (prefers-color-scheme: dark) {
   :root {
@@ -101,11 +159,15 @@
     --text-color: #f5f5f5;
   }
 
-  .strategy-card,
-  .strategie-kaart {
+  body {
+    background: #121212;
+    color: var(--text-color);
+  }
+
+  .strategie-kaart,
+  .strategy-card {
     background: var(--bg-color);
     color: var(--text-color);
-    border-left-color: #0f0;
     border-color: #444;
   }
 
@@ -118,20 +180,24 @@
     border-bottom: 1px solid #444;
   }
 
-  .strategy-card:hover,
-  .strategie-kaart:hover {
-    box-shadow: 0 4px 12px rgba(255, 255, 255, 0.05);
+  input,
+  textarea,
+  select {
+    background: #2a2a2a;
+    color: #f5f5f5;
+    border: 1px solid #555;
   }
 }
 
 /* ✅ Responsief */
 @media (max-width: 768px) {
-  .strategy-card,
-  .strategie-kaart {
+  .strategie-kaart,
+  .strategy-card {
     padding: 16px;
   }
 
-  .strategy-filters {
+  .strategy-filters,
+  .strategie-sorteer {
     flex-direction: column;
     gap: 10px;
   }
@@ -142,11 +208,10 @@
   }
 }
 
-/* ✅ AI Strategie tools (knop + status) */
-.ai-strategie-tools {
-  margin: 30px 0;
+/* ✅ AI Strategie tools */
+.ai-strategie-gen {
   text-align: center;
-  transition: all 0.3s ease-in-out;
+  margin: 30px 0;
 }
 
 #genereerStrategieënBtn {
@@ -165,7 +230,7 @@
   background-color: #28a745;
 }
 
-/* ✅ Feedback blok */
+/* ✅ Status feedback */
 #genereerStatus {
   font-size: 0.95rem;
   margin-top: 15px;
@@ -177,13 +242,11 @@
   transition: all 0.4s ease;
 }
 
-/* ✅ Actieve statusblok fade-in */
 #genereerStatus.visible {
   opacity: 1;
   transform: translateY(0);
 }
 
-/* ✅ Status types met animatie */
 .status-loading {
   background-color: #f5f5f5;
   color: #444;
@@ -219,23 +282,3 @@
   0% { transform: rotate(0deg); }
   100% { transform: rotate(360deg); }
 }
-<style>
-.tooltip {
-  position: relative;
-  cursor: help;
-}
-
-.tooltip:hover::after {
-  content: attr(data-tooltip);
-  position: absolute;
-  left: 0;
-  top: 120%;
-  background: #333;
-  color: #fff;
-  padding: 6px 10px;
-  border-radius: 6px;
-  font-size: 13px;
-  white-space: pre-line;
-  z-index: 10;
-}
-</style>
