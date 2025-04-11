@@ -5,23 +5,58 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>📊 Macro Indicatoren</title>
   <link rel="stylesheet" href="styles.css">
+  <style>
+    .sortable:hover { cursor: pointer; text-decoration: underline; }
+    .bullish { color: #28a745; font-weight: bold; }
+    .bearish { color: #dc3545; font-weight: bold; }
+    .neutral { color: #6c757d; font-weight: bold; }
+    .macro-score[data-tooltip]:hover::after {
+      content: attr(data-tooltip);
+      position: absolute;
+      background: #333;
+      color: white;
+      padding: 6px 10px;
+      border-radius: 5px;
+      font-size: 12px;
+      white-space: pre;
+      top: 100%;
+      left: 0;
+      z-index: 100;
+    }
+    .macro-filters {
+      display: flex;
+      gap: 15px;
+      margin: 10px 0;
+      align-items: center;
+    }
+    @media (max-width: 768px) {
+      .macro-filters { flex-direction: column; align-items: flex-start; }
+    }
+  </style>
 </head>
 <body>
 
 <div class="macro-container">
   <h2>📊 Macro Indicatoren</h2>
 
-  <button class="btn-add" onclick="addMacroRow()">➕ Indicator toevoegen</button>
+  <!-- ✅ Filters -->
+  <div class="macro-filters">
+    <label for="macroFilter">🔍 Filter op naam:</label>
+    <input type="text" id="macroFilter" placeholder="bijv. fear, dxy..." />
 
+    <button class="btn-add" onclick="addMacroRow()">➕ Indicator toevoegen</button>
+  </div>
+
+  <!-- ✅ Tabel -->
   <table id="macroTable">
     <thead>
       <tr>
-        <th>Indicator</th>
+        <th class="sortable" onclick="sortMacroTable('name')">Indicator</th>
         <th>Huidig Niveau</th>
-        <th>Trend</th>
+        <th class="sortable" onclick="sortMacroTable('trend')">Trend</th>
         <th>Interpretatie</th>
         <th>Actie</th>
-        <th>Score</th>
+        <th class="sortable" onclick="sortMacroTable('score')">Score</th>
         <th>Verwijderen</th>
       </tr>
     </thead>
@@ -32,7 +67,7 @@
         <td id="fearGreedTrend" class="trend-cell">N/A</td>
         <td id="fearGreedInterpretation">N/A</td>
         <td id="fearGreedAction">N/A</td>
-        <td class="macro-score" id="fearGreedScore">-</td>
+        <td class="macro-score" id="fearGreedScore" data-tooltip="Score gebaseerd op extremen: <30 = -2, >70 = +2">-</td>
         <td><button class="btn-remove" onclick="removeRow(this)">❌</button></td>
       </tr>
       <tr>
@@ -41,7 +76,7 @@
         <td id="btcDominanceTrend" class="trend-cell">N/A</td>
         <td id="btcDominanceInterpretation">N/A</td>
         <td id="btcDominanceAction">N/A</td>
-        <td class="macro-score" id="btcDominanceScore">-</td>
+        <td class="macro-score" id="btcDominanceScore" data-tooltip="Score gebaseerd op drempels: 45/50/55">-</td>
         <td><button class="btn-remove" onclick="removeRow(this)">❌</button></td>
       </tr>
       <tr>
@@ -50,7 +85,7 @@
         <td id="dxyTrend" class="trend-cell">N/A</td>
         <td id="dxyInterpretation">N/A</td>
         <td id="dxyAction">N/A</td>
-        <td class="macro-score" id="dxyScore">-</td>
+        <td class="macro-score" id="dxyScore" data-tooltip="Lager is positiever: <100 = +2, >106 = -2">-</td>
         <td><button class="btn-remove" onclick="removeRow(this)">❌</button></td>
       </tr>
     </tbody>
@@ -61,127 +96,6 @@
   <p id="macroStatus" class="loading">📡 Data laden...</p>
 </div>
 
-<script type="module">
-  import { API_BASE_URL } from "../config.js";
-
-  const indicators = {
-    "fearGreed": { thresholds: [30, 50, 70], positive: true },
-    "btcDominance": { thresholds: [45, 50, 55], positive: true },
-    "dxy": { thresholds: [100, 103, 106], positive: false }
-  };
-
-  async function fetchMacroData() {
-    try {
-      const response = await fetch(`${API_BASE_URL}/macro_data`);
-      if (!response.ok) throw new Error("Fout bij ophalen macro-data");
-      const data = await response.json();
-
-      Object.keys(indicators).forEach(id => {
-        const value = data[id] ?? "N/A";
-        const { thresholds, positive } = indicators[id];
-        updateMacroIndicator(id, value, thresholds, positive);
-      });
-
-      updateMacroScore();
-      document.getElementById("macroStatus").textContent = "✅ Macrodata up-to-date";
-
-      markStepDone(3); // ✅ Onboarding stap 3 voltooid
-
-    } catch (error) {
-      console.error("❌ Macrodata ophalen mislukt:", error);
-      document.getElementById("macroStatus").textContent = "❌ Fout bij ophalen macro-data.";
-    }
-  }
-
-  function updateMacroIndicator(id, value, thresholds, positive) {
-    const el = document.getElementById(id);
-    const trendEl = document.getElementById(`${id}Trend`);
-    const interpEl = document.getElementById(`${id}Interpretation`);
-    const actionEl = document.getElementById(`${id}Action`);
-    const scoreEl = document.getElementById(`${id}Score`);
-
-    el.textContent = `${value}${id === "btcDominance" ? "%" : ""}`;
-    const score = calculateScore(value, thresholds, positive);
-    scoreEl.textContent = score;
-
-    const trend = score >= 1 ? "Bullish 📈" : score <= -1 ? "Bearish 📉" : "Neutraal ⚖️";
-    const interp = score >= 1 ? "Positief signaal" : score <= -1 ? "Negatief signaal" : "Geen duidelijke richting";
-    const action = score >= 1 ? "Overwegen om te kopen 🟢" : score <= -1 ? "Voorzichtigheid geboden 🔴" : "Geen actie nodig";
-
-    trendEl.textContent = trend;
-    interpEl.textContent = interp;
-    actionEl.textContent = action;
-
-    trendEl.classList.remove("bullish", "bearish", "neutral");
-    trendEl.classList.add(score >= 1 ? "bullish" : score <= -1 ? "bearish" : "neutral");
-  }
-
-  function calculateScore(value, thresholds, positive) {
-    if (isNaN(value)) return "N/A";
-    value = parseFloat(value);
-
-    return positive
-      ? value > thresholds[2] ? 2 : value > thresholds[1] ? 1 : value > thresholds[0] ? -1 : -2
-      : value < thresholds[0] ? 2 : value < thresholds[1] ? 1 : value < thresholds[2] ? -1 : -2;
-  }
-
-  function updateMacroScore() {
-    let total = 0, count = 0;
-    document.querySelectorAll(".macro-score").forEach(cell => {
-      const score = parseInt(cell.textContent);
-      if (!isNaN(score)) {
-        total += score;
-        count++;
-      }
-    });
-
-    const avg = count > 0 ? (total / count).toFixed(1) : "N/A";
-    document.getElementById("macroTotalScore").textContent = avg;
-    updateMacroAdvice(avg);
-  }
-
-  function updateMacroAdvice(score) {
-    const advice = score >= 1.5 ? "🟢 Bullish" : score <= -1.5 ? "🔴 Bearish" : "⚖️ Neutraal";
-    document.getElementById("macroAdvice").textContent = advice;
-  }
-
-  function addMacroRow() {
-    const table = document.getElementById("macroTable").getElementsByTagName('tbody')[0];
-    const newRow = table.insertRow();
-    newRow.innerHTML = `
-      <td><input type="text" placeholder="Naam Indicator"></td>
-      <td>Laden...</td>
-      <td>N/A</td>
-      <td>N/A</td>
-      <td>N/A</td>
-      <td class="macro-score">-</td>
-      <td><button class="btn-remove" onclick="removeRow(this)">❌</button></td>
-    `;
-  }
-
-  function removeRow(btn) {
-    const row = btn.parentNode.parentNode;
-    row.parentNode.removeChild(row);
-    updateMacroScore();
-  }
-
-  function markStepDone(step) {
-    const userId = localStorage.getItem("user_id");
-    if (!userId) return;
-
-    fetch(`${API_BASE_URL}/api/onboarding_progress/${userId}`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ step })
-    }).then(res => {
-      if (!res.ok) console.warn("⚠️ Stap niet bijgewerkt");
-    });
-  }
-
-  document.addEventListener("DOMContentLoaded", () => {
-    fetchMacroData();
-    setInterval(fetchMacroData, 60000);
-  });
-</script>
+<script type="module" src="js/macro.js"></script>
 </body>
 </html>
